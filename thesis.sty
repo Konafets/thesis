@@ -1,0 +1,384 @@
+% ********************************************************************
+% thesis.sty
+%
+% Copyright (C) 2012 Andr\'e Miede http://www.miede.de
+% Copyright (C) 2014 Stefano Kowalke
+%
+% License:
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 2 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; see the file COPYING.  If not, write to
+% the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+% Boston, MA 02111-1307, USA.
+%
+% *****************************************************************
+% *****************************************************************
+% Note:
+% This style file is inspired by the classicthesis.sty from Andr\'e Miede
+% which can be found at http://www.miede.de/index.php?page=classicthesis
+%
+% I modified the style slightly to fits my needs. The biggest change is that
+% my variant supports LuaLaTeX.
+% *******************************************************************
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis}[2013/11/22 v5.0 Typographic style for a classic-looking thesis]
+\RequirePackage{ifthen}
+\RequirePackage{verbatim}         % Provide the possibility for multi-line comments
+\RequirePackage{graphicx}         % Provide the possibility for multi-line comments
+\RequirePackage{caption}          % The caption package provides many ways to customise the captions in floating environments like figure and table
+\RequirePackage{subcaption}       % The package provides a means of using facilities analagous to those of the caption package, when writing captions for subfigures and the like
+\RequirePackage{tikz}             % Diagramme per Text beschreiben
+\RequirePackage{tikz-uml}         % UML Diagramme per Text beschreiben
+\RequirePackage{xstring}          % Abhängigkeit von tikz-uml
+\RequirePackage{calc}             % Abhängigkeit von tikz-uml
+\RequirePackage[draft]{microtype} % mikrotypographische Optimierungen. Moved
+\RequirePackage{pgfopts}          % This package is an add-on of the pgfkeys package for the management of packages and classes options.
+
+\newboolean{@drafting}            % Activate/Deactivate drafting informations
+\newboolean{@eulerchapternumbers} % use AMS Euler for chapter font (otherwise Palatino)
+\newboolean{@a5paper}             % use those tiny DIN A5 pages
+\newboolean{@minionpro}           % setup for minion pro font
+\newboolean{@eulermath}           % use awesome Euler fonts for math
+\newboolean{@beramono}            % toggle nice monospaced font (w/ bold) + pre-installed
+\newboolean{@linedheaders}        % chaper headers will have line above and beneath
+\newboolean{@layout}              % add a page to the document which shows the layout visually. Cant use in production mode
+\newboolean{@colophon}            % Loads the packages which are needed to create a nice colophon page
+\newboolean{@bettertable}         % Loads tabluarx package
+
+%---------
+% Options
+%---------
+\DeclareOption{drafting}{\setboolean{@drafting}{true}}
+\DeclareOption{eulerchapternumbers}{\setboolean{@eulerchapternumbers}{true}}
+\DeclareOption{a5paper}{\setboolean{@a5paper}{true}}
+\DeclareOption{minionpro}{\setboolean{@minionpro}{true}}
+\DeclareOption{eulermath}{\setboolean{@eulermath}{true}}
+\DeclareOption{beramono}{\setboolean{@beramono}{true}}
+\DeclareOption{linedheaders}{\setboolean{@linedheaders}{true}}
+\DeclareOption{layout}{\setboolean{@layout}{true}}
+\DeclareOption{colophon}{\setboolean{@colophon}{true}}
+\DeclareOption{bettertable}{\setboolean{@bettertable}{true}}
+\ProcessOptions\relax
+
+%---------------
+% Drafting mode
+%---------------
+\ifthenelse{\boolean{@drafting}}
+{%
+    \ifthenelse{\boolean{@layout}}
+    {
+    	\RequirePackage{layout}
+    }{\relax}%
+}{%
+    \ifthenelse{\boolean{@layout}}
+    {
+    	\setboolean{@layout}{false}%
+    }{\relax}%
+}
+
+%----------
+% Colophon
+%----------
+\ifthenelse{\boolean{@colophon}}
+{%
+    \RequirePackage{hologo}                        % Wird zum rendern des LaTeX und LuLaTeX "Logos" verwendet
+    \RequirePackage{ifluatex}                      % Testen ob LuLaTeX installiert ist
+
+    %------------------------------------------------
+    % Determine the current running version of LaTeX
+    %------------------------------------------------
+    \newcommand*{\InfoLaTeX}{%
+      \hologo{\fmtname}
+    }
+
+    %---------------------------------------------------
+    % Determine the current running version of LuaLaTeX
+    %---------------------------------------------------
+    \newcommand*{\InfoTeX}{%
+	    \ifluatex%
+		    \hologo{LuaTeX}-%
+      	    \begingroup
+			    \count@=\luatexversion
+			    \divide\count@ by 100 %
+			    \edef\x{\the\count@}%
+			    \count@=-\x\relax
+			    \multiply\count@ by 100 %
+			    \advance\count@ by \luatexversion
+			    \x.\the\count@.\luatexrevision
+		    \endgroup
+	    \fi%
+    }%
+}
+
+
+%-------------
+% Fancy Stuff
+%-------------
+\RequirePackage{textcase} % for \MakeTextUppercase
+
+\DeclareRobustCommand{\spacedallcaps}[1]{\textls[160]{\MakeTextUppercase{#1}}}%
+\DeclareRobustCommand{\spacedlowsmallcaps}[1]{\textls[80]{\scshape\MakeTextLowercase{#1}}}%
+
+
+%--------
+% Colors
+%--------
+\RequirePackage{xcolor}
+\definecolor{halfgray}{gray}{0.55} % chapter numbers will be semi transparent .5 .55 .6 .0
+
+%------------
+% Font stuff
+%------------
+
+% mikrotypographische Optimierungen
+\ifthenelse{\boolean{@drafting}}
+{% Drafting mode enabled
+    \PackageInfo{thesis}{Setting document in "Draft" mode.}%
+    \PassOptionsToPackage{draft}{microtype}
+}
+{% Drafting mode disabled
+    \PackageInfo{thesis}{Setting document in "Final" mode.}%
+    \PassOptionsToPackage{final}{microtype}
+}
+\RequirePackage{microtype}
+
+% specialists: MinionPro
+\ifthenelse{\boolean{@minionpro}}%
+{%
+    % in order have Euler math fonts work with Minion, special option is needed
+    \ifthenelse{\boolean{@eulermath}}%
+    {%
+        \PassOptionsToPackage{opticals,mathlf,onlytext}{MinionPro}%
+        \RequirePackage{MinionPro} %  opticals, fullfamily, osf
+    }{%
+        \PassOptionsToPackage{opticals,mathlf}{MinionPro}%
+        \RequirePackage{MinionPro} %  opticals, fullfamily, osf
+    }
+}{%
+    % default: Palatino
+    \PassOptionsToPackage{osf,sc}{mathpazo}%
+    \RequirePackage{mathpazo} % Palatino with real small caps and old style figures
+    \linespread{1.05} % a bit more for Palatino
+    %\setmainfont{ITC Goudy Sans LT Medium}
+}
+
+\ifthenelse{\boolean{@beramono}}%
+{%
+    \PassOptionsToPackage{scaled=0.85}{beramono}%
+    \RequirePackage{beramono}%
+}{%
+
+    \setmonofont[Scale=0.75]{Source Code Pro Light}
+    % put your own suitable typewriter font here
+    %\renewcommand{\ttdefault}{\rmdefault}
+}
+
+\ifthenelse{\boolean{@eulermath}}%
+{%
+    \PassOptionsToPackage{euler-digits}{eulervm}%
+    \RequirePackage{eulervm}% Euler math fonts
+}
+{\relax}%
+
+% Euler eurb10 / Palatino OSF pplr9d / Palatino SC pplrc9d
+% Latin Modern cork-lmr10 / Minion MinionPro-Regular-osf-t1
+% (MinionPro-SemiboldCapt-osf-t1 MinionPro-SemiboldDisp-osf-t1)
+\ifthenelse{\boolean{@eulerchapternumbers}}% font for the chapter numbers
+{%
+    \newfont{\chapterNumber}{eurb10 scaled 7000}%
+}{%
+    \newfont{\chapterNumber}{pplr9d scaled 7000}
+}
+
+%--------
+% Tables
+%--------
+\RequirePackage{tabularx}
+
+%-----------
+% Own Stuff
+%-----------
+% Disable single lines at the start of a paragraph (Schusterjungen)
+\clubpenalty = 10000
+
+% Disable single lines at the end of a paragraph (Hurenkinder)
+\widowpenalty = 10000
+\displaywidowpenalty = 10000 % formulas
+
+% Graffiti as in GKP's book "Concrete Mathematics"
+% thanks to Lorenzo Pantieri and Enrico Gregorio
+\def\graffito@setup{%
+   \slshape\footnotesize%
+   \parindent=0pt \lineskip=0pt \lineskiplimit=0pt %
+   \tolerance=2000 \hyphenpenalty=300 \exhyphenpenalty=300%
+   \doublehyphendemerits=100000%
+   \finalhyphendemerits=\doublehyphendemerits
+}
+
+%\DeclareRobustCommand{\graffito}[1]{%
+%    \marginpar[\graffito@setup\raggedleft\hspace{0pt}{#1}]%
+%    {\graffito@setup\raggedright\hspace{0pt}{#1}}%
+%}
+
+\let\oldmarginpar\marginpar
+\renewcommand{\marginpar}[1]{%
+    \oldmarginpar%
+    [\graffito@setup\raggedleft\hspace{0pt}{#1}]%
+    {\graffito@setup\raggedright\hspace{0pt}{#1}}%
+}
+
+% Enumeration environment with small caps
+\newenvironment{aenumerate}
+{%
+    \def\theenumi{%
+        \textsc{\alph{enumi}}%
+    }
+    \enumerate
+}
+{\endenumerate}
+
+
+%--------------------------
+% Seitenkopf und Seitenfuß
+%--------------------------
+\PassOptionsToPackage{automark}{scrpage2}
+\@ifpackageloaded{scrpage2}%
+{\relax}
+{
+	\RequirePackage{scrpage2} % provides headers and footers (KOMA Script)
+}
+
+\clearscrheadfoot
+\setheadsepline{0pt}
+\renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{#1}}{\spacedlowsmallcaps{#1}}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace\spacedlowsmallcaps{#1}}}
+\lehead{\mbox{\llap{\small\thepage\kern2em}\headmark\hfil}}
+\rohead{\mbox{\hfil{\headmark}\rlap{\small\kern2em\thepage}}}
+\renewcommand{\headfont}{\small}
+\ifthenelse{\boolean{@drafting}}
+{%
+    \RequirePackage{gitinfo}     % Stellt Information von Git wie SHA, Version und Commitdatum zur Verfügung.
+    \setkomafont{pagefoot}{%
+		\footnotesize\ttfamily
+	}
+
+	% Set the version informations from git to \chapterpagestyle and \pagestyle
+	\cfoot[Version: \gitVtags\ Commit: \gitAbbrevHash\ from \gitAuthorIsoDate]{Version: \gitVtags\ Commit: \gitAbbrevHash\ from \gitAuthorIsoDate}
+
+    \ifthenelse{\boolean{@layout}}
+    {
+    	\RequirePackage{layout}
+    }{\relax}%
+}{%
+    \ifthenelse{\boolean{@layout}}
+    {
+    	\setboolean{@layout}{false}%
+    }{\relax}%
+}
+
+\def\toc@heading{%
+	\chapter*{\contentsname}%chapters
+	\@mkboth{\spacedlowsmallcaps{\contentsname}}{\spacedlowsmallcaps{\contentsname}}
+}
+\pagestyle{scrheadings}
+
+%----------------------------------------------------------------
+% Layout of the chapter-, section-, subsection-, subsubsection-,
+% paragraph and description-headings
+%----------------------------------------------------------------
+\RequirePackage{titlesec}
+
+% chapters
+\ifthenelse{\boolean{@linedheaders}}%
+{% lines above and below, number right
+    \titleformat{\chapter}[display]
+        {\relax}{\raggedleft{\color{halfgray}\chapterNumber\thechapter} \\ }{0pt}%
+        {\titlerule\vspace*{.9\baselineskip}\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]%
+}{% something like Bringhurst
+    \titleformat{\chapter}[display]
+        {\relax}{\mbox{}\oldmarginpar{\vspace*{-3\baselineskip}\color{halfgray}\chapterNumber\thechapter}}{0pt}%
+        {\raggedright\spacedallcaps}[\normalsize\vspace*{.8\baselineskip}\titlerule]%
+}
+
+% sections \FloatBarrier
+\titleformat{\section}{\relax}{\textsc{\MakeTextLowercase{\thesection}}}{1em}{\spacedlowsmallcaps}
+
+% subsections
+\titleformat{\subsection}{\relax}{\textsc{\MakeTextLowercase{\thesubsection}}}{1em}{\normalsize\itshape}
+
+% subsubsections
+\titleformat{\subsubsection}{\relax}{\textsc{\MakeTextLowercase{\thesubsubsection}}}{1em}{\normalsize\itshape}
+
+% paragraphs
+\titleformat{\paragraph}[runin]{\normalfont\normalsize}{\theparagraph}{0pt}{\spacedlowsmallcaps}
+
+% descriptionlabels
+%\renewcommand{\descriptionlabel}[1]{\hspace*{\labelsep}\spacedlowsmallcaps{#1}}
+
+% spacing
+\titlespacing*{\chapter}{0pt}{1\baselineskip}{1.2\baselineskip}%
+
+\titlespacing*{\section}{0pt}{1.25\baselineskip}{1\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.25\baselineskip}{1\baselineskip}
+\titlespacing*{\paragraph}{0pt}{1\baselineskip}{1\baselineskip}
+
+%-----------------------
+% Size of the textblock
+%-----------------------
+\@ifpackageloaded{typearea}%
+{\relax}
+{%
+    \RequirePackage{typearea}%
+}
+\ifthenelse{\boolean{@a5paper}}%
+{% A5
+    \ifthenelse{\boolean{@minionpro}}%
+    {% Minion gets some extra sizes
+	    \PackageInfo{classicthesis}{A5 paper, MinionPro}%
+        \areaset[current]{278pt}{556pt}%
+	    \setlength{\marginparwidth}{5em}%
+    	\setlength{\marginparsep}{1.25em}%
+    }{% Palatino or other
+        \PackageInfo{classicthesis}{A5 paper, Palatino or other}%
+        \areaset[current]{288pt}{555pt}%
+        \setlength{\marginparwidth}{4em}%
+        \setlength{\marginparsep}{1.25em}%
+    }%
+}{% A4
+    \ifthenelse{\boolean{@minionpro}}%
+    {% Minion gets some extra sizes
+        \PackageInfo{classicthesis}{A4 paper, MinionPro}%
+        \areaset[current]{312pt}{684pt}% 609 + 33 + 42 head \the\footskip
+        \setlength{\marginparwidth}{7.5em}%
+        \setlength{\marginparsep}{2em}%
+    }
+    {% Palatino or other
+	    \PackageInfo{classicthesis}{A4 paper, Palatino or other}
+	    \areaset[current]{336pt}{750pt} % ~ 336 * factor 2 + 33 head + 42 \the\footskip
+%   	\areaset{336pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip 10pt
+		\setlength{\marginparwidth}{7em}%
+        \setlength{\marginparsep}{2em}%
+    }%
+}
+% Here are some suggestions for the text widths and heights:
+% Palatino 	10pt: 288--312pt | 609--657pt
+% Palatino 	11pt: 312--336pt | 657--705pt
+% Palatino 	12pt: 360--384pt | 768pt
+% Minion 	  10pt: 264--288pt | 561--609pt
+% Minion 	  11pt: 288--312pt | 609--657pt
+% Minion 	  12pt: 336pt      | 672pt
+% Libertine 10pt:
+% Libertine 11pt:
+% Libertine 12pt:
+% kpfonts 10pt:
+% kpfonts 11pt:
+% kpfonts 12pt:

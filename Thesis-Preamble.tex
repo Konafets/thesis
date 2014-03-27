@@ -1,0 +1,164 @@
+%-----------------------------------------------
+% Dateiname: Thesis-Preamble.tex
+% Autor    : Stefano Kowalke <blueduck@gmx.net>
+% Lizenz   : BSD
+%-----------------------------------------------
+
+%----------------------------------
+% Dokumentenklasse DINA4 einseitig
+%----------------------------------
+\documentclass[
+	fontsize    = 11pt,           % Die Schriftgröße
+	twoside     = false,          % scrbook hat per Default ein Zwei-Seitenlayout
+	parskip     = full,           % Steuert die Absätze. http://www.rrzn.uni-hannover.de/fileadmin/kurse/material/latex/scrguide.pdf Tabelle 3.7
+	headsepline,                  % Fügt eine Trennungslinie in den Seitenkopf
+	footnotes   = multiple,       % Fügt ein Komma zwischen den Indexzahlen bei aufeinanderfolgende Fußnoten ein
+	numbers     = noendperiod     % Keinen Punkt der letzten Gliederungsebene in der Überschrift  -> 1.2.1 statt 1.2.1.
+]{scrbook}
+
+\PassOptionsToPackage{
+	%layout,
+	drafting,
+    eulerchapternumbers,
+	eulermath,
+	colophon,
+	bettertable,
+    %minionpro,
+%	dottedtoc,
+}{thesis}
+
+
+%===============
+% Pakete laden
+%===============
+\usepackage{fontspec}                      % Wird von LuLaTeX benöigt und löst "fontenc" ab.
+\usepackage{polyglossia}                   % Wird von LuLaTeX benöigt und löst "babel" ab.
+\usepackage[german=quotes]{csquotes}       % Anführungszeichen global im Dokument steuern. Paket wird von "polyglossia" empfohlen.
+\usepackage[
+	backend=biber,                         % Benutzer biber zur Erstellung
+	bibwarn=true,                          % Warne, wenn das BiTex Format falsch ist
+	autolang=other,
+	style=authoryear,
+	bibstyle=iso-authoryear,
+]
+{biblatex}                                 % Nutze Biblatex zur Erstellung des Literaturverzeichnis
+\addbibresource{Bib/Bibliography.bib}      % Die Literatureinträge
+\usepackage{minted}                        % Sourcecode Highlighting. Dieses Package benötigt Python und Pygments 1.5. Version 1.6 macht Probleme mit gerade Anführungszeichen (') - es stellt sie als normale Anführungszeichen dar.
+\usepackage[punct-after=true]{fnpct}       % Ermöglicht das Setzen der Indexzahlen der Fußnoten hinter dem Punkt oder Komma. Hier ist es dafür gedacht die Option footnotes=multiple von KOMA wiederherzustellen, die durch das Hyperref Paket kaputt gegangen ist.
+\usepackage{hyperref}                      % Stellt Links in Schreibmaschinenschrift dar und legt einen Link über den Text.
+                                           % Dieses Package sollte als letztes aufgerufen werden, da es Problem mit Anderen geben könnte
+\usepackage[
+    xindy={language=german,codepage=din5007-utf8}, % Ruft Xindy zum Erstellen des Index in der deutschen Version auf
+    toc,                                   % Fügt die Glossare dem Inhaltsverzeichnis zu
+    acronym,                               % Erstellt ein neues Glossar mit dem Label "acronym"
+    nonumberlist,                          % Fügt die Seitenzahlen hinzu, auf denen der Eintrag vorkommt, nicht hinzu
+    nopostdot                              % Entferne den Punkt am Ende der Definition
+    ]{glossaries}                          % Erstellt Glossar und Abkürzungsverzeichnis. Laut der Dokumentation ist es ausdrücklich notwendig, dass es nach dem Package hyperref eingebunden werden muß
+\makeglossaries                            % Anweisung das Glossar zu erstellen
+
+%=================================================
+% Angaben zur Arbeit wie Titel und Name des Autor
+%=================================================
+\newcommand{\myTitle}{Integration der Datenbank-Abstraktionsschicht Doctrine2\xspace}
+\newcommand{\myTitleSecondLine}{ in das Content-Management-System TYPO3\xspace}
+%\newcommand{\mySubtitle}{Put your subtitle here\xspace}
+%\newcommand{\myDegree}{Put your degree here\xspace}
+\newcommand{\myName}{Stefan Kowalke\xspace}
+\newcommand{\myEMail}{<stefan.kowalke@stud.fh-flensburg.de>\xspace}
+\newcommand{\myMatricleNumber}{485366\xspace}
+\newcommand{\myProf}{Prof. Dr. Hans-Werner Lang\xspace}
+\newcommand{\myOtherProf}{Dipl. VK Tobias Hiep\xspace}
+%\newcommand{\mySupervisor}{Put name here\xspace}
+\newcommand{\myUni}{\uppercase{\large Fachhochschule Flensburg}\xspace}
+\newcommand{\myDepartment}{Angewandte Informatik - \xspace}
+%\newcommand{\myFaculty}{Put data here\xspace}
+\newcommand{\myMajor}{Medieninformatik\xspace}
+\newcommand{\myLocation}{Flensburg\xspace}
+\newcommand{\myTime}{März 2014\xspace}
+%\newcommand{\myVersion}{version 4.1\xspace}
+
+
+%----------------
+% Renew commands
+%----------------
+%\renewcommand*{\multfootsep}{,\nobreakspace}  % Fügt bei den hochgestellten Indexzahlen von Fußnoten ein Leerzeichen nach dem Komma ein
+\deffootnote{1em}{1em}{\thefootnotemark\ }    % Setzt die Indexzahlen in den Fußnoten etwas entfernt vom Text
+
+%---------------------------------------------------------------
+% Renew the citation style from parenthesis to square brackets:
+%---------------------------------------------------------------
+% (Popel 2007, S. 59–63) -> [Popel 2007, S. 59–63]
+% http://tex.stackexchange.com/questions/16765/biblatex-author-year-square-brackets
+%---------------------------------------------------------------
+\makeatletter
+\newrobustcmd*{\parentexttrack}[1]{%
+  \begingroup
+  \blx@blxinit
+  \blx@setsfcodes
+  \blx@bibopenparen#1\blx@bibcloseparen
+  \endgroup}
+
+\AtEveryCite{%
+  \let\parentext=\parentexttrack%
+  \let\bibopenparen=\bibopenbracket%
+  \let\bibcloseparen=\bibclosebracket}
+\makeatother
+
+%------------------
+% Eigene Kommandos
+%------------------
+
+
+%---------------------
+% Spracheinstellungen
+%---------------------
+\setdefaultlanguage[spelling=new]{german}   % Die Sprache muß vor dem Einbinden von dem Blindtextpackage eingestellt werden
+\usepackage{blindtext}                      % Erstellt schnell und einfach Blindtexte mit \Blindtext. Wird ausnahmsweise hier eingebunden
+
+
+%-------------------
+% Linkkonfiguration
+%-------------------
+\hypersetup
+{
+	pdftitle       = {\myTitle \myTitleSecondLine},
+	pdfauthor      = {\myName},
+	pdfsubject     = {\myTitle \myTitleSecondLine},
+	pdfcreator     = {\myName},
+	pdfkeywords    = {typo3} {dbal} {doctrine} {mysql} {postgres},
+	linktoc        = all,
+	colorlinks     = true,
+	linkcolor      = black,
+	citecolor      = black,
+	filecolor      = black,
+	urlcolor       = blue,
+}
+
+%----------
+% Grafiken
+%----------
+\graphicspath{ {gfx/} }
+
+%--------------
+% Code Listing
+%--------------
+%**************************************
+% Schrifteinstellungen für Codelistings
+%
+\setmonofont[Scale=0.75]{Source Code Pro Light}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+\newminted{php}{
+	linenos              = true,
+	xleftmargin          = 2em,
+	tabsize              = 4,
+	bgcolor              = bg,
+	funcnamehighlighting = true
+}
+
+\newminted{mysql}{
+	linenos     = true,
+	bgcolor     = bg,
+	xleftmargin = 2em
+}
+
+\usepackage{thesis}
