@@ -1,0 +1,55 @@
+%-----------------------------------------------
+% Dateiname: Introduction.tex
+% Autor    : Stefano Kowalke <blueduck@gmx.net>
+% Lizenz   : BSD
+%-----------------------------------------------
+\chapter{Einleitung}
+\label{ch:intro}
+Als sich auf den Developer Days 2006 das Entwicklerteam für einen Nachfolger der eben erst erschienen TYPO3 Version 4.0 formierte[News T3Org], war wohl keinem der dort Anwesenden klar wohin die Reise gehen würde - man ging anfänglich noch von einem Refactoring der schon vorhandenen Codebasis aus.
+
+In der Konzeptionsphase kristallisierte sich immer mehr heraus, dass es damit nicht getan sein würde. Der Nachfolger mit dem Codenamen "Phoenix" sollte nicht nur den zukünftigen Anforderungen des Web standhalten, sondern die Position der Version 4.0 weiter ausbauen. Das Enwicklerteam um Chefentwickler Robert Lemke entschloss sich die Version 5.0 des TYPO3 CMS komplett neu zu schreiben [Quelle anfügen] und merkte dabei, dass man als Entwickler bei der Programmierung von Webanwendungen immer wieder mit den gleichen Problemen wie Routing, die Erstellung und Validierung von Formularen und die Verbindung zur Datenbank konfrontiert wird.
+
+Die Idee eines - von dem Content-Managementsystem - unabhängigen PHP Frameworks war geboren, welches zunächst auf den Namen FLOW3 getauft wurde. Dies sollte die spätere Basis für TYPO3 5.0 werden und all die wiederkehrenden Aufgaben übernehmen. Das CMS TYPO3 sollte lediglich ein Modul (in der TYPO3 Terminologie Package genannt) darstellen.
+
+Schon in einer recht frühen Entwichlungsphase wurde sich dem Thema Persistenz gewidmet, die zu der Zeit noch als "Content Repository for Java Technology API (JCR)" in PHP implementiert [Quelle einfügen], später jedoch durch eine eigene Persistenzschicht ersetzt wurde. Schnell wurden jedoch klar, dass eine eigene Persistenzschicht zu wartungsintensiv und fehleranfällig war und zudem nicht trivial umzusetzen. Man entschloss sich aus diesem Gründen stattdessen als Persistenzschicht Doctrine zu integrieren. [Quelle anfügen]
+
+Die Persistenzschicht von TYPO3 Flow (wie es mittlerweile heißt) und dem Nachfolger TYPO3 Neos basiert nachwievor auf Doctrine2 ORM.
+
+Für Anwender von TYPO3 CMS stellte sich von Anfang an die Frage, ob eine Migration von dem 4.0er Versionszweig zu dem Nachfolger möglich ist und mit wieviel Aufwand dies verbunden sein würde. Aus diesem Grund trafen sich die Kernentwickler beider Teams 2008 in Berlin um sich über mögliche Migrationstragieen auszutauschen. Als Ergebnis dieses Treffens wurde das "Berlin Manifesto" [Quelle angeben] bekanntgegeben, welches mit kappen Worten feststellt, dass (Vergl.)
+\begin{itemize} 
+	\item TYPO3 v4 continues to be actively developed
+	\item v4 development will continue after the the release of v5
+	\item Future releases of v4 will see its features converge with those in TYPO3 v5
+	\item TYPO3 v5 will be the successor to TYPO3 v4
+	\item Migration of content from TYPO3 v4 to TYPO3 v5 will be easily possible
+	\item TYPO3 v5 will introduce many new concepts and ideas. Learning never stops and we'll help with adequate resources to ensure a smooth transition
+\end{itemize}
+
+Wobei mittlerweile die Auffassung durchgedrungen ist, dass TYPO3 Neos nicht der Nachfolger ist, als der das Projekt mal gestartet wurde, sondern wie TYPO3 Flow als Produkt der TYPO3 Familie angesehen wird. [Quellen angabe]
+
+An der Umsetzung dieser Punkte wurde sofort nach dem Treffen begonnen, in dem Teile des TYPO3 Flow Frameworks nach TYPO3 CMS zurückportiert wurden. Dies wurde zunächst als eigene Extension unter dem Namen Extbase veröffentlicht und ist mittlerweile ein fester Bestandteil von TYPO3 geworden. 
+
+Extbase stellt die API [Abkürzungsverzeichnis] bereit, mit der externe Entwickler die Funktionen von TYPO3 erweitern können ohne den Kern des CMS zu verändern zu müssen. Es ist als vollständiger Ersatz der bis dahin sogenannten PI-Base API [LINK ZU PI BASE] konzipiert worden und wird mittlerweile auch für die Systemextensions verwendet. Im Gegensatz zu PI-Base arbeitet Extbase streng Objekt-Orientiert und führt einige - bis dahin in TYPO3 CMS unbekannte - Programmierparadigma ein. Zu nennen ist hier sicherlich das Model-View-Controller (MVC) [Abkürzungsverzeichnis] Pattern, welches die Businesslogik von der Darstellung und der Datenspeicherung trennt. Extbase mappt die PHP Objekte selbsständig auf die Datenbank. Ein Entwickler muss nur noch in sehr seltenen Ausnahmefällen einen SQL Query von Hand schreiben. Das Repository stellt alle gebrüchlichen Queries wie \texttt{findById()}, \texttt{findAll()}, \texttt{findByName()}, ... bereit. 
+
+Extbase wurde von TYPO3 Flow zu der Zeit zurückportiert, als dieses gerade seine selbstgeschriebene Persistenzschicht im Einsatz hatte. Wenngleich Extbase immer weiterentwicklet wird, hat es bisher noch keine erfolgreiche Rückportierung der Doctrine2 Persistenzschicht aus TYPO3 Flow gegeben, was nicht unbedingt an den Mangel an Versuchen gelegen hat. [Einfügen der URL zu Benjamins Extbase Repository]. In Gesprächen und E-Mails mit dem Hauptentwickler des Doctrine2 Projekts, Benjamin Eberlei, wurde dem Autor mitgeteilt, dass die Integration von Doctrines Object Relational Mapping (ORM) [Abkürzungsverzeichnis] nicht realisierbar sei, da Extbase von dem ... Pattern ausgeht und Doctrine von dem ... Pattern. Dennoch ist der Wunsch nach einer Integration von Doctrine in TYPO3 CMS ein Wunsch der Community und tritt immer mal wieder in Form von Diskussionen auf der Mailingliste und einstündigen Prototypen zu Tage. Leider ist es dabei bisher geblieben und 
+es drängte sich dem Autor die Frage auf, ob sich zumindest die Datenbankabstraktionsschicht des Doctrine Projekts in TYPO3 CMS integrieren lässt. Nach ersten Tests und weiteren Gesprächen mit Mitgliedern der TYPO3 Community schien diese möglich zu sein, wenn auch niemand mehr mit einer erfolgreichen Integration rechnete. Zum anderen gab es immer noch den Punkt 3 des Berlin Manifesto, welcher besagt, dass es für eine leichte Migration erforderlich sein wird, dass sich beide Projekte immer mehr annäheren, was jedoch in der Realität bedeutet, dass sich TYPO3 CMS immer nach TYPO3 Flow bzw. TYPO3 Neos richten muß, um nicht den Anschluß zu verpassen.
+
+Neben diesen Punkten ist die Integration der Datenbankabstraktionsschicht von Doctrine auch aus dem Grund attraktiv, als dass bei einem Erfolg die derzeitige zum Teil selbstgeschriebene und zum Teil auf AdoDB basierende Extension DBAL [LINK] aus dem Core entfernt werden kann. Die Datenbankabstraktionsschicht AdoDB wird, wenn man den Seite auf SourceForge Glauben schenken darf, nicht mehr aktiv weiterentwickelt und ist aus diesem Grunde schon nicht mehr zukunfsicher. Dazu kommt, dass es momentat nur einen Entwickler in der TYPO3 Community gibt, der sich mit dieser Bibliothek auskennt.
+\section{Motivation}
+- AdoDB tot
+http://sourceforge.net/projects/adodb/files/
+- Berlin Manifesto
+- Wunsch der Community
+- Flow / Neos
+- Zukunfsicher
+- Grundlage für ORM
+Es haben schon einige versucht ORM in TYPO3 einzubauen, sind gescheitert. Mein Ansatz ist es, die Grundlage zu schaffen um danach ORM einbauen zu können.
+
+\section{Zielstellung}
+Das Ziel ist eine TYPO3 Extension, die die Schnittstelle für TYPO3 zu Doctrine DBAL bereitstellt. Diese Schnittstelle soll bietet Zugriff über die aktuelle API, sowie über die neue API zu Doctrine.
+
+Um die Funktionsweise zu demonstrieren, wird die Schnittstelle im Core benutzt, d. h. es wird ein TYPO3 Core dahingehend modifiziert, dass er die neue API nutzt.
+\section{Aufbau der Arbeit}
+Im ersten Teil erfolgt die Einleitung, inder auf die Idee und die dahinterliegende Motivation eingegangen wird. Im zweiten Teil wird die Ausgangssituation beschrieben und es werden die Werkzeuge näher beleuchtet, die notwendig sind um von der aktuellen Situation zum oben beschriebenen Ziel zu gelangen.
+
+Der dritte Teil ist die Beschreibung der technischen Umsetzung mit den unter 2. beschriebenen Werkzeugen. Er schließt mit einer Schritt-für-Schritt Anleitung ab, welche beschreibt, wie das ganze zu testen ist.

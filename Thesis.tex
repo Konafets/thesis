@@ -23,10 +23,16 @@
 		%Prelude
 		\include{FrontBackmatter/Titlepage}
 		\include{FrontBackmatter/Colophon}
+		\include{FrontBackmatter/Copyleft}
 		\include{FrontBackmatter/Abstract}
 		\tableofcontents
 	\mainmatter
-
+		\include{Chapters/Introduction}
+		\include{Chapters/Basics}
+		\include{Chapters/Prototype}
+		\include{Chapters/Outlook}
+	\backmatter
+		\include{Chapters/Conclusion}
 	\appendix
 		\printbibliography[title={Quellenverzeichnis}]
 		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
