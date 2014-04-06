@@ -25,14 +25,13 @@
 		\include{FrontBackmatter/Colophon}
 		\include{FrontBackmatter/Abstract}
 		\tableofcontents
-		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
-		\printglossary[type=main, title=Glossar,toctitle=Glossar]
-
 	\mainmatter
 
 	\appendix
 		\include{FrontBackmatter/Statement}
 		\printbibliography[title={Quellenverzeichnis}]
+		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
+		\printglossary[type=main, title=Glossar,toctitle=Glossar]
 		\listoftables
 		\listoffigures
 		\listoflistings
