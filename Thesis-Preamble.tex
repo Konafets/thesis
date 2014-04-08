@@ -57,6 +57,8 @@
     ]{glossaries}                          % Erstellt Glossar und Abkürzungsverzeichnis. Laut der Dokumentation ist es ausdrücklich notwendig, dass es nach dem Package hyperref eingebunden werden muß
 \makeglossaries                            % Anweisung das Glossar zu erstellen
 
+\newfontfamily\quotefont[Ligatures=TeX]{Palatino} % The font for the quotation marks at a quote
+
 %=================================================
 % Angaben zur Arbeit wie Titel und Name des Autor
 %=================================================
@@ -104,6 +106,49 @@
   \let\bibopenparen=\bibopenbracket%
   \let\bibcloseparen=\bibclosebracket}
 \makeatother
+
+%----------------------
+% Neue Quoting Umgebung
+%----------------------
+\newcommand*\quotesize{60} % if quote size changes, need a way to make shifts relative
+% Make commands for the quotes
+\newcommand*{\openquote}
+   {\tikz[remember picture,overlay,xshift=-4ex,yshift=-2.5ex]
+   \node (OQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}
+
+\newcommand*{\closequote}[1]
+  {\tikz[remember picture,overlay,xshift=4ex,yshift={#1}]
+   \node (CQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont''};}
+
+% select a colour for the shading
+\definecolor{shadecolor}{gray}{0.95}
+
+\newcommand*\shadedauthorformat{\emph} % define format for the author argument
+
+% Now a command to allow left, right and centre alignment of the author
+\newcommand*\authoralign[1]{%
+  \if#1l
+    \def\authorfill{}\def\quotefill{\hfill}
+  \else
+    \if#1r
+      \def\authorfill{\hfill}\def\quotefill{}
+    \else
+      \if#1c
+        \gdef\authorfill{\hfill}\def\quotefill{\hfill}
+      \else\typeout{Invalid option}
+      \fi
+    \fi
+  \fi}
+
+% wrap everything in its own environment which takes one argument (autor) and one 
+% optional argument [l, c or r]
+\newenvironment{shadequote}[2][l]%
+{\authoralign{#1}
+\ifblank{#2}
+   {\def\shadequoteauthor{}\def\yshift{-2ex}\def\quotefill{\hfill}}
+   {\def\shadequoteauthor{\par\authorfill\shadedauthorformat{#2}}\def\yshift{2ex}}
+\begin{snugshade}\begin{quote}\openquote}
+{\shadequoteauthor\quotefill\interlinepenalty=10000\end{quote}\end{snugshade}}
 
 %------------------
 % Eigene Kommandos
