@@ -158,7 +158,7 @@
     % in order have Euler math fonts work with Minion, special option is needed
     \ifthenelse{\boolean{@eulermath}}%
     {%
-        \PassOptionsToPackage{opticals,mathlf,onlytext}{MinionPro}%
+        %\PassOptionsToPackage{opticals,mathlf,onlytext}{MinionPro}%
         \RequirePackage{MinionPro} %  opticals, fullfamily, osf
     }{%
         \PassOptionsToPackage{opticals,mathlf}{MinionPro}%
@@ -167,9 +167,11 @@
 }{%
     % default: Palatino
     \PassOptionsToPackage{osf,sc}{mathpazo}%
-    \RequirePackage{mathpazo} % Palatino with real small caps and old style figures
-    \linespread{1.05} % a bit more for Palatino
+    %\RequirePackage{mathpazo} % Palatino with real small caps and old style figures
+    \RequirePackage{eulervm} % Palatino with real small caps and old style figures
+    \setmainfont[Ligatures=TeX]{Palatino}
     %\setmainfont{ITC Goudy Sans LT Medium}
+    \linespread{1.05} % a bit more for Palatino
 }
 
 \ifthenelse{\boolean{@beramono}}%
