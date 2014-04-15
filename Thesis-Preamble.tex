@@ -35,12 +35,13 @@
 \usepackage{fontspec}                      % Wird von LuLaTeX benöigt und löst "fontenc" ab.
 \usepackage{polyglossia}                   % Wird von LuLaTeX benöigt und löst "babel" ab.
 \usepackage[german=quotes]{csquotes}       % Anführungszeichen global im Dokument steuern. Paket wird von "polyglossia" empfohlen.
+
 \usepackage[
 	backend=biber,                         % Benutzer biber zur Erstellung
 	bibwarn=true,                          % Warne, wenn das BiTex Format falsch ist
 	autolang=other,
-	style=authoryear,
-	bibstyle=iso-authoryear,
+	style=alphabetic-verb,
+	bibstyle=alphabetic-verb,
 ]
 {biblatex}                                 % Nutze Biblatex zur Erstellung des Literaturverzeichnis
 \addbibresource{Bib/Bibliography.bib}      % Die Literatureinträge
