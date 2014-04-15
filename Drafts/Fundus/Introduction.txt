@@ -1,0 +1,23 @@
+Extbase führt per Definition einige - bis dahin in TYPO3 v4 unbekannte - Programmierparadigma ein. Als größter Unterschied zu dem PI-Based Ansatz ist hier sicherlich das Model-View-Controller (MVC) [Abkürzungsverzeichnis] Pattern zu nennen, welches die Businesslogik von der Darstellung und der Datenspeicherung trennt. Dabei werden die Daten im Model vorgehalten, der View gibt die Daten aus und der Controller steuert welche Daten ausgegeben werden. Das Model ist unabhänigig von der View, was bedeutet, dass die gleichen Daten auf verschiedene Weise ausgegeben werden können. Man denke hier an Meßdaten die zum einen als Tabelle über einer Listview dargestellt werden können oder als Diagramme mit einer entsprechenden View. 
+
+Das Model wird dabei von Extbase automatisch per Objektrelationaler Abbildung (ORM) auf die Datenbank gemappt, so dass ein Objekt eine Zeile darstellt und dessen Eigenschaften als Tabellenspalten gehandhabt werden. Das zum Einsatz kommende ORM ist Bestandteil der oben erwähnten selbstgeschriebenen Persistenzschicht von FLOW3, da Extbase zu der Zeit rückportiert wurde, als diese bei FLOW3 im Einsatz war.
+
+Obwohl es der Wunsch der Community ist, die in Extbase verwendete Persistenzschicht gegen Doctrine2 auszutauschen, was sich in Form von Posts auf der Maillingliste [Ausdruck und Link der Quelle einfügen] oder in Prototypen ausdrückt [Link der Quelle einfügen], ist dies bis heute noch nicht realisiert worden. Der Chefentwickler des Doctrine Projekts hat gegenüber dem Autor in einer Mail die unterschiedlichen Ansätze beider Projekte zum Ausdruck gebracht: 
+"Doctrine nutzt das Collection Interface, Extbase SplObjectStorage. Doctrine Associationen funktionieren semantisch anders als in Extbase, z.B. Inverse/Owning Side Requirements.
+Typo3 hat die Enabled/Deleted flags an m_n tabellen, sowie das start_date Konzept. Das gibts in Doctrine ORM alles evtl nur über Filter API, aber vermutlich nicht vollständig abbildbar. 
+Das betrifft aber alles nur das ORM, das Doctrine DBAL hinter Extbase zu setzen ist ein ganz anderes Abstraktionslevel." 
+Benjamin Eberlei via Mail [Email in Literatur anhängen und als Quelle anfügen]
+
+Zum jetzigen Zeitpunkt wird die Datenbankabstraktionsschicht  (DBAL) in TYPO3 durch eine Systemextension bereitstellt, die auf der externen Bibliothek AdoDB basiert, welche jedoch Anzeichen des Stillstands aufzeigt und davon ausgegangen werden kann, dass das Projekt nicht weiterentwickelt wird. [Linkt zu SourceForge]
+
+Anhand dieser Fakten wird ersichtlich, dass die Integration von Doctrine erstrebenswert ist, da dadurch die Abhängigkeit zu dem inaktiven Projekt AdoDB aufgelöst werden kann, gleichzeitig eine Integration von Doctrine ORM in Extbase nicht in der gegebenen Zeit, die für die Bearbeitung der Thesis zur Verfügung steht, zu realisieren ist. Aus diesem Grund wurde der Fokus stattdessen auf die Integration von Doctrine DBAL in TYPO3 gelegt, wodurch nicht nur Extbase von den Möglichkeiten eines DBAL profitieren kann, sondern der gesamte Core und somit alle Extensions die noch nicht mit Extbase erstellt worden sind.
+
+Ferner wird durch diesen Ansatz eine stabile Basis zu Verfügung gestellt, auf der eine zukünftige Integration der ORM Komponente von Doctrine aufbauen kann.
+
+Ziel dieser Thesis ist es einen funktionierenden Prototypen zu entwicklen, der zum einen aus einer Extension besteht, die für die Integration von Doctrine DBAL zuständig ist und zum anderen aus einem modifizierten TYPO3, welches die neue API, die mit der Extension eingeführt wird, beispielhaft benutzt.
+
+Im ersten Teil werden die eingesetzten Werkzeuge vorgestellt. Es wird erklärt warum diese und nicht andere eingesetzt worden sind und wie diese in Hinblick auf die Aufgabenstellung benutzt wurden.
+
+Der zweite Teil beschreibt die praktische Umsetzung und schließt mit einer Demonstrations wie der Prototyp getestet werden kann.
+
+Teil drei gibt einen Ausblick auf die weitere Verwendung des Quellcodes und des Prototypen, während Teil vier mit einem Fazit schließt.
