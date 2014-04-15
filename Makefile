@@ -5,7 +5,7 @@ SOURCES=$(MAINDOCUMENT).tex Makefile
 
 UMLFILES=$(wildcard gfx/uml/*.plantuml)
 
-all: uml latexmake
+all: latexmake
 
 verbose:
 	$(LATEXMK) --verbose
