@@ -2,7 +2,9 @@
 
 ## Geschichte
 
-TYPO3 ist eine modular aufgebautes Content-Management-System, welches vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt, jedoch im Jahr [JAHR] von ihm als Open Source veröffentlicht wurde. Es fand schnell eine aktive Anhängerschaft, die zum Teil aus Anwendern und zum Teil aus Programmieren bestand.
+TYPO3 ist (eine modular aufgebautes) Content-Management-System, welches vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
+
+Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 aktuell (16.April 2014)  [Anzahl von TYPO3 Zensus einfügen] Mal installiert.
 
 [Bild einfügen]
 
@@ -17,8 +19,6 @@ Systemextensions, sind für den Betrieb einer TYPO3 Instanz unverzichtbar - sie 
 Die Datenbank-API ist eine der vielen APIs, die TYPO3 anbietet. Sie wird vom Core\footnote{Programmkern - eine Teilmenge von unverzichtbaren Systemextensions} genutzt und es wird den Entwicklern von Extensions sehr empfohlen diese API in ihrem Code zu verwenden anstelle von eigenen Queries.\footnote{Es ist aktuell möglich komplett an der Datenbank API vorbei mit der Datenbank zu kommunizieren.}
 
 
-
-TYPO3 ist ein Content-Management-Sytem, welches vom Dänen Kaspar Skåhøj entwickelt und im Jahr [JAHR] als OpenSource veröffentlicht wurde. Es ist hauptsächlich in Deutschland, Österreich und der Schweiz verbreitet, wird jedoch auch darüber hinaus eingesetzt [Quelle Uni Eindhoven].
 
 Seine Mächtigkeit erhält TYPO3 durch dessen Erweiterbarkeit über Extensions, durch die das System nahezu jeder Anforderung angepasst werden kann. Aus diesem Grund wird es auch oft als Content-Management-Framework bezeichnet, da es Drittparteien möglich ist - wie in der Einleitung schon angeklungen ist - das System durch eigene Extension zu erweitern. Dem sind fast keine Grenzen gesetzt.
 
