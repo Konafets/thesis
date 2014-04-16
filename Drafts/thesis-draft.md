@@ -133,8 +133,13 @@ Im Anhang befindet sich neben den obligatorischen Verzeichnissen für Literatur 
   * Issues
 * PHPUnit
 * Verwendete IDE
-#### Erstellen der Extension über den Extension Builder
+* Erstellen der Extension über den Extension Builder
 
+Obwohl die TYPO3 Community sehr auf die Qualität des Codes achtet und es mittlerweile ca. 6458 UnitTests ausgeführt werden\footnote{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}, gab es nur eine handvoll an Unit Tests für die DatbaseConnection Klasse. 
+
+
+
+Es war vielmehr notwendig eine Ebene tiefer anzusetzen und Testcases für die Methoden der alten API zu definieren, die von den Methoden der neuen API erfüllt werden müssen. 
 
 # Schlussbetrachtung
 (My results are)

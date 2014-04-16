@@ -5,3 +5,5 @@
 * XCLASS Mechanismus
 * TCA Ablösung in Form von YAML / XML / JSON
 * Analyse der vorhandenen DBAL Extension
+* Anforderungen an den Prototyp
+  * alte API unterstützen 
