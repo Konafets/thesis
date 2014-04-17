@@ -63,8 +63,8 @@ Im Anhang befindet sich neben den obligatorischen Verzeichnissen für Literatur 
 
 
 
-# Grundlagen (besseren Titel finden)
-(Vorstellung der verwendeten Werkzeuge)
+# Grundlegendes / Grundlagen / Basics / 
+In diesem Kapitel werden die Werkzeuge vorgestellt, die im praktischen Teil verwendet wurden. Dies umfasst sowohl die verwendeten Programmbibliotheken, sowie die Infrastruktur für die \gls{qa} und schließt mit dem Editor ab.
 
 * warum TYPO3
 * warum Dotrine und nicht Propel
