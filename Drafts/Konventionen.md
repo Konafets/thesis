@@ -5,6 +5,11 @@ Konventionen
 * Der gezeigte Code folgt den Coding Guidelines des TYPO3 Projekts
 * TYPO3 wurde in der Version 6.2 beta6 benutzt (UPdate auf 6.2 stable)
 
+Verzeichnisse und Dateinamen werden kursiv dargestellt:
+
+* */typo3/systext/cms/*
+* *index.php*
+
 Ein wörtlichen Zitat wird in dieser Form gekennzeichnet:
 
 
