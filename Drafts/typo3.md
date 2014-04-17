@@ -1,12 +1,42 @@
-# TYPO3
+## TYPO3
 
-## Geschichte
+* in PHP geschrieben 
+* läuft auf einem Webserver (Apache oder Nginx)
+* standardmäßig MySQL Datenbank
+* kann über DBAL mit anderen DBs benutzt werden
+* geht DBAL überhaupt mit Version 6.2?
+* Extbase und pi-Based erwähnen
+* Unterschiede erklären
+* erklären warum eskeinen Sinn macht weder den einen noch den anderen Ansatz zu wählen
+* Low-Level
+* TCA
+* XCLASS
+* Aufbau von TYPO3 erklären
+  * Verzeichnisstruktur √
+  * einzelne Dateien (LocalConf, index.php, Symlinks) √
+* Aufbau von Extension erklären
+  * Verzeichnisstruktur
+  * Namenskonventionen
+  * was machen all die Dateien
 
-TYPO3 ist (eine modular aufgebautes) Content-Management-System, welches vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
 
-Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 aktuell (16.April 2014)  [Anzahl von TYPO3 Zensus einfügen] Mal installiert.
+### TYPO3 als Framework
 
-[Bild einfügen]
+### Geschichte
+
+TYPO3 ist Content-Management-System, welches vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
+
+[Timeline der TYPO3 Extensions einfügen]
+
+Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 mit dem heutigen Tag (\today)  [Anzahl von TYPO3 Zensus einfügen] Mal installiert.
+
+### Was ist ein CMS
+
+
+
+### TYPO3 als CMS
+
+[Skizze Backend / Frontend einfügen]
 
 Für das Grundverständnis ist es wichtig zu wissen, dass sich TYPO3 in ein Backend und ein Frontend unterteilt, wobei letzteres naturgemäß für die Webseitenbenutzer sichtbar. Das Backend wird zur Konfiguration, Administration und der Pflege der Website benutzt und ist deshalb nur für einen internen Personenkreis verfügbar. 
 
@@ -14,7 +44,7 @@ Aus der Perspektive eines Programmierers, ist TYPO3 ein Framework und wird desha
 
 Eine der großen Stärken des System ist seine nahezu unendliche Erweiterbarkeit durch ein Pluginsystem. Plugins werden in der TYPO3 Terminologie als Extensions bezeichnet, wobei man zwischen System- und „normalen“ Extensions unterscheidet. 
 
-Systemextensions, sind für den Betrieb einer TYPO3 Instanz unverzichtbar - sie \emph{sind} das System, während mit normalen Extensions solche bezeichnet werden, die aus der Community kommen. Diese sind im TYPO3 Extension Repository (TER) [Abkürzungsverzeichnis] \footnote{http://ter.de} zu finden.
+Systemextensions, sind für den Betrieb einer TYPO3 Instanz unverzichtbar - sie \emph{sind} das System, während mit normalen Extensions solche bezeichnet werden, die aus der Community kommen. Diese sind im TYPO3 \gls{ter}\footnote{http://typo3.org/extensions/repository/} zu finden.
 
 Die Datenbank-API ist eine der vielen APIs, die TYPO3 anbietet. Sie wird vom Core\footnote{Programmkern - eine Teilmenge von unverzichtbaren Systemextensions} genutzt und es wird den Entwicklern von Extensions sehr empfohlen diese API in ihrem Code zu verwenden anstelle von eigenen Queries.\footnote{Es ist aktuell möglich komplett an der Datenbank API vorbei mit der Datenbank zu kommunizieren.}
 
@@ -31,3 +61,79 @@ Backend / Frontend Konzept
 Das System unterscheidet zwischen einem Backend und einem Frontend, die strikt voneinander getrennt sind, jedoch beide auf die Datenbank zugreifen. Intern besteht das TYPO3 aus verschiedenen Systemextensions, die genauso aufgebaut sind, wie extene Extensions, mit dem Unterschied, dass es ohne sie nicht funktionieren würde. Sucht man den Kern von TYPO3, so findet man die Core Extension, die auch die Anbindung an die Datenbank bereitstellt.
 
 Interner Aufbau durch Extensions
+
+### Architektur und Aufbau von TYPO3
+
+In der im März 2014 erschienen Version 6.2 gab es viele grundlegende Änderungen am Dateisystem, die hier kurz erläutert werden. Dies schafft das notwendige Grundwissen um im späteren Verlauf die Zusammenhänge des Eingreifens des Prototypen in das System herzustellen.
+
+Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Webroot des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses *typo3/*.
+
+Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis *www.example.com* anzulegen, in dem die Verzeichnisse *fileadmin/*, *typo3conf/*, *typo3temp/* und *uploads/* anzulegen sind. Das Verzeichnis *typo3_src/* ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis *typo3/* ist ebenfalls ein Symlink, welcher auf über den Symlink *typo3_src* auf *typo3* zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink *typo3_src* auf das Installationverzeichnis der neuen Version "umgebogen" werden muss. 
+
+	.
+	├── Packages/
+	│   └── Libraries/
+	├── fileadmin/
+	├── typo3_src/ -> ../../typo3-6.2.0
+	├── typo3/ -> typo3_src/typo3
+	│   ├── contrib/
+	│   ├── ext/
+	│   ├── gfx/
+	│   ├── install/
+	│   ├── js/
+	│   ├── mod/
+	│   └── sysext/
+	├── typo3conf/
+	│   ├── ext/
+	│   │   ├── doctrine_dbal/
+	│   │   └── phpunit/
+	│   └── l10n/
+	├── typo3temp/
+	└── uploads/
+	    ├── media/
+	    ├── pics/
+	    ├── tf/
+	    └── tx_phpunit/
+	    
+Im folgenden werden die einzelen Verzeichnisse näher erklärt:
+
+| Verzeichnis         | Erklärung |
+|---------------------|-----------|
+| Packages/Libraries/ | Dieser Ordner ist neu und wurde von der Packageverwaltug von TYPO3 Flow übernommen. Ziel ist hier, dass die heuzutage als Extension bezeichnete Erweiterungen von TYPO3 in einer der nächsten Versionen als Packages umdefiniert werden. Im aktuellen Fall liegen hier externe Bibliotheken, die zum Bespiel mit Composer\footnote{Ein Kommandozeilen Programm um Abhängigkeiten in PHP Projekten aufzulösen. https://getcomposer.org/‎} installiert wurden, wie zum Beispiel Doctrine DBAL          |
+| fileadmin/          | In diesem Ordner werden Dateien gespeichert, die über die Website erreichbar und ausgeliefert werden sollen. Dazu zählen CSS-, Image, HTML-Template- und TypoScriptdateien. Allgemein also Dateien, die vom Websitebetreiber hochgeladen werden.
+| typo3/              | Der TYPO3 Kern
+|   contrib/          | Bibliotheken von Drittanbietern
+|   ext/              | Das Verzeichnis für globale Extensions
+|   gfx/              | Jegliche Grafiken die im Core verwendet werden
+|   install/          | Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Gründen der Abwärtskompatibiliät und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter *sysext/install/* zu finden.
+|   js/               | Hier befinden sich die JavaScript Bibliotheken, die von Core genutzt werden.
+|   mod/              | Enthält die Konfiguration der Hauptmodule des Backends (File, Help, System, Tools, User, Web).
+|   sysext/           | Enthält die Systemextensions. Letztendlich kann man sagen, dass dies der Core ist.
+| typo3conf/          | Lokale Extensions und die lokale Konfiguration
+| typo3temp/          | Temporäre Dateien
+| uploads/            | Dateien die vom Websitebesucher hochgeladen werden - zum Beispiel über ein Formular.
+
+Im Verzeichnis *www.example.com* muss noch ein Symlink *index.php* angelegt werden, welcher auf *typo3_src/index.php* zeigt.
+
+Unter *www.example.com/typo3conf/* befindet sich die Datei *LocalConfiguration.php*. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
+
+* Debug Mode
+* Sicherheitslevel für den Login (Fronend und Backend)
+* das Passwort für das Installtool (mit MD5 und Salt gehasht)
+* die Zugangsdaten zur Datenbank (Benutzername, Password, Datenbankname, Socket, …)
+* Einstellungen zum Caching
+* Titel der Website
+* Einstellungen zum Erzeugen von Graphiken
+
+Die Einstellungen zur Datenbank werden im praktischen Teil näher beleuchtet.
+
+### Extensions
+
+Extensions sind funktionale Erweiterungen, welche in System-, globale\footnote{Das Feature von globalen Extension funktioniert immer noch, wird jedoch nur noch vereinzelt genutzt und es gibt Bestrebungen es ganz zu entfernen. Da sie außerdem nicht zum weiteren Verständis der Arbeit benötigt werden, wurden sie hier nur der Vollständigkeit halber erwähnt.} und lokale Extensions unterteilt werden. 
+
+#### Einteilung
+
+Systemextension werden mit dem System mitgeliefert und befinden sich ausschließlich im Ordner *typo3/sysext/*. Sie werden nochmals unterteilt in jene, die für den Betrieb von TYPO3 unabdingbar sind und solche die nicht zwangsläufig installiert sein müssen, jedoch wichtige Funktionen beisteuern. Die Extension DBAL ist solch eine Erweiterung, auf die im Kapitel \ref{extDBAL} näher eingegangen wird.
+
+Mit dem Begriff "Extension" ist jede andere Extension gemeint, auf die die oben genannten Bedingungen nicht zutreffen. Lokale Extension werden im Ordner *typo3conf/ext/* und globale Extensions im Ordner *typo3/ext* installiert.
+
