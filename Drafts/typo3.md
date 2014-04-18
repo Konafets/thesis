@@ -19,12 +19,24 @@
   * Namenskonventionen
   * was machen all die Dateien
 
+Die Frage was TYPO3 eigentlich ist, ist gar nicht so einfach zu beanworten, da es dabei auf die Sichweise ankommt. Allgemein wird es als Content-Management-System bezeichnet. Da es sich um den Inhalt von Webseiten kümmert, kann gesagt werden, dass TYPO3 ein Web Content Management System ist (WCMS). Fragt man das TYPO3 Marketing Team, so würde man wohl die Antwort erhalten, dass TYPO3 ein Enterprise Content Management System ist, da es vorwiegend für umfangreiche Webprojekte von Unternehmen eingesetzt wird, anstatt als Basis für die Webvisitenkarte.
 
-### TYPO3 als Framework
+Schaut man in den Quellcode einer TYPO3 Website, so sieht man in der Regel diesen HTML Kommentar:
+
+    <!-- 
+	    This website is powered by TYPO3 - inspiring people to share!
+	    TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.
+	    TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions are copyright of their respective owners.
+	    Information and contribution at http://typo3.org/
+    -->
+    
+Aus der Sicht seines Erfinders ist TYPO3 ein Content Managment Framework. 
+
+In diesen Kapitel wird erklärt warum all diese Bezeichnungen auf TYPO3 zutreffen.
 
 ### Geschichte
 
-TYPO3 ist Content-Management-System, welches vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
+TYPO3 wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
 
 [Timeline der TYPO3 Extensions einfügen]
 
@@ -32,6 +44,9 @@ Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 mit dem he
 
 ### Was ist ein CMS
 
+### Was ist ein Framework
+
+### TYPO3 als Framework
 
 
 ### TYPO3 als CMS
