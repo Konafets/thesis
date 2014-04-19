@@ -19,24 +19,15 @@
   * Namenskonventionen
   * was machen all die Dateien
 
-Die Frage was TYPO3 eigentlich ist, ist gar nicht so einfach zu beanworten, da es dabei auf die Sichweise ankommt. Allgemein wird es als Content-Management-System bezeichnet. Da es sich um den Inhalt von Webseiten kümmert, kann gesagt werden, dass TYPO3 ein Web Content Management System ist (WCMS). Fragt man das TYPO3 Marketing Team, so würde man wohl die Antwort erhalten, dass TYPO3 ein Enterprise Content Management System ist, da es vorwiegend für umfangreiche Webprojekte von Unternehmen eingesetzt wird, anstatt als Basis für die Webvisitenkarte.
+Content-Management-System, Web-Content-Managentsystem, Enterprise-Content-Management-System oder Content-Management-Framework. 
 
-Schaut man in den Quellcode einer TYPO3 Website, so sieht man in der Regel diesen HTML Kommentar:
+In diesen Kapitel werden diese Begriffe erläutert und in welchen Bezug sie zu TYPO3 stehen.
 
-    <!-- 
-	    This website is powered by TYPO3 - inspiring people to share!
-	    TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.
-	    TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions are copyright of their respective owners.
-	    Information and contribution at http://typo3.org/
-    -->
-    
-Aus der Sicht seines Erfinders ist TYPO3 ein Content Managment Framework. 
-
-In diesen Kapitel wird erklärt warum all diese Bezeichnungen auf TYPO3 zutreffen.
 
 ### Geschichte
+TYPO3 ist ein TYPO3 ist ein \gls{wcms} Web Content Management-System (WCMS) und wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt - im Jahr 2000 von ihm unter der \gls{gnu2} veröffentlich. Dadurch wurde es einer breiten Öffentlichkeit bekannt und fand weltweit Beachtung. 
 
-TYPO3 wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
+Im April 2007 hat sich Skårhøjs aus dem Projekt zurückgezogen um die Entwicklung in die Hände einer neuen Generation zu geben. Projektleiter des CMS ist Oliver Hader; für TYPO3 Flow and TYPO3 Neos Robert Lemke. 
 
 \startchronology[startyear=1995, stopyear=2015]
 	\chronoevent{1997}{Beginn der Entwicklung}
@@ -46,16 +37,19 @@ TYPO3 wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt w
 	\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
 \stopchronology
 
-Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 mit dem heutigen Tag (\today)  [Anzahl von TYPO3 Zensus einfügen] Mal installiert.
+Hinter der Marke TYPO3 steht keine Firma, sondern alle Projekte werden allein von der Community betreut und weiterentwickelt.
 
-### Was ist ein CMS
+Laut der Website TYPO3 Census\footnote{http://t3census.org} existierten am 07.04.2014 weltweit 208.561 TYPO3 Installationen. 
 
-### Was ist ein Framework
-
-### TYPO3 als Framework
-
+In der Literatur und auf der Projektseite von TYPO3\footnote{http://typo3.org/} findet sich noch der Begriff \gls{ecms} Enterprise Content Management-System (ECMS), was auf den Einsatz von TYPO3 in großen Projekten hinweisen soll.
 
 ### TYPO3 als CMS
+\cite[Seite 2]{Content-Management-Systeme (CMS) sind Anwendungen, die das Erstellen, die Kontrolle, die Freigabe, die Publikation, die Archivierung und die Individualisierung von Inhalten im Inter-, Intra oder Extranet ermöglichen. Sie sind darauf ausgelegt einerseits dem Anwender einen einfachen Zugang zum Publikationsprozess zu verschaffen und anderseits eine systemtechnische Grundlage für die Verwaltung darzustellen.}
+
+Die Frage was TYPO3 eigentlich ist, ist gar nicht so einfach zu beanworten, da es dabei auf die Sichweise ankommt. Allgemein wird es als Content-Management-System bezeichnet. Da es sich um den Inhalt von Webseiten kümmert, kann gesagt werden, dass TYPO3 ein Web Content Management System ist (WCMS). Fragt man das TYPO3 Marketing Team, so würde man wohl die Antwort erhalten, dass TYPO3 ein Enterprise Content Management System ist, da es vorwiegend für umfangreiche Webprojekte von Unternehmen eingesetzt wird, anstatt als Basis für die Webvisitenkarte.
+
+
+
 
 [Skizze Backend / Frontend einfügen]
 
@@ -81,7 +75,21 @@ Backend / Frontend Konzept
 
 Das System unterscheidet zwischen einem Backend und einem Frontend, die strikt voneinander getrennt sind, jedoch beide auf die Datenbank zugreifen. Intern besteht das TYPO3 aus verschiedenen Systemextensions, die genauso aufgebaut sind, wie extene Extensions, mit dem Unterschied, dass es ohne sie nicht funktionieren würde. Sucht man den Kern von TYPO3, so findet man die Core Extension, die auch die Anbindung an die Datenbank bereitstellt.
 
-Interner Aufbau durch Extensions
+### Was ist ein Framework
+
+### TYPO3 als Framework
+Schaut man in den Quellcode einer TYPO3 Website, so sieht man in der Regel diesen HTML Kommentar:
+
+    <!-- 
+	    This website is powered by TYPO3 - inspiring people to share!
+	    TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.
+	    TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions are copyright of their respective owners.
+	    Information and contribution at http://typo3.org/
+    -->
+    
+Aus der Sicht seines Erfinders ist TYPO3 ein Content Managment Framework. 
+
+
 
 ### Architektur und Aufbau von TYPO3
 
@@ -158,3 +166,4 @@ Systemextension werden mit dem System mitgeliefert und befinden sich ausschließ
 
 Mit dem Begriff "Extension" ist jede andere Extension gemeint, auf die die oben genannten Bedingungen nicht zutreffen. Lokale Extension werden im Ordner *typo3conf/ext/* und globale Extensions im Ordner *typo3/ext* installiert.
 
+#### Interner Aufbau durch Extensions
