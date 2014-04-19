@@ -38,7 +38,13 @@ In diesen Kapitel wird erklärt warum all diese Bezeichnungen auf TYPO3 zutreffe
 
 TYPO3 wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt wurde. Im Jahr [JAHR] veröffentlichte es Skårhøj unter der \gls{gnu2}, wordurch es einer breiten Öffentlichkeit bekannt wurde und recht schnell Anhänger fand. Bis zum Rückzug Skårhøjs aus dem Projekt im Jahr [Jahr einfügen] wurde das System unter seiner Leitung mit Hilfe vieler tausend freiwilliger Programmierer weiterentwickelt. Aktuell wird es von den Active Contributern entwickelt. Projektleiter des CMS ist Oliver Hader.
 
-[Timeline der TYPO3 Extensions einfügen]
+\startchronology[startyear=1995, stopyear=2015]
+	\chronoevent{1997}{Beginn der Entwicklung}
+	\chronoevent[markdepth=45pt]{2001}{Version 3.0}
+	\chronoevent{2006}{Versoin 4.0}
+	\chronoevent[markdepth=25pt]{2011}{Versoin 4.5 LTS}
+	\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
+\stopchronology
 
 Laut der Website TYPO3 Census\footnote{http://t3census.org} ist TYPO3 mit dem heutigen Tag (\today)  [Anzahl von TYPO3 Zensus einfügen] Mal installiert.
 
