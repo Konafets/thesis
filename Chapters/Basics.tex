@@ -6,35 +6,63 @@
 \chapter{Grundlagen}
 \label{ch:basics}
 
-\section{Ausgangssituation}
+%\section{Ausgangssituation}
 
-\section{LAMP Stack}
-	\subsection{Apache 2}
-	\subsection{MySQL}
-	\subsection{PostgreSQL}
-	\subsection{PHP}
+%\section{LAMP Stack}
+	%\subsection{Apache 2}
+	%\subsection{MySQL}
+	%\subsection{PostgreSQL}
+	%\subsection{PHP}
 	
 \section{TYPO3}
-	\begin{itemize}
-		\item Geschichte
-		\startchronology[startyear=1995, stopyear=2015]
-		\chronoevent{1997}{Beginn der Entwicklung}
-		\chronoevent[markdepth=45pt]{2001}{Version 3.0}
-		\chronoevent{2006}{Versoin 4.0}
-		\chronoevent[markdepth=25pt]{2011}{Versoin 4.5 LTS}
-		\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
-		\stopchronology
-		Gegründet von und wann \\
-		Communtiy driven
-		Assoc
-		CodeSprints
-		Verbreitung
-		\item Abgrenzung Backend / Frontent
+	\subsection{Geschichte}
+TYPO3 CMS ist ein \gls{wcms} und wurde von dem dänischen Programmierer Kaspar Skårhøj im Jahr 1997 zunächst für seine Kunden entwickelt - im Jahr 2000 von ihm unter der \gls{gpl2} veröffentlicht. Dadurch fand es weltweit Beachtung und erreichte eine breite Öffentlichkeit. Laut der Website T3Census\footnote{http://t3census.info/} gab es am 7. April 2014 208561 Installationen von TYPO3 CMS.
+\\
+\\
+		\begin{figure}[h!]
+			\startchronology[startyear=1995, stopyear=2015]
+			\chronoevent{1997}{Beginn der Entwicklung}
+			\chronoevent[markdepth=45pt]{2001}{Version 3.0}
+			\chronoevent{2006}{Versoin 4.0}
+			\chronoevent[markdepth=25pt]{2011}{Versoin 4.5 LTS}
+			\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
+			\stopchronology
+			\caption{Zeitachse der TYPO3 Entwicklung}
+		\end{figure}
+
+Im Jahr 2012 entschied sich das Projekt zu einer Änderung in der Namesgebung:
+\begin{itemize}
+  \item aus TYPO3 v4\footnote{Damit ist das von Skårhøj entwickelte \gls{cms} gemeint, welches den 4.x Zweig des Projekts darstellt.} wurde TYPO3 CMS
+  \item aus FLOW3 wurde TYPO3 Flow
+  \item und aus TYPO3 5.0 / TYPO3 Phoenix wurde TYPO3 Neos
+\end{itemize}
+
+Diese Änderung wurde notwendig, da schon länger abzusehen war, dass TYPO3 Phoenix nicht den Nachfolger von TYPO3 v4 darstellt. Somit war die Entwicklung von TYPO3 v4 in dem Versionszweig 4.x gefangen und es konnten keine neuen Features eingebaut oder veraltete Funktionen entfernt werden. Durch dieses neue Schema bekommt der Name "TYPO3" die Bedeutung einer Dachmarke zuteil, während "TYPO3 CMS", "TYPO3 Flow" und "TYPO3 Neos" Produkte innerhalb der TYPO3 Familie darstellen. Im weiteren Verlauf dieser Arbeit werden ausschließlich die neuen Namen verwendet.
+
+Heute kümmert sich ein Team um die Entwicklung von TYPO3 CMS und eines um TYPO3 Flow und TYPO3 Neos. Dahinter steht keine Firma, wie es bei anderen Open Source Projekten wie Drupal (Acquia) oder Wordpress (Automattic) vorzufinden ist, sondern die \gls{t3assoc}. Die \gls{t3assoc} ist ein gemeinnütziger Verein und wurde 2004 von Kaspar Skårhøj und anderen Entwicklern gegründet um als Anlaufstelle für Spenden zu dienen, die die langfristige Entwicklung von TYPO3 sicherstellen sollen. Die Spenden werden in Form von Mitgliedsbeiträgen erhoben.\footnote{http://association.typo3.org/}
+
+\subsection{Definition}
+TYPO3 ist ein klassisches \gls{cms}, welches auf die Erstellung, die Bearbeitung und das Publizieren von Inhalten im Intra- oder Internet spezialisiert ist und es somit per Definition zu einem \gls{wcms} macht.
+
+Daneben findet man auch die Bezeichnung \gls{ecms}\footnote{http://www.typo3.org}, was als Hinweis auf den Einsatz des Systems für mittel- bis große Webprojekte dient.
+
+Als letztes sei noch erwähnt, dass TYPO3 ebenso zu den \gls{cmf} gezählt werden kann, da es dem Entwickler verschiedene \gls{api}s zur Verfügung stellt. Dieser Begriff findet sich unter anderen in einem Kommentar im – von TYPO3 erzeugten – HTML-Code:
+\begin{minted}[mathescape]{html}
+<!-- 
+  This website is powered by TYPO3 - inspiring people to share!
+  TYPO3 is a free open source Content Management Framework
+  initially created by Kasper Skaarhoj and licensed under GNU/GPL.
+  TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions
+  are copyright of their respective owners.
+  Information and contribution at http://typo3.org/
+-->
+\end{minted}
+
+		Abgrenzung Backend / Frontent
 		Skizze mit Backend / Frontend / Datenbank bei erwähnung der Caches. Diese jedoch sind zu vernachlässigen, da
 		Fokus auf der Datenbank lag.
-		\item Zugriff auf die Datenbank
+		Zugriff auf die Datenbank
 		Klassische Datenbankanwendung -> Hinten Daten rein, vorne Daten raus
-	\end{itemize}
 \section{Doctrine 2 DBAL}
 	\subsection{Beschreibung}
 	\subsection{Abgrenzung zum ORM}
