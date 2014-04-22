@@ -1,99 +1,101 @@
 ## TYPO3
-
-* in PHP geschrieben 
-* läuft auf einem Webserver (Apache oder Nginx)
-* standardmäßig MySQL Datenbank
-* kann über DBAL mit anderen DBs benutzt werden
-* geht DBAL überhaupt mit Version 6.2?
-* Extbase und pi-Based erwähnen
-* Unterschiede erklären
-* erklären warum eskeinen Sinn macht weder den einen noch den anderen Ansatz zu wählen
-* Low-Level
-* TCA
-* XCLASS
-* Aufbau von TYPO3 erklären
-  * Verzeichnisstruktur √
-  * einzelne Dateien (LocalConf, index.php, Symlinks) √
-* Aufbau von Extension erklären
-  * Verzeichnisstruktur
-  * Namenskonventionen
-  * was machen all die Dateien
-
 Content-Management-System, Web-Content-Managentsystem, Enterprise-Content-Management-System oder Content-Management-Framework. 
 
 In diesen Kapitel werden diese Begriffe erläutert und in welchen Bezug sie zu TYPO3 stehen.
 
+TYPO3 CMS ist ein \gls{wcms} und wurde von dem dänischen Programmierer Kaspar Skårhøj im Jahr 1997 zunächst für seine Kunden entwickelt - im Jahr 2000 von ihm unter der \gls{gpl2} veröffentlicht. Dadurch fand es weltweit Beachtung und erreichte eine breite Öffentlichkeit. Laut der Website T3Census\footnote{http://t3census.info/} gab es am 7. April 208561 Installationen von TYPO3 CMS.
+\\
+\\
+    \begin{figure}[h]
+			\startchronology[startyear=1995, stopyear=2015]
+			\chronoevent{1997}{Beginn der Entwicklung}
+			\chronoevent[markdepth=45pt]{2001}{Version 3.0}
+			\chronoevent{2006}{Versoin 4.0}
+			\chronoevent[markdepth=25pt]{2011}{Versoin 4.5 LTS}
+			\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
+			\stopchronology
+			\caption{Zeitachse der TYPO3 Entwicklung}
+		\end{figure}
 
-### Geschichte
-TYPO3 ist ein TYPO3 ist ein \gls{wcms} Web Content Management-System (WCMS) und wurde vom Dänen Kaspar Skårhøj zunächst für seine Kunden entwickelt - im Jahr 2000 von ihm unter der \gls{gnu2} veröffentlich. Dadurch wurde es einer breiten Öffentlichkeit bekannt und fand weltweit Beachtung. 
+Im Jahr 2012 entschied sich das Projekt zu einer Änderung in der Namesgebung. Bis zu dem Zeitpunkt gab es die Projekte:
 
-Im April 2007 hat sich Skårhøjs aus dem Projekt zurückgezogen um die Entwicklung in die Hände einer neuen Generation zu geben. Projektleiter des CMS ist Oliver Hader; für TYPO3 Flow and TYPO3 Neos Robert Lemke. 
+\begin{itemize}
+  \item TYPO3 v4 \footnote{TYPO3 stellt dabei das bis dahin bekannte, von Skårhøj entwickelte \gls{cms} dar, welches den 4.x Zweig des Projekts darstellt.}
+  \item FLOW3
+  \item TYPO3 5.0 bzw. TYPO3 Phoenix
+\end{itemize}
 
-\startchronology[startyear=1995, stopyear=2015]
-	\chronoevent{1997}{Beginn der Entwicklung}
-	\chronoevent[markdepth=45pt]{2001}{Version 3.0}
-	\chronoevent{2006}{Versoin 4.0}
-	\chronoevent[markdepth=25pt]{2011}{Versoin 4.5 LTS}
-	\chronoevent[markdepth=55pt]{2014}{Version 6.2 LTS}
-\stopchronology
+Eine Änderung wurde notwendig, da schon länger abzusehen war, dass TYPO3 Phoenix nicht den Nachfolger von TYPO3 v4 darstellen würde. Somit war die Entwicklung von TYPO3 v4 in dem Versionszweig 4.x gefangen und konnte keine neuen Features einbauen oder veraltete Funktionen entfernen.
 
-Hinter der Marke TYPO3 steht keine Firma, sondern alle Projekte werden allein von der Community betreut und weiterentwickelt.
+Durch das neue Namesschema bekommt der Name TYPO3 die Bedeutung einer Dachmarke während TYPO3 v4, FLOW3 und TYPO3 Phoenix Produkte darstellen. Die neue Namen im Einzelnen:
 
-Laut der Website TYPO3 Census\footnote{http://t3census.org} existierten am 07.04.2014 weltweit 208.561 TYPO3 Installationen. 
+\begin{itemize}
+	\item aus TYPO3 v4 wird TYPO3 CMS
+	\item aus FLOW3 wird TYPO3 Flow 
+	\item und aus TYPO3 5.0 / TYPO3 Phoenix wird TYPO3 Neos
+\end{itemize}
 
-In der Literatur und auf der Projektseite von TYPO3\footnote{http://typo3.org/} findet sich noch der Begriff \gls{ecms} Enterprise Content Management-System (ECMS), was auf den Einsatz von TYPO3 in großen Projekten hinweisen soll.
+Im weiteren Verlauf dieser Arbeit werden ausschließlich die neuen Namen verwendet.
 
-### TYPO3 als CMS
-\cite[Seite 2]{Content-Management-Systeme (CMS) sind Anwendungen, die das Erstellen, die Kontrolle, die Freigabe, die Publikation, die Archivierung und die Individualisierung von Inhalten im Inter-, Intra oder Extranet ermöglichen. Sie sind darauf ausgelegt einerseits dem Anwender einen einfachen Zugang zum Publikationsprozess zu verschaffen und anderseits eine systemtechnische Grundlage für die Verwaltung darzustellen.}
+Heute kümmert sich je ein Team um die Entwicklung von TYPO3 CMS und eines um TYPO3 Flow und TYPO3 Neos. Dahinter steht keine Firma, wie es bei anderen Open Source Projekten wie Drupal (Acquia) oder Wordpress (Automattic) vorzufinden ist, sonderen die \gls{t3assoc} TYPO3 Association (T3Assoc). Die \gls{t3assoc} ist ein gemeinnütziger Verein und wurde 2004 von Kaspar Skårhøj und andern Entwicklern gegründet um als Anlaufstelle für Spenden zu dienen, die die langfristige Entwicklung von TYPO3 sicherstellen sollen. Die Spenden werden in Form von Mitgliedsbeiträgen erhoben.\footnote{http://association.typo3.org/}
 
-Die Frage was TYPO3 eigentlich ist, ist gar nicht so einfach zu beanworten, da es dabei auf die Sichweise ankommt. Allgemein wird es als Content-Management-System bezeichnet. Da es sich um den Inhalt von Webseiten kümmert, kann gesagt werden, dass TYPO3 ein Web Content Management System ist (WCMS). Fragt man das TYPO3 Marketing Team, so würde man wohl die Antwort erhalten, dass TYPO3 ein Enterprise Content Management System ist, da es vorwiegend für umfangreiche Webprojekte von Unternehmen eingesetzt wird, anstatt als Basis für die Webvisitenkarte.
+### Definition
 
+Das System ist ein klassisches \gls{cms}, welches auf die Erstellung, die Bearbeitung und das Publizieren von Inhalten im Intra- oder Internet spezialisiert ist, was es somit per Definition zu einem \gls{wcms} macht.
 
+Daneben wird TYPO3 auch als \gls{ecms} bezeichnet\footnote{http://www.typo3.org}, was als Hinweis auf den Einsatz des Systems für mittel- bis große Webprojekte dient.
 
-
-[Skizze Backend / Frontend einfügen]
-
-Für das Grundverständnis ist es wichtig zu wissen, dass sich TYPO3 in ein Backend und ein Frontend unterteilt, wobei letzteres naturgemäß für die Webseitenbenutzer sichtbar. Das Backend wird zur Konfiguration, Administration und der Pflege der Website benutzt und ist deshalb nur für einen internen Personenkreis verfügbar. 
-
-Aus der Perspektive eines Programmierers, ist TYPO3 ein Framework und wird deshalb auch als Content-Manangement-Framework (CMF) [Abkürzungsverzeichnis] bezeichnet. 
-
-Eine der großen Stärken des System ist seine nahezu unendliche Erweiterbarkeit durch ein Pluginsystem. Plugins werden in der TYPO3 Terminologie als Extensions bezeichnet, wobei man zwischen System- und „normalen“ Extensions unterscheidet. 
-
-Systemextensions, sind für den Betrieb einer TYPO3 Instanz unverzichtbar - sie \emph{sind} das System, während mit normalen Extensions solche bezeichnet werden, die aus der Community kommen. Diese sind im TYPO3 \gls{ter}\footnote{http://typo3.org/extensions/repository/} zu finden.
-
-Die Datenbank-API ist eine der vielen APIs, die TYPO3 anbietet. Sie wird vom Core\footnote{Programmkern - eine Teilmenge von unverzichtbaren Systemextensions} genutzt und es wird den Entwicklern von Extensions sehr empfohlen diese API in ihrem Code zu verwenden anstelle von eigenen Queries.\footnote{Es ist aktuell möglich komplett an der Datenbank API vorbei mit der Datenbank zu kommunizieren.}
-
-
-
-Seine Mächtigkeit erhält TYPO3 durch dessen Erweiterbarkeit über Extensions, durch die das System nahezu jeder Anforderung angepasst werden kann. Aus diesem Grund wird es auch oft als Content-Management-Framework bezeichnet, da es Drittparteien möglich ist - wie in der Einleitung schon angeklungen ist - das System durch eigene Extension zu erweitern. Dem sind fast keine Grenzen gesetzt.
-
-TYPO3 ist eine klassische Datenbankanwendung, welche die Trennung von Inhalt, Struktur und Design befolgt, in dem es die Inhalte in einer Datenbank speichert, die Struktur in HTML Templates und das Design durch CSS Styles vorhält. 
-
-Backend / Frontend Konzept
-
-[Bild einfügen]
-
-Das System unterscheidet zwischen einem Backend und einem Frontend, die strikt voneinander getrennt sind, jedoch beide auf die Datenbank zugreifen. Intern besteht das TYPO3 aus verschiedenen Systemextensions, die genauso aufgebaut sind, wie extene Extensions, mit dem Unterschied, dass es ohne sie nicht funktionieren würde. Sucht man den Kern von TYPO3, so findet man die Core Extension, die auch die Anbindung an die Datenbank bereitstellt.
-
-### Was ist ein Framework
-
-### TYPO3 als Framework
-Schaut man in den Quellcode einer TYPO3 Website, so sieht man in der Regel diesen HTML Kommentar:
-
-    <!-- 
-	    This website is powered by TYPO3 - inspiring people to share!
-	    TYPO3 is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.
-	    TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions are copyright of their respective owners.
-	    Information and contribution at http://typo3.org/
-    -->
-    
-Aus der Sicht seines Erfinders ist TYPO3 ein Content Managment Framework. 
-
-
+TYPO3 stellt zudem verschiedene \gls{api}s bereit, wodurch es auch als \gls{cmf} bezeichnet wird:
+		
+\begin{minted}{html}
+<!-- 
+  This website is powered by TYPO3 - inspiring people to share!
+  TYPO3 is a free open source Content Management Framework
+  initially created by Kasper Skaarhoj and licensed under GNU/GPL.
+  TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions
+  are copyright of their respective owners.
+  Information and contribution at http://typo3.org/
+-->
+\end{minted}
 
 ### Architektur und Aufbau von TYPO3
 
-In der im März 2014 erschienen Version 6.2 gab es viele grundlegende Änderungen am Dateisystem, die hier kurz erläutert werden. Dies schafft das notwendige Grundwissen um im späteren Verlauf die Zusammenhänge des Eingreifens des Prototypen in das System herzustellen.
+Im folgenden werden die grundlegenden Konzepte von TYPO3 CMS vorgestellt. Dort wo es für das weitere Verständis notwenig ist, wird tiefer in das Thema eingestiegen. Ansonsten werden die Konzepte lediglich angerissen um einen generellen Überblick zu erhalten.
+
+#### Webstack als Basis
+
+TYPO3 CMS wurde in PHP - basierend auf dem Konzept der Objektorientierung - geschrieben und ist damit auf jeder Platform lauffähig, die über einem PHP Interpreter verfügt. Die Version 6.2 von TYPO3 CMS benötigt mindestens PHP 5.3.7.
+
+PHP bildet zusammen mit einem Apache Webserver und einer MySQL Datenbank den sogenannten Webstack, der abhängig von dem eingesetzten Betriebssystem MAMP (OSX / \bfseries{M}ac), LAMP (\bfseries{L}inux) oder WAMP (\bfseries{W}indows) heißt.
+
+In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension [Glossar] können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel [KAPITEL zur Analyse von ext:DBAL einfügen].
+
+
+#### Ansichtssache
+
+Aus Anwendersicht teilt sich TYPO3 in zwei Bereiche:
+
+\begin{itemize}
+    \item das Backend\\
+          stellt die Administrationsoberfläche dar. Hier erstellen und verändern Redaktuere die Inhalte während Administratoren das System von hier aus konfigurieren
+    \item das Frontend\\
+          stellt die Website dar, die ein Besucher zu Gesicht bekommt.
+\end{itemze}
+(vgl. \cite[S. 5]{book:dulepovTypo32008)
+
+[Skizze Backend / Frontend einfügen]
+
+
+#### Der Systemkern und die APIs
+TYPO3 CMS besteht aus einem Systemkern, der lediglich grundlegende Funktionen zur Datenbank-, Datei- und Benutzerverwaltung zu Verfügung stellt. Dieser Kern ist nicht monolithisch aufgebaut, sondern besteht aus Systemextensions. (vgl. \cite[S. 32]{book:laborenzTypo32006})
+
+Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten APIs, wird als die "TYPO3 API" bezeichnet. Diese kann - analog zum Backend / Frontend Konzept - in eine Backend API und eine Frontend API unterteilt werden kann. Die Aufgabe der Frontend API ist die Zusammenführung der getrennt vorliegenden Bestandteile (Inhalt, Struktur und Layout) aus der Datenbank oder dem Cache zu einer HTML-Seite. Die Backend API stellt Funktionen zur Erstellung und Bearbeitung von Inhalten zur Verfügung. (vgl. \cite[S. 5 ff.]{book:dulepovTypo32008})
+
+Die APIs, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet \cite[S. 5 ff.]{book:dulepovTypo32008} als "Common"-API. Die Funktionen der Common-APi werden von allen anderen APIs genutzt. Ein Beispiel dafür stellt die Datenbank API dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren \footnote{CRUD - \bfseries{C}reate, \bfseries{R}etrieve, \bfseries{U}pdate und \bfseries{D}elete) von Datensätzen bereitzustellen hat. Würde man je eine Datenbank API für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundanter Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
+
+Auf die aktuelle Datenbank-API wird in [KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
+
+#### Verzeichnisstruktur
 
 Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Webroot des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses *typo3/*.
 
@@ -166,4 +168,31 @@ Systemextension werden mit dem System mitgeliefert und befinden sich ausschließ
 
 Mit dem Begriff "Extension" ist jede andere Extension gemeint, auf die die oben genannten Bedingungen nicht zutreffen. Lokale Extension werden im Ordner *typo3conf/ext/* und globale Extensions im Ordner *typo3/ext* installiert.
 
-#### Interner Aufbau durch Extensions
+#### Verzeichnisstruktur
+
+#### XCLASS
+
+#### TCA
+
+* Interner Aufbau durch Extensions √
+* in PHP geschrieben √
+* läuft auf einem Webserver (Apache oder Nginx) √
+* standardmäßig MySQL Datenbank √
+* kann über DBAL mit anderen DBs benutzt werden √
+* geht DBAL überhaupt mit Version 6.2?
+* Extbase und pi-Based erwähnen
+* Unterschiede erklären
+* erklären warum eskeinen Sinn macht weder den einen noch den anderen Ansatz zu wählen
+* Low-Level
+* TCA
+* XCLASS
+* Aufbau von TYPO3 erklären
+  * Frontend / Backend √
+  * Core √
+  * Verzeichnisstruktur √
+  * einzelne Dateien (LocalConf, index.php, Symlinks) √
+* Aufbau von Extension erklären
+  * Verzeichnisstruktur
+  * Namenskonventionen
+  * was machen all die Dateien
+

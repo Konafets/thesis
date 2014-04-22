@@ -48,7 +48,7 @@ Daneben findet man auch die Bezeichnung \gls{ecms}\footnote{http://www.typo3.org
 
 Als letztes sei noch erwähnt, dass TYPO3 ebenso zu den \gls{cmf} gezählt werden kann, da es dem Entwickler verschiedene \gls{api}s zur Verfügung stellt. Dieser Begriff findet sich unter anderen in einem Kommentar im – von TYPO3 erzeugten – HTML-Code:
 \begin{minted}[mathescape]{html}
-<!-- 
+<!--
   This website is powered by TYPO3 - inspiring people to share!
   TYPO3 is a free open source Content Management Framework
   initially created by Kasper Skaarhoj and licensed under GNU/GPL.
@@ -57,6 +57,123 @@ Als letztes sei noch erwähnt, dass TYPO3 ebenso zu den \gls{cmf} gezählt werde
   Information and contribution at http://typo3.org/
 -->
 \end{minted}
+
+\subsection{Architektur und Aufbau von TYPO3}
+Im folgenden werden die grundlegenden Konzepte von TYPO3 CMS vorgestellt. Dort wo es für das weitere Verständnis notwendig ist, wird tiefer in das Thema eingestiegen. Ansonsten werden die Konzepte lediglich angerissen um einen generellen Überblick zu erhalten.
+
+\subsubsection{Webstack als Basis}
+
+TYPO3 CMS wurde in PHP - basierend auf dem Konzept der Objektorientierung - geschrieben und ist damit auf jeder Platform lauffähig, die über einem PHP Interpreter verfügt. Die Version 6.2 von TYPO3 CMS benötigt mindestens PHP 5.3.7.
+
+PHP bildet zusammen mit einem Apache Webserver und einer MySQL Datenbank den sogenannten Webstack, der abhängig von dem eingesetzten Betriebssystem MAMP (OSX / {\bfseries M}ac), LAMP ({\bfseries L}inux) oder WAMP ({\bfseries W}indows) heißt.
+
+In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension [Glossar] können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel [Kgls{api}TEL zur Analyse von ext:DBAL einfügen].
+
+\subsubsection{Ansichtssache}
+Aus Anwendersicht teilt sich TYPO3 in zwei Bereiche:
+
+\begin{itemize}
+    \item das Backend\\
+          stellt die Administrationsoberfläche dar. Hier erstellen und verändern Redaktuere die Inhalte während Administratoren das System von hier aus konfigurieren
+    \item das Frontend\\
+          stellt die Website dar, die ein Besucher zu Gesicht bekommt.
+\end{itemize}
+(vgl. \cite[S. 5]{book:dulepovTypo32008})
+
+%[Skizze Backend / Frontend einfügen]
+
+
+\subsubsection{Der Systemkern und die \gls{api}s}
+TYPO3 CMS besteht aus einem Systemkern, der lediglich grundlegende Funktionen zur Datenbank-, Datei- und Benutzerverwaltung zu Verfügung stellt. Dieser Kern ist nicht monolithisch aufgebaut, sondern besteht aus Systemextensions. (vgl. \cite[S. 32]{book:laborenzTypo32006})
+
+Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten \gls{api}s, wird als die "TYPO3 \gls{api}" bezeichnet. Diese kann - analog zum Backend / Frontend Konzept - in eine Backend \gls{api} und eine Frontend \gls{api} unterteilt werden kann. Die Aufgabe der Frontend \gls{api} ist die Zusammenführung der getrennt vorliegenden Bestandteile (Inhalt, Struktur und Layout) aus der Datenbank oder dem Cache zu einer HTML-Seite. Die Backend \gls{api} stellt Funktionen zur Erstellung und Bearbeitung von Inhalten zur Verfügung. (vgl. \cite[S. 5 ff.]{book:dulepovTypo32008})
+
+Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet \cite[S. 5 ff.]{book:dulepovTypo32008} als "Common"-\gls{api}. Die Funktionen der Common-APi werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundanter Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
+
+Auf die aktuelle Datenbank-\gls{api} wird in [KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
+
+\subsubsection{Verzeichnisstruktur}
+
+Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses \textit{typo3/}.
+
+Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \textit{www.example.com} anzulegen, in dem die Verzeichnisse \textit{fileadmin/}, \textit{typo3conf/}, \textit{typo3temp/} und \textit{uploads/} anzulegen sind. Das Verzeichnis \textit{typo3\_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis \textit{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \textit{typo3\_src} auf \textit{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \textit{typo3\_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss.
+
+\begin{Verbatim}[samepage=true]
+.
+├── Packages/
+│   └── Libraries/
+├── fileadmin/
+├── typo3_src/ -> ../../typo3-6.2.0
+├── typo3/ -> typo3_src/typo3
+│   ├── contrib/
+│   ├── ext/
+│   ├── gfx/
+│   ├── install/
+│   ├── js/
+│   ├── mod/
+│   └── sysext/
+├── typo3conf/
+│   ├── ext/
+│   │   ├── doctrine_dbal/
+│   │   └── phpunit/
+│   └── l10n/
+├── typo3temp/
+└── uploads/
+    ├── media/
+    ├── pics/
+    ├── tf/
+    └── tx_phpunit/
+\end{Verbatim}
+
+Im folgenden werden die einzelnen Verzeichnisse näher erklärt:
+
+\begin{tabularx}{\textwidth}{|X|X|}
+	\hline
+	Verzeichnis & Erklärung\\
+	\hline
+	Packages/Libraries/ & Dieser Ordner wurde von der von TYPO3 Flow übernommen. In einer der nächsten Versionen sollen hier die Extensions gespeichert werden. Im aktuellen Fall liegen hier externe Bibliotheken, die mit Composer\footnote{Ein Kommandozeilen Programm, um Abhängigkeiten in PHP Projekten aufzulösen https://getcomposer.org/} installiert wurden, wie zum Beispiel Doctrine\\
+	\hline
+	fileadmin/ & In diesem Ordner werden Dateien gespeichert, die über die Website erreichbar und ausgeliefert werden sollen. Dazu zählen CSS-, Image, HTML-Template- und TypoScriptdateien. Allgemein also Dateien, die vom Websitebetreiber hochgeladen werden.\\
+	\hline
+	typo3/ & Der TYPO3 Kern\\
+	\hline
+	contrib/ & Bibliotheken von Drittanbietern\\
+	\hline
+	  ext/ & Das Verzeichnis für globale Extensions \\
+	\hline
+	  gfx/ & Jegliche Grafiken, die im Core verwendet werden \\
+	\hline
+	  install/ & Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Kompatibilitätsgründen und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter \textit{sysext/install/} zu finden\\
+	\hline
+	  js/ & Hier befinden sich die JavaScript Bibliotheken, die von Core genutzt werden.\\
+	\hline
+	  mod/ & Enthält die Konfiguration der Hauptmodule des Backends (File, Help, System, Tools, User, Web).\\
+	\hline
+	  sysext/ & Enthält die Systemextensions.\\
+	\hline
+	typo3conf/ & Lokale Extensions und die lokale Konfiguration\\
+	\hline
+	typo3temp/ & Temporäre Dateien\\
+	\hline
+	uploads/ & Dateien die vom Websitebesucher hochgeladen werden - zum Beispiel über ein Formular.\\
+	\hline
+\end{tabularx}
+
+Im Verzeichnis \textit{www.example.com} muss noch ein Symlink \textit{index.php} angelegt werden, welcher auf \textit{typo3\_src/index.php} zeigt.
+
+Unter \textit{www.example.com/typo3conf/} befindet sich die Datei \textit{LocalConfiguration.php}. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
+
+\begin{itemize}
+	\item Debug Mode
+	\item Sicherheitslevel für den Login (Fronend und Backend)
+	\item das Passwort für das Installtool (mit MD5 und Salt gehasht)
+	\item die Zugangsdaten zur Datenbank (Benutzername, Password, Datenbankname, Socket, …)
+	\item Einstellungen zum Caching
+	\item Titel der Website
+	\item Einstellungen zum Erzeugen von Graphiken
+\end{itemize}
+
+Die Einstellungen zur Datenbank werden im praktischen Teil näher beleuchtet.
 
 		Abgrenzung Backend / Frontent
 		Skizze mit Backend / Frontend / Datenbank bei erwähnung der Caches. Diese jedoch sind zu vernachlässigen, da
