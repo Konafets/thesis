@@ -157,7 +157,7 @@
 %------------------
 % Eigene Kommandos
 %------------------
-
+\newcommand{\pdf}[1]{\textit{\mbox{#1}}}
 
 %---------------------
 % Spracheinstellungen
@@ -196,8 +196,11 @@
 % Schrifteinstellungen für Codelistings
 \setmonofont[Scale=0.75]{Source Code Pro}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
+%\usemintedstyle[php]{monokai}
+\newmintinline{php}{startinline} % http://www.joelclermont.com/2013/03/28/better-php-highlighting-in-octopress/
 \newminted{php}{
 	linenos              = true,
+	startinline          = true, % http://www.joelclermont.com/2013/03/28/better-php-highlighting-in-octopress/
 	xleftmargin          = 2em,
 	tabsize              = 4,
 	bgcolor              = bg,
