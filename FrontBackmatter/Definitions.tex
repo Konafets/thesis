@@ -9,6 +9,15 @@
 %-----------------
 % http://tex.stackexchange.com/questions/8946/how-to-combine-acronym-and-glossary
 
+\newglossaryentry{tca}
+{
+	type=\acronymtype,
+	name={TCA},
+	description={Table Content Array},
+	first={Table Content Array (TCA)},
+	see=[Glossary:]{tcag}
+}
+
 \newglossaryentry{t3assoc}
 {
 	type=\acronymtype,
@@ -119,4 +128,10 @@
 {
 	name={dbal},
 	description={a very long description of of what is dbal}
+}
+
+\newglossaryentry{tcag}
+{
+	name={TCA},
+	description={Das TCA ist ein globales PHP Array, welches die Definition von Datanbanktabellen weit über die Möglichkeiten herkömmlichen SQLs erweitert. Seine Hauptaufgabe besteht in der Definition der, durch das TYPO3 CMS Backend, editierbaren Tabellen. Es beschreibt die Beziehungen zu anderen Tabellen, welches Feld einer Tabelle soll in welchen Layout im \gls{be} dargestellt werden und wie soll das Feld validiert werden. Enthält eine Tabelle keinen Eintrag im TCA ist sie im Backend nicht sichtbar.}
 }
