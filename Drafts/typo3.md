@@ -97,9 +97,9 @@ Auf die aktuelle Datenbank-API wird in [KAPITEL zur Analyse der aktuellen Situat
 
 #### Verzeichnisstruktur
 
-Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Webroot des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses *typo3/*.
+Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Webroot des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses \pdf{typo3/}.
 
-Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis *www.example.com* anzulegen, in dem die Verzeichnisse *fileadmin/*, *typo3conf/*, *typo3temp/* und *uploads/* anzulegen sind. Das Verzeichnis *typo3_src/* ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis *typo3/* ist ebenfalls ein Symlink, welcher auf über den Symlink *typo3_src* auf *typo3* zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink *typo3_src* auf das Installationverzeichnis der neuen Version "umgebogen" werden muss. 
+Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \pdf{typo3_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss. 
 
 	.
 	├── Packages/
@@ -136,7 +136,7 @@ Im folgenden werden die einzelen Verzeichnisse näher erklärt:
 |   contrib/          | Bibliotheken von Drittanbietern
 |   ext/              | Das Verzeichnis für globale Extensions
 |   gfx/              | Jegliche Grafiken die im Core verwendet werden
-|   install/          | Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Gründen der Abwärtskompatibiliät und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter *sysext/install/* zu finden.
+|   install/          | Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Gründen der Abwärtskompatibiliät und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter \pdf{sysext/install/} zu finden.
 |   js/               | Hier befinden sich die JavaScript Bibliotheken, die von Core genutzt werden.
 |   mod/              | Enthält die Konfiguration der Hauptmodule des Backends (File, Help, System, Tools, User, Web).
 |   sysext/           | Enthält die Systemextensions. Letztendlich kann man sagen, dass dies der Core ist.
@@ -144,9 +144,9 @@ Im folgenden werden die einzelen Verzeichnisse näher erklärt:
 | typo3temp/          | Temporäre Dateien
 | uploads/            | Dateien die vom Websitebesucher hochgeladen werden - zum Beispiel über ein Formular.
 
-Im Verzeichnis *www.example.com* muss noch ein Symlink *index.php* angelegt werden, welcher auf *typo3_src/index.php* zeigt.
+Im Verzeichnis \pdf{www.example.com} muss noch ein Symlink \pdf{index.php} angelegt werden, welcher auf \pdf{typo3_src/index.php} zeigt.
 
-Unter *www.example.com/typo3conf/* befindet sich die Datei *LocalConfiguration.php*. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
+Unter \pdf{www.example.com/typo3conf/} befindet sich die Datei \pdf{LocalConfiguration.php}. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
 
 * Debug Mode
 * Sicherheitslevel für den Login (Fronend und Backend)
@@ -158,22 +158,124 @@ Unter *www.example.com/typo3conf/* befindet sich die Datei *LocalConfiguration.p
 
 Die Einstellungen zur Datenbank werden im praktischen Teil näher beleuchtet.
 
-### Extensions
+#### TCA
 
-Extensions sind funktionale Erweiterungen, welche in System-, globale\footnote{Das Feature von globalen Extension funktioniert immer noch, wird jedoch nur noch vereinzelt genutzt und es gibt Bestrebungen es ganz zu entfernen. Da sie außerdem nicht zum weiteren Verständis der Arbeit benötigt werden, wurden sie hier nur der Vollständigkeit halber erwähnt.} und lokale Extensions unterteilt werden. 
+Wie bereits geschrieben wurde, stellt das \gls{be} eine Ansicht auf die Datenbank dar. Die Inhalte werden dabei mittels Formulare eingegeben und in der Datenbank gespeichert. Die Konfiguration dieser Formulare erfolgt über ein globales \gls{php}-Array - dem \gls{tca}. 
 
-#### Einteilung
+Über das TCA werden die Metadaten einer Tabelle (Datentyp, Länge, Engine) mit weiteren Daten angereichert. So können mit dem \gls{tca} 
 
-Systemextension werden mit dem System mitgeliefert und befinden sich ausschließlich im Ordner *typo3/sysext/*. Sie werden nochmals unterteilt in jene, die für den Betrieb von TYPO3 unabdingbar sind und solche die nicht zwangsläufig installiert sein müssen, jedoch wichtige Funktionen beisteuern. Die Extension DBAL ist solch eine Erweiterung, auf die im Kapitel \ref{extDBAL} näher eingegangen wird.
+* die Beziehungen einer Tabelle zu anderen Tabellen beschrieben werden
+* in welchem Layout soll ein Feld im Formular dargestellt werden
+*  und wie soll das Feld validiert werden. 
 
-Mit dem Begriff "Extension" ist jede andere Extension gemeint, auf die die oben genannten Bedingungen nicht zutreffen. Lokale Extension werden im Ordner *typo3conf/ext/* und globale Extensions im Ordner *typo3/ext* installiert.
+Enthält eine Tabelle keinen Eintrag im TCA ist sie im Backend nicht sichtbar.(vgl. \cite{web:typo3TCA})
 
-#### Verzeichnisstruktur
+[HINWEIS: Vielleicht kann das TCA auch einfach im Glossar beschrieben werden. Einen Eintrag gibt es schon unter tcag]
 
 #### XCLASS
 
-#### TCA
+TYPO3 CMS besitzt einen Mechanismus, der es erlaubt Klassen zu erweitern oder Methoden mit eigenem Code zu überschreiben. Dies funktioniert für den Systemkern wie auch für andere Extensions. Dieses Feature nennt sich XCLASS und wird vom Prototypen eingesetzt um die Datenbankklasse von TYPO3 CMS zu überschreiben. Darauf wird im Kapitel [KAPITEL Analyse Ist-Zustand einfügen] näher eingegangen. Hier soll lediglich der Hintergrund zu XCLASS beschrieben werden.
 
+Damit eine Klasse per XCLASS erweiterbar ist, darf sie nicht per \code{new()} Operator erzeugt werden, sondern mit der von TYPO3 CMS angebotenen Methode \phpinline{\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()}. Diese Methode sucht im globalen PHP Array \phpinline{$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']} nach angemeldeten Klassen, instanziiert diese und liefert sie anstelle der Originalklasse zurück. Dieses Array dient der Verwaltung der zu überschreibenden Klassen und erfolgt in der Datei \pdf{ext_localconf.php} innerhalb des Extensionsverzeichnisses \ref{Verzeichnisstruktur}:
+
+\begin{phpcode}
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\Controller\\NewRecordController'] = array(
+ 'className' => 'Documentation\\Examples\\Xclass\\NewRecordController'
+);
+\begin{phpcode}
+
+Der Mechanismus hat jedoch ein paar Einschränkungen:
+
+* der Code der Originalklasse kann sich ändern. Es ist somit nicht sichergestellt, dass der überschreibende Code weiterhin das macht, wofür gedacht war
+* XCLASSes funktioneren nicht mit statischen Klassen, statischen Methoden und finalen Klassen
+* eine Originalklasse kann nur einmal per XCLASS übeschrieben werden
+* einige Klassen werden sehr früh bei der Initialisierung des System instanziiert. Das kann dazu führen, dass Klassen die als Singleton ausgeführt sind, nicht überschrieben werden können oder es kann zu unvorhergesehenen Nebeneffekten kommen.
+
+
+### Extensions
+
+Extensions sind funktionale Erweiterungen. Sie interagieren mit dem Systemkern über die Extension API und stellen die Möglichkeit dar TYPO3 CMS zu erweitern und anzupassen.
+
+[2. Bild von https://typo3.org/extensions/what-are-extensions/ einfügen oder nachbauen]
+
+Extensions werden - je nach Kontext - in unterschiedliche Kategorien eingeteilt, die hier kurz vorgestellt werden.
+
+#### Einteilung
+
+Systemextension werden mit dem System mitgeliefert und befinden sich ausschließlich im Ordner \pdf{typo3/sysext/}. Sie werden nochmals unterteilt in jene, die für den Betrieb von TYPO3 unabdingbar sind und solche die nicht zwangsläufig installiert sein müssen, jedoch wichtige Funktionen beisteuern. Die Extension DBAL ist in die letzte Kategorie einzuordnen. Auf sie wird im Kapitel \ref{extDBAL} näher eingegangen.
+
+Neben Systemextensions gibt es noch globale und lokale Extensions.\footnote{Da globale Extensions nur in bestimmten Szenarien einen Sinn ergeben und in der Realität so gut wie nicht vorkommen, wird von der TYPO3 Community der Begriff "Extension"  synonym zum Begriff "lokale Extension" verwendet und dies wird auch in dieser Arbeit so gehandhabt.}
+Lokale Extensions werden im Ordner \pdf{typo3conf/ext/} und globale Extensions im Ordner \pdf{typo3/ext} installiert.
+
+Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Die Festlegung auf eine der folgenden Kategorien hat keine direkte Auswirkung auf die Funktion der Extension. Sie wird von TYPO3 hauptsächlich als Sortiermerkmal im Extension Manager genutzt.
+
+[3. Bild von https://typo3.org/extensions/what-are-extensions/ einfügen oder eigenen Screenshot machen]
+
+* Frontend
+* Frontend Plugins
+* Backend
+* Backend Modul
+* Service
+* Example
+* Templates
+* Documentation
+* Verschiedenens
+
+
+#### Extension Manager
+
+Der Extension Manager (EM) \gls{em} ist ein \gls{be} Modul, über das die Extensions verwaltet werden können. Es erlaubt die Aktivierung, Deaktivierung, Herunterladen und das Löschen von Extensions. Darüberhinaus bietet der \gls{em} Möglichkeiten zur detailierten Anzeige von Informationen über die Extensions wie das Changelog\footnote{Das Prototoll der Codeänderungen, die ein Programm von Version zu Version erlebt}, Angaben zu den Autoren und Ansicht der Dateien der Extension.
+
+#### Verzeichnisstruktur
+
+Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unterscheiden sie sich nicht in der Verzeichnis- und Dateistruktur. Mit der Integration von Extbase in TYPO3 CMS hat sich eine neue Verzeichnisstruktur etabliert. Sie folgt dem Paradigma "Konvention statt Konfiguration", was bedeutet, dass durch Einhaltung der Struktur keine weitere Konfiguration notwendig ist.
+
+    .
+    ├── Classes/
+    │   ├── Install/
+    │   ├── Loggers/
+    │   └── Persistence/
+    ├── Configuration/
+    │   ├── ExtensionBuilder/
+    │   ├── TCA/
+    │   └── TypoScript/
+    ├── Documentation/
+    ├── Resources/
+    │   ├── Private/
+    │   └── Public/
+    ├── Tests/
+    │   ├── Build/
+    │   └── Unit/
+    ├── vendor/
+    │   ├── bin/
+    │   ├── composer/
+    │   ├── doctrine/
+    │   └── symfony/
+    ├── composer.json
+    ├── ext_emconf.php
+    ├── ext_icon.gif
+    ├── ext_localconf.php
+    ├── ext_tables.php
+    ├── ext_tables.sql
+    └── ext_tables_static+adt.sql
+    
+| Verzeichnis / Datei | Erklärung |
+|---------------------|-----------|
+| Classes/ | Hier erwartet TYPO3 CMS alle Klassendateien. Diese können in weiteren Unterverzeichnissen nach ihren Zweck unterteilt werden (Controller, Service, Loggers, Persistence) |
+| Configuration | Enthält alle Konfigurationen die von der Extension, TYPO3 CMS und Extbase benötigt werden. |
+| Documentation/ | Enthält die Dokumentation / das Manual im ReST\footmark{reStructuredText \url{http://docutils.sourceforge.net/rst.html} Format. Wird die Extension im \gls{ter} veröffentlicht, so wird dieses Verzeichnis ausgelesen und via Sphinx\footnote{http://sphinx-doc.org/rest.html} ein Handbuch im HTML und PDF Format generiert.
+| Resources/Private/ | Enthält die Fluid-Template\footnote{TYPO3s Templating Sprache}, Sprach- und Sassdateien. Kurz alle Dateien, die für die Struktur und das Aussehen einer Website notwendig sind, jedoch lediglich Templates darstellen und noch verarbeitet werden müssen |
+| Resources/Public/ | Hier liegen Grafiken, CSS- und Javasciptdateien | 
+| Tests/            | Hier werden die PHPUnit-, Akzeptanz- und/oder Verhaltenstests abgelegt. |
+| vendor/ | Dieses Verzeichnis wird von Composer angelegt und enthält externe Abhängigkeiten wie in dem Fall Doctrine DBAL. Im Moment ist dies redunant, da der selbe Inhalt auch im Webroot der Site unter \pdf{Packages/Libraries/} verfügbar sein muss. Das liegt an der noch nicht vollständig umgesetzten Kompatibilität von TYPO3 CMS zu Composer, die jedoch in einer späteren Version noch nachgereicht wird.|
+| composer.json | Seit Version 6.2 von TYPO3 CMS ist eine Composer.json erforderlich. In ihr werden Metadaten der Extensions wie Name, Typ (System- oder lokale Extension), Lizenz, Version und Abhängigkeiten definiert. Sie wird in Zukunft wahrscheinleich die Datei \pdf{ext_emconf.php} ablösen.|
+| ext_emconf.php | Diese Datei ist unabdinglich für die Funktionsweise der Extensions. Sie definiert ebenso wie die \pdf{composer.json} Metadaten jedoch in einem PHP-Array und nicht im JSON\footnote{http://json.org/}-Format. Diese Datei existiert seit den Anfängen von TYPO3 und wird wahrscheinlich bald von der composer.json abgelöst werden. |
+| ext_icon.gif | Ein Icon für die Extension, welches im \gls{be} angezeigt wird |
+| ext_localconf.php | In dieser Datei wird die Extension für einen Hook oder eine XCLASS registiert. |
+| ext_tables.php | Die Datei hat drei Aufgaben: \begin{itemize} \item Definition von Extensionstabellen \item Definition von Feldern und Tabellen, die von dieser Extension erweitert werden \item \gls{fe} Plugins und \gls{be} Module werden hier registiert \end{itemize} |
+| ext_tables.sql | Diese Datei enthält Anweisungen um eine Datenbanktabelle zu erstellen. Sie sind im MySQL Format zu formulieren, auch wenn als Datenbank etwas anderes genutzt wird. TYPO3 CMS parst die Datei mit einem eigenen (sehr rudimentären) SQL-Parser und generiert einen eigene SQL-Abfrage. Dieses Vorgehen hat den Hintergrund, dass dadurch auf Fehler im diesen Dateien reagiert werden kann und zum anderen das die mitgelieferte Datenbankabstraktionsschicht die Anweisungen in das SQL der entsprechenden Hersteller übersetzen kann. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel \ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.|
+| ext_tables_static+adt.sql | Auch diese Datei enthält SQL Code wie \pdf{ext_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der Extension Manager genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel \ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.|
+    
 * Interner Aufbau durch Extensions √
 * in PHP geschrieben √
 * läuft auf einem Webserver (Apache oder Nginx) √
