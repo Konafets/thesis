@@ -94,9 +94,9 @@ Auf die aktuelle Datenbank-\gls{api} wird in [KAPITEL zur Analyse der aktuellen 
 
 \subsubsection{Verzeichnisstruktur}
 
-Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses \textit{typo3/}.
+Im Gegensatz zu frühren TYPO3 Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enhält der Download lediglich den TYPO3 Kern in Form des Verzeichnisses \pdf{typo3/}.
 
-Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \textit{www.example.com} anzulegen, in dem die Verzeichnisse \textit{fileadmin/}, \textit{typo3conf/}, \textit{typo3temp/} und \textit{uploads/} anzulegen sind. Das Verzeichnis \textit{typo3\_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis \textit{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \textit{typo3\_src} auf \textit{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \textit{typo3\_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss.
+Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3\_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \pdf{typo3\_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3\_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss.
 
 \begin{Verbatim}[samepage=true]
 .
@@ -143,7 +143,7 @@ Im folgenden werden die einzelnen Verzeichnisse näher erklärt:
 	\hline
 	  gfx/ & Jegliche Grafiken, die im Core verwendet werden \\
 	\hline
-	  install/ & Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Kompatibilitätsgründen und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter \textit{sysext/install/} zu finden\\
+	  install/ & Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Kompatibilitätsgründen und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter \pdf{sysext/install/} zu finden\\
 	\hline
 	  js/ & Hier befinden sich die JavaScript Bibliotheken, die von Core genutzt werden.\\
 	\hline
@@ -159,10 +159,15 @@ Im folgenden werden die einzelnen Verzeichnisse näher erklärt:
 	\hline
 \end{tabularx}
 
-Im Verzeichnis \textit{www.example.com} muss noch ein Symlink \textit{index.php} angelegt werden, welcher auf \textit{typo3\_src/index.php} zeigt.
+Im Verzeichnis \pdf{www.example.com} muss noch ein Symlink \pdf{index.php} angelegt werden, welcher auf \pdf{typo3\_src/index.php} zeigt.
 
-Unter \textit{www.example.com/typo3conf/} befindet sich die Datei \textit{LocalConfiguration.php}. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
-
+Unter \pdf{www.example.com/typo3conf/} befindet sich die Datei \pdf{LocalConfiguration.php}. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
+\phpinline{$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']}
+\begin{phpcode}
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\Controller\\NewRecordController'] = array(
+ 'className' => 'Documentation\\Examples\\Xclass\\NewRecordController'
+);
+\end{phpcode}
 \begin{itemize}
 	\item Debug Mode
 	\item Sicherheitslevel für den Login (Fronend und Backend)
