@@ -1,3 +1,5 @@
+# Grundlagen
+
 ## TYPO3
 Content-Management-System, Web-Content-Managentsystem, Enterprise-Content-Management-System oder Content-Management-Framework. 
 
@@ -80,7 +82,7 @@ Aus Anwendersicht teilt sich TYPO3 in zwei Bereiche:
           stellt die Administrationsoberfläche dar. Hier erstellen und verändern Redaktuere die Inhalte während Administratoren das System von hier aus konfigurieren
     \item das Frontend\\
           stellt die Website dar, die ein Besucher zu Gesicht bekommt.
-\end{itemze}
+\end{itemize}
 (vgl. \cite[S. 5]{book:dulepovTypo32008)
 
 [Skizze Backend / Frontend einfügen]
@@ -182,7 +184,8 @@ Damit eine Klasse per XCLASS erweiterbar ist, darf sie nicht per \code{new()} Op
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\Controller\\NewRecordController'] = array(
  'className' => 'Documentation\\Examples\\Xclass\\NewRecordController'
 );
-\begin{phpcode}
+$
+\end{phpcode}
 
 Der Mechanismus hat jedoch ein paar Einschränkungen:
 
@@ -286,15 +289,14 @@ Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unt
 * Unterschiede erklären
 * erklären warum eskeinen Sinn macht weder den einen noch den anderen Ansatz zu wählen
 * Low-Level
-* TCA
-* XCLASS
+* TCA √
+* XCLASS √
 * Aufbau von TYPO3 erklären
   * Frontend / Backend √
   * Core √
   * Verzeichnisstruktur √
   * einzelne Dateien (LocalConf, index.php, Symlinks) √
-* Aufbau von Extension erklären
-  * Verzeichnisstruktur
+* Aufbau von Extension erklären √
+  * Verzeichnisstruktur √
   * Namenskonventionen
-  * was machen all die Dateien
-
+  * was machen all die Dateien √
