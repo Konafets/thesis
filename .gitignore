@@ -6,7 +6,8 @@
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -152,3 +153,5 @@ Session.vim
 .netrwhist
 *~
 
+*.project.vim
+Bib/Zotero/Exportierte Einträge
