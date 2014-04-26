@@ -36,26 +36,19 @@ Die Signatur des Konstruktors sieht wie folgt aus:
 	public PDO::__construct ( string $dsn [, string $username [, string $password [, array $driver_options ]]] )
 	\end{phpcode}
 
-Während die ersten Parameter zwei und drei selbsterklärend sind und über den letzten Parameter Datenbanktreiber-spezifische Einstellungen im Key => Value Format übergeben werden können, erfordert der erste Parameter einen nähere Beschreibung.
+Während die Parameter \inlinephp{$username} und \inline{$password} selbsterklärend sind und über den letzten Parameter \inlinephp{$driver_options} Datenbanktreiber-spezifische Einstellungen übergeben werden können, erfordert der erste Parameter eine nähere Beschreibung.
 
-Das \phpinline{$dsn} steht für Data Source Name. Hier muß also der Name der Datenquelle übergeben werden. Dieser Name folgt einem gewissen Format, bei dem zuerst der Typ des \gls{dbms} angegeben wird und - getrennt von einem Doppelpunkt - der Datenbank-spezifische Teil.
-  
-
-Um eine Verbindung aufzubauen werden dem Konstruktor ein sogenannter ``Connection String'' übergeben. Dieser ist nach dem Muster \pdf{TypPrefix:Datenbank-spezifischerTeil} aufgebaut.
+Das Kürzel \phpinline{$dsn} steht für Data Source Name damit ist die Datenquelle gemeint. Diese Zeichenkette folgt einem gewissen Format, bei dem zuerst der Typ des \gls{dbms} angegeben wird und - getrennt von einem Doppelpunkt - der Datenbank-spezifische Teil.
 
 	\begin{phpcode}
   	// MySQL
   	$dsn = 'mysql:host=$host;dbname=$db';
-  
-  	//PostgresSQL
-  	$dsn = 'pgsql:host=$host dbname=$db';
-  	\end{phpcode}
-  	
-Der vollständige Aufbau einer Verbindung mit obigen \gls{dsn}s:
-  
-	\begin{phpcode}
+   
 	// MySQL
   	$connection = new PDO($dsn, $user, $pass);
+
+  	//PostgresSQL
+  	$dsn = 'pgsql:host=$host dbname=$db';
 
   	// PostgreSQL
   	$connection = new PDO($dsn, $user, $pass);
@@ -63,21 +56,24 @@ Der vollständige Aufbau einer Verbindung mit obigen \gls{dsn}s:
 
 Die Variable \phpinline{$connection} enthält nun das Verbindungsobjekt.
 
-Als Vergleich dazu der Verbindungsaufbau via MySQLi und PostgreSQL
+Als Vergleich dazu der Verbindungsaufbau via MySQL, MySQLi und PostgreSQL
 
 	\begin{phpcode}
 	// MySQL
-	mysql_connect($host, $user, $password);
-  	mysql_select_db($db)
+	$connection = mysql_connect($host, $username, $password);
+  	$connection = mysql_select_db($dbname);
+
+	// MySQLi
+	$connection = new mysqli($host, $username, $password, $dbName);
   
   	// PostgreSQL
-  	pg_connect("host=localhost dbname=students user=stefano password=geheim");
+  	$connection = pg_connect('host=' . $host . ' dbname=' . $dbname . ' user=' . $userName . ' password=' . $password);
  	\end{phpcode}
  	
-Schon dieses einfache Beispiel zeigt den Vorteil einer einheitlichen \gls{api} – hier muss lediglich der \gls{dsn} angepasst werden.
+Dieses Beispiel zeigt, dass MySQL und PostgreSQL einfache Methoden zur Verfügung stellen – MySQLi nach dem \gls{oop} Prinzip arbeitet und ein Verbindungsobjekt erzeugt. Desweiteren wird der Vorteil einer einheitlichen \gls{api} deutlich.
 
 #### PDO Statements
-Um die Abfrage der Daten mittels \gls{pdo} zu demonstrieren wird davon ausgegangen, dass eine Datenbank mit folgenden Tabellen erstellt wurde.
+Um die Abfrage der Daten mittels \gls{pdo} zu demonstrieren wird davon ausgegangen, dass eine Datenbank mit folgenden Tabellen existiert.
     
     students
     +----+------------+-----------+-------+   	| id | first_name | last_name | house |   	+----+------------+-----------+-------+   	|  1 | Lucius     | Malfoy    |   4   |   	|  2 | Harry      | Potter    |   1   |   	|  3 | Herminone  | Granger   |   1   |	|  4 | Ronald     | Weasley   |   1   |
@@ -90,17 +86,40 @@ Um die Abfrage der Daten mittels \gls{pdo} zu demonstrieren wird davon ausgegang
     |  1 | Gryffindor |
     |  2 | Huffelpuff |
     |  3 | Ravenclaw  |
-    |  4 | Slyhterin  |
+    |  4 | Slytherin  |
     +----+------------+
     
-   	// Let's keep our SQL in a single variable   	$sql = 'SELECT last_name FROM students ORDER BY last_name';    
-    $db       = 'students';    $host     = 'localhost';
-	$user     = 'stefano';
-	$password = 'geheim';       	// Now, assuming MySQL:   	mysql_connect($host, $user, $password);   	mysql_select_db($db);   	$q = mysql_query($sql);
-      	// And for PostgreSQL:
-$connectionString =    	   	pg_connect("host=localhost dbname=students user=stefano password=geheim);   	$q = pg_query($sql);
-   	// assume the $connStr variable holds a valid connection string	// as discussed in previous point	$sql = 'SELECT DISTINCT make FROM cars ORDER BY make';	$conn = new PDO($connStr, $user, $password);	$q = $conn->query($sql);
-	
+Eine einfache Abfrage soll die unterschiedlichen Herangehensweisen der Systeme verdeutlichen. Diese Abfrage wird in der Variablen \inlinephp{$sql} gespeichert und die Variable \inlinephp{$connection} enthält ein Objekt mit einer aktiven Verbindung zur Datenbank. 
+    
+	\begin{phpcode}   	$sql = 'SELECT last_name FROM students ORDER BY last_name';
+	
+	$statement = $conn->query($sql);
+	
+	foreach($statement as $row) {
+	  echo $row['last_name'];
+	}	
+	\end{phpcode}    
+Ausgabe des Skripts:
+\begin{Verbatim}
+Diggory
+Granger
+Lovegood
+Malfoy
+Potter
+Weasly
+\end{Verbatim}Die Methode \inlinephp{$query} gibt ein Objekt vom Typ PDOStatement zurück. Da dieses Objekt das Interface \inlinephp{Traversable} implementiert, ist es in einer For-Schleife traversierbar und kann wie ein Array behandelt werden.    
+Zum Vergleich das Vorgehen von MySQL und PostgreSQL
+
+	\begin{phpcode}   	// MySQL:   	$query = mysql_query($sql);
+	
+	// PostgreSQL   	$query = pg_query($sql);
+    \end{phpcode}
+
+Die beiden Funktionen \inlinephp{*_query} senden die Abfragen ebenfalls an die Datenbank, liefern jedoch eine Kennung in Form einer PHP-Resource zurück (oder FALSE im Falle eines Fehlers). Der Inhalt dieser Variablen kann lediglich zur Überprüfung von Verbindungsfehlern genutzt werden. Um aus der abgesendeten Anfrage ein Ergebnis zu erhalten, müssen die entsprechenden Methoden der beiden \gls{dbms} genutzt werden:       	// assume the query is in the $sql variable   	$sql = "SELECT DISTINCT make FROM cars ORDER BY make";   	// For MySQL:   	$q = mysql_query($sql);   	while($r = mysql_fetch_assoc($q))   	{    	echo $r['make'], "\n";   	}
+
+	// and, finally, PostgreSQL:   	$q = pg_query($sql);   	while($r = pg_fetch_assoc($q))   	{		echo $r['make'], "\n";	}
+Die Objekte PDOConnection und PDOStatement besitzen viele weitere nützliche Methoden, die hier jedoch nicht alle aufgezählt werden. In Kapitel [KAP zum praktischen Teil einfügen] werden jedoch die gängigen Methoden verwendet und teilweise erläutert. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
+
 #### Traversierung von Ergebnissmengen   	// assume the query is in the $sql variable   	$sql = "SELECT DISTINCT make FROM cars ORDER BY make";   	// For MySQL:   	$q = mysql_query($sql);   	while($r = mysql_fetch_assoc($q))   	{    	echo $r['make'], "\n";   	}
 
 	// and, finally, PostgreSQL:   	$q = pg_query($sql);   	while($r = pg_fetch_assoc($q))   	{		echo $r['make'], "\n";	}
