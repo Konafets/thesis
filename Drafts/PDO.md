@@ -1,7 +1,7 @@
 ## PDO
-Wie wir im nächsten Kapitel sehen werden [Hängt davon ab, wo dieses Kapitel eingefügt wird], baut Doctrine \gls{dbal} auf \gls{pdo} auf. Es wendet dessen Konzepte an und erweitert diese. Um ein tieferes Verständnis von Doctrine \gls{dbal} zu erlangen kommt man nicht umhin sich mit \gls{pdo} selbst zu beschäftigen - dies geschieht im folgenden Kapitel.
+Wie wir im Kapitel über Doctrine sehen werden [Hängt davon ab, wo dieses Kapitel eingefügt wird], baut es auf \gls{pdo} auf. Es verwendet dessen Konzepte und erweitert diese. Um ein tieferes Verständnis von Doctrine \gls{dbal} zu erlangen, kommt man nicht umhin sich mit \gls{pdo} zu beschäftigen.
 
-Im diesem Kapitel wird auf den Hintergrund von \gls{pdo} und dessen Konzepte eingegangen. Es werden die Fähigkeiten und die Grenzen aufgezeigt, sowie anhand von einfachen Beispielen die Funktionsweise illustriert.
+Im diesem Kapitel wird auf den Hintergrund von \gls{pdo}. Es werden die Fähigkeiten und Grenzen aufgezeigt, sowie anhand von einfachen Beispielen die Funktionsweise illustriert.
 
 ### Was ist PDO
 PHP Data Objects (PDO) ist eine Extension aus der \gls{PECL} PHP Extension Community Library (PECL) für PHP5 und stellt eine Abstraktionsbibliothek für die Interaktion mit \gls{dbms} verschiedener Hersteller dar. Dabei orientiert sie sich an dem Konzept der Java Data Objects (JDO) \gls{jdo}.
@@ -18,66 +18,21 @@ Ein weiterer Vorteil von \gls{pdo} gegenüber anderen Projekten ist die Geschwin
 ### Grenzen / Limitierungen
 Bei einer Abstraktion wird stets etwas Spezifisches, durch das Weglassen von Details, in etwas Allgemeines überführt. Im Fall von \gls{pdo} wird der andere Weg gegangen – es werden allgemeine \gls{sql}-Anfragen in den Dialekt\footnote{Als Dialekt wird die Hersteller-eigene Implementation des \gls{sql}-Standards genannt, dass sich im Umfang und Syntax vom Standard unterscheidet.} des Herstellers übersetzt. 
 
-Aus diesem Grund vermag es \gls{pdo} nicht eine SQL-Abfrage die in dem Dialekt eines Herstellers formuliert wurde, in den eines anderen zu übersetzen. Stattdessen muss die Anfrage so nah wie möglich am Standard gestellt werden, um als portabel zu gelten.
+Aus diesem Grund vermag es \gls{pdo} nicht eine SQL-Abfrage, die in dem Dialekt eines Herstellers formuliert wurde, in den eines anderen zu übersetzen. Stattdessen muss die Anfrage so nah wie möglich am Standard gestellt werden, um als portabel zu gelten.
 
 * Beispiel einfügen SQL-Standard und eigene Erweiterung von MySQL -> Siehe Buch Seite 17
   
 ### Verwendung
-Im Folgenden wird die Verwendung von \gls{pdo} erläutert. Dabei werden die Unterschiede zur den klassischen Verfahren (MySQL und PostgreSQL) demonstriert. 
+Der grundlegenden Unterschied von PHP-Extensions wie die für MySQL und PosgreSQL zu PDO besteht darin, dass die zuerst genannten eine prozeduale Bibliothek darstellen und \gls{pdo} streng Objekt-orientiert aufgebaut ist. Während diese Extensions lediglich Funktionen zur Interaktion mit der Datenbank zur Verfügung stellen, die keine weiteren Informationen über den inneren Zustand der Verbindung besitzen, führt \gls{pdo} Klassen ein, die sowohl die Verbindung als auch die eine Abfrage kapseln und als Schnittstelle dienen.
 
-Damit \gls{pdo} mit verschiedenen \gls{dbms} benutzt werden kann, müssen die Treiber des entsprechenden \gls{dbms} installiert sein.  
+Die Klasse (\inlinephp{PDO}) beinhaltet die Verbindung zur Datenbank und stellt Methoden zum Verbindungsmanament bereit, während die Klasse \inlinephp{PDOStatement}eine Schnittstelle zu Anfragen und teilweise auch zur Ergebnismenge\footnote{Da alle betrachteten Datenbanken den relationalen Datenbanken zuzuschreiben sind, handelt es sich bei den Datenbanktabellen um die mathematischen Beschreibung einer Relation [http://de.wikipedia.org/wiki/Relationale_Datenbank]. Zudem kann eine Relation/Tabelle als eine Menge aufgefasst werden. Verknüpft man Relationen mit Operatoren (Abfrage) erhält man stets wieder eine Relation. Somit ist das Ergebnis einer Abfrage eine Menge - die Ergebnismenge} bietet.
 
-#### Verbindung
-Da \gls{pdo} eine Objekt-orientierte \gls{api} anbietet, wird die Verbindung über ein Verbindungsobjekt gesteuert. Um eine Verbindung aufzubauen und ein solches Objekt zu erzeugen, wird der Konstrukur mit entsprechenen Parametern aufgerufen.
-
-Die Signatur des Konstruktors sieht wie folgt aus:
-
-	\begin{phpcode}
-	public PDO::__construct ( string $dsn [, string $username [, string $password [, array $driver_options ]]] )
-	\end{phpcode}
-
-Während die Parameter \inlinephp{$username} und \inline{$password} selbsterklärend sind und über den letzten Parameter \inlinephp{$driver_options} Datenbanktreiber-spezifische Einstellungen übergeben werden können, erfordert der erste Parameter eine nähere Beschreibung.
-
-Das Kürzel \phpinline{$dsn} steht für Data Source Name damit ist die Datenquelle gemeint. Diese Zeichenkette folgt einem gewissen Format, bei dem zuerst der Typ des \gls{dbms} angegeben wird und - getrennt von einem Doppelpunkt - der Datenbank-spezifische Teil.
-
-	\begin{phpcode}
-  	// MySQL
-  	$dsn = 'mysql:host=$host;dbname=$db';
-   
-	// MySQL
-  	$connection = new PDO($dsn, $user, $pass);
-
-  	//PostgresSQL
-  	$dsn = 'pgsql:host=$host dbname=$db';
-
-  	// PostgreSQL
-  	$connection = new PDO($dsn, $user, $pass);
-  	\end{phpcode}
-
-Die Variable \phpinline{$connection} enthält nun das Verbindungsobjekt.
-
-Als Vergleich dazu der Verbindungsaufbau via MySQL, MySQLi und PostgreSQL
-
-	\begin{phpcode}
-	// MySQL
-	$connection = mysql_connect($host, $username, $password);
-  	$connection = mysql_select_db($dbname);
-
-	// MySQLi
-	$connection = new mysqli($host, $username, $password, $dbName);
-  
-  	// PostgreSQL
-  	$connection = pg_connect('host=' . $host . ' dbname=' . $dbname . ' user=' . $userName . ' password=' . $password);
- 	\end{phpcode}
- 	
-Dieses Beispiel zeigt, dass MySQL und PostgreSQL einfache Methoden zur Verfügung stellen – MySQLi nach dem \gls{oop} Prinzip arbeitet und ein Verbindungsobjekt erzeugt. Desweiteren wird der Vorteil einer einheitlichen \gls{api} deutlich.
-
-#### PDO Statements
-Um die Abfrage der Daten mittels \gls{pdo} zu demonstrieren wird davon ausgegangen, dass eine Datenbank mit folgenden Tabellen existiert.
+Im Folgenden wird die Verwendung der Klassen an einfachen Beispielen erläutert. Dabei werden die Unterschiede zur den klassischen Verfahren (MySQL und PostgreSQL) demonstriert. Damit \gls{pdo} mit verschiedenen \gls{dbms} benutzt werden kann, müssen die Treiber des entsprechenden \gls{dbms} installiert sein. Als Grundlage der Abfragen und Ergebnisse dient eine Datenbank mit den folgenden Tabellen. Es wird davon ausgegangen, dass sie bereits erstellt wurde.
     
     students
-    +----+------------+-----------+-------+   	| id | first_name | last_name | house |   	+----+------------+-----------+-------+   	|  1 | Lucius     | Malfoy    |   4   |   	|  2 | Harry      | Potter    |   1   |   	|  3 | Herminone  | Granger   |   1   |	|  4 | Ronald     | Weasley   |   1   |
-    |  5 | Luna       | Lovegood  |   3   |    |  6 | Cedric     | Diggory   |   2   |   	+----+------------+-----------+-------+
+	+----+------------+-----------+-------+	| id | first_name | last_name | house |	+----+------------+-----------+-------+	|  1 | Lucius     | Malfoy    |   4   |	|  2 | Harry      | Potter    |   1   |	|  3 | Herminone  | Granger   |   1   |
+	|  4 | Ronald     | Weasley   |   1   |
+	|  5 | Luna       | Lovegood  |   3   |	|  6 | Cedric     | Diggory   |   2   |	+----+------------+-----------+-------+
     
     houses
     +----+------------+
@@ -88,18 +43,64 @@ Um die Abfrage der Daten mittels \gls{pdo} zu demonstrieren wird davon ausgegang
     |  3 | Ravenclaw  |
     |  4 | Slytherin  |
     +----+------------+
+
+
+#### Verbindung aufbauen
+Traditionell wird eine Verbindung wie folgt aufgebaut:
+
+	\begin{phpcode}
+	// MySQLi
+	$connection = mysqli_connect($host, $username, $password, $dbname);
+
+  	// PostgreSQL
+  	$connection = pg_connect('host=' . $host . ' dbname=' . $dbname . ' user=' . $userName . ' password=' . $password);
+ 	\end{phpcode}
+
+Dieses Beispiel zeigt, dass MySQLi\footnote{MySQLi bietet sowohl eine prodezuale als auch eine objektorientierte \gls{api} an. Da TYPO3 CMS auschließlich den  prodezualen Ansatz nutzt und sich dieser nahezu mit derAPI von MySQL deckt, sind die Bespiele in prozedualer Form gehalten.} und PostgreSQL zwar einfache Methoden zur Verfügung stellen, diese sich jedoch in der Benutzung voneinander unterscheiden.
+
+Um eine Verbindung mit \gls{pdo} zu etablieren wird der Konstruktor verwendet, welcher ein Objekt vom Typ PDO zurückgibt. Die Signatur des Konstruktors sieht wie folgt aus:
+
+	\begin{phpcode}
+	public PDO::__construct ( string $dsn [, string $username [, string $password [, array $driver_options ]]] )
+	\end{phpcode}
+
+Während die Parameter \inlinephp{$username} und \inline{$password} selbsterklärend sind und über den letzten Parameter \inlinephp{$driver_options} Datenbanktreiber-spezifische Einstellungen übergeben werden können, erfordert der erste Parameter eine nähere Beschreibung.
+
+Mit dem Kürzel \phpinline{$dsn} (engl. Data Source Name) ist die Datenquelle gemeint, die in einem bestimmten Format übergeben werden muss. Dabei wird zuerst der Typ des \gls{dbms} angegeben und - getrennt von einem Doppelpunkt - der Datenbank-spezifische Teil.
+
+	\begin{phpcode}   
+	// MySQL
+  	$connection = new PDO('mysql:host=$host;dbname=$db', $user, $pass);
+
+  	// PostgreSQL
+  	$connection = new PDO('pgsql:host=$host dbname=$db', $user, $pass);
+  	\end{phpcode}
+
+Das in der Variablen \phpinline{$connection} enthaltene Verbindungsobjekt stellt den Ausgangspunkt für alles Weitere dar. Die naheliegendsten Aktionen nach dem Verbindungsaufbau sind das Absetzen einer SQL-Anfrage an die Datenbank und die Ausgabe des Ergebnisses.
+
+#### Datenbankabfragen
+Die als Beispiel dienende Abfrage soll die Nachnamen aller Studierenden in alphabetischer Reihenfolge ausgeben. Die in einer Variablen gespeicherten SQL-Abfrage\footnote{Um SQL-Injections zu unterbinden, muß das \gls{sql}-Query entsprechenden maskiert werden. \gls{pdo} bietet dafür die Methode \inlinephp{PDO::quote()} an. SQL-Injections werden im Kapitel [KAP Sicherheit einfügen] über Sicherheit eingehend behandelt.\label{ftn:maskQueries} wird an die Datenbank gesendet und das Ergebnis über eine Schleife ausgegeben. Zunächst wird der althergebrachte Weg gezeigt. Beide PHP-Extensions stellen dafür \inlinephp{*_query} Funktionen zur Verfügung, die eine Kennung der Datenbankverbindung zurückgeben. Im Fall eines Fehlers geben sie \inlinephp{FALSE} zurück. 
+
+	\begin{phpcode}
+	$query = 'SELECT last_name FROM students ORDER BY last_name';
+	   	// For MySQLi:   	$result = mysqli_query($connection, $query);   	while($row = mysqli_fetch_assoc($result))   	{    	echo $row['last_name'] . "\n";   	}
+
+	// PostgreSQL:   	$result = pg_query($query);   	while($row = pg_fetch_assoc($result))   	{		echo $row['last_name'] . "\n";	}
+    \end{phpcode}
     
-Eine einfache Abfrage soll die unterschiedlichen Herangehensweisen der Systeme verdeutlichen. Diese Abfrage wird in der Variablen \inlinephp{$sql} gespeichert und die Variable \inlinephp{$connection} enthält ein Objekt mit einer aktiven Verbindung zur Datenbank. 
-    
+Das \gls{pdo}-Objekt bietet dafür die Methode \inlinephp{query()} an, die ein Objekt vom Typ \inlinephp{PDOStatement} zurückgibt. Dieses implementiert das Interface Traversable und kann somit - analog zu einem Array - in einer Schleife durchlaufen werden.
+
 	\begin{phpcode}   	$sql = 'SELECT last_name FROM students ORDER BY last_name';
 	
-	$statement = $conn->query($sql);
+	$statement = $connection->query($sql);
 	
 	foreach($statement as $row) {
 	  echo $row['last_name'];
 	}	
-	\end{phpcode}    
-Ausgabe des Skripts:
+	\end{phpcode}
+	
+Die Ausgabe aller Bespiele lautet:
+
 \begin{Verbatim}
 Diggory
 Granger
@@ -107,34 +108,59 @@ Lovegood
 Malfoy
 Potter
 Weasly
-\end{Verbatim}Die Methode \inlinephp{$query} gibt ein Objekt vom Typ PDOStatement zurück. Da dieses Objekt das Interface \inlinephp{Traversable} implementiert, ist es in einer For-Schleife traversierbar und kann wie ein Array behandelt werden.    
-Zum Vergleich das Vorgehen von MySQL und PostgreSQL
+\end{Verbatim}Somit erübrigt sich der Aufruf einer weiteren Methode wie \inlinephp{mysqli_result::fetch_assoc}. 
 
-	\begin{phpcode}   	// MySQL:   	$query = mysql_query($sql);
+Um das Ergebnis der Abfrage sinnvoll nutzen zu können, gibt es verschiedene Stile (engl. fetch styles) in die es formatiert werden kann. Um dennoch die interne Struktur der Ergebnismenge beinflussen zu können, gibt es in \gls{pdo} Konstanten, die als optionales Argument an \inlinephp{query()} übergeben werden. In der Defaulteinstellung benutzt \gls{pdo} die Konstante \inlinephp{PDO::FETCH_BOTH}, bei dem das Ergebnis zum einen über den Spaltenbezeichner (wie im obigen Beispiel) als auch über eine Indexzahl angesprochen werden kann. Im Beispiel würde das so aussehen: \inlinephp{echo $row[0]}.
+Zu allen \inlinephp{*_fetch_*}-Methoden gibt es das entsprechende Äquivalent als \gls{pdo}-Konstante. Die Wichtigsten sind:
+
+* PDO::FETCH_ASSOC - entspricht *_fetch_assoc() 
+* PDO::FETCH_NUM   - entspricht *_fetch_array()
+* PDO::FETCH_ROW   - entspricht *_fetch_row()
+
+Darüberhinaus definiert \gls{pdo} noch weitere Konstanten, die keine Ensprechungen haben. 
+
+* PDO::FETCH_OBJ - liefert jede Zeile der Ergebnisrelation als Objekt zurück. Die Spaltenbezeichner werden dabei zu Eigenschaften der Klasse.
+* PDO::FETCH_LAZY - wie PDO::FETCH_OBJ. Das Objekt wird jedoch erst dann erstellt, wenn darauf zugegriffen wird.
+* PDO::FETCH_CLASS - liefert eine neue Instanz der angeforderten Klasse zurück. Die Spaltenbezeichner werden dabei zu Eigenschaften der Klasse. 
+* PDO::FETCH_COLUMN - liefert nur eine Spalte aus der Ergebnismenge zurück.
+
+Dies stellt eine nicht abschließende Aufzählung dar. Die Dokumentation von \gls{pdo} benennt weitere sogenannte ``Fetch Styles''-Konstanten\footnote{\url{http://mx2.php.net/manual/en/pdo.constants.php}}, die für diese Arbeit jedoch nicht von Interesse sind.
+Die Benutzung der Konstanten erfolgt per Übergabe als Parameter an die \inlinephp{query()}-Methode:
+	\begin{phpcode}
+	$statement = $connection->query($sql, PDO::FETCH_NUM);
 	
-	// PostgreSQL   	$query = pg_query($sql);
-    \end{phpcode}
+	foreach($statement as $row) {
+	  echo $row[0];
+	}	
+	\end{phpcode}
+	
+Über das PDOStatement-Objekt\footnote{Leider ist der Begriff dieser Klasse etwas unglücklich gewählt oder es ist ein Designfehler von \gls{pdo}, denn ein Objekt dieser Klasse repräsentiert zum einen ein (Prepared) Statement und, nachdem die Anfrage ausgeführt wurde, die Ergebnisrelation. Die Methoden der Klasse agieren somit einmal auf dem Statement und einmal auf dem Ergebnis.} werden weitere Möglichkeiten wie die Methoden \inlinephp{fetch()} und \inlinephp{fetchAll()} angeboten, um das Ergebnis zu erhalten. Diese Methoden müssen auch genutzt werden, wenn statt der \inlinephp{foreach}-Schleife eine \inlinephp{while}-Schleife genutzt werden soll:
 
-Die beiden Funktionen \inlinephp{*_query} senden die Abfragen ebenfalls an die Datenbank, liefern jedoch eine Kennung in Form einer PHP-Resource zurück (oder FALSE im Falle eines Fehlers). Der Inhalt dieser Variablen kann lediglich zur Überprüfung von Verbindungsfehlern genutzt werden. Um aus der abgesendeten Anfrage ein Ergebnis zu erhalten, müssen die entsprechenden Methoden der beiden \gls{dbms} genutzt werden:       	// assume the query is in the $sql variable   	$sql = "SELECT DISTINCT make FROM cars ORDER BY make";   	// For MySQL:   	$q = mysql_query($sql);   	while($r = mysql_fetch_assoc($q))   	{    	echo $r['make'], "\n";   	}
+	\begin{phpcode}
+	$statement = $connection->query($sql);
+	
+	while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+	  echo $row['last_name'];
+	}	
+	\end{phpcode}
 
-	// and, finally, PostgreSQL:   	$q = pg_query($sql);   	while($r = pg_fetch_assoc($q))   	{		echo $r['make'], "\n";	}
-Die Objekte PDOConnection und PDOStatement besitzen viele weitere nützliche Methoden, die hier jedoch nicht alle aufgezählt werden. In Kapitel [KAP zum praktischen Teil einfügen] werden jedoch die gängigen Methoden verwendet und teilweise erläutert. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
+Zudem gibt es mit \inlinephp{fetch_column()} und \inlinephp{fetch_Object()} Alternativen für die Verwendung von \inlinephp{fetch()} in Verbindung mit den entsprechenden Konstanten. 
 
-#### Traversierung von Ergebnissmengen   	// assume the query is in the $sql variable   	$sql = "SELECT DISTINCT make FROM cars ORDER BY make";   	// For MySQL:   	$q = mysql_query($sql);   	while($r = mysql_fetch_assoc($q))   	{    	echo $r['make'], "\n";   	}
+Die \inlinephp{fetch*}-Methoden können alternativ zu \inlinephp{query()} genutzt werden, sind jedoch obligatorisch im Zusammenhang mit Prepared Statements.
 
-	// and, finally, PostgreSQL:   	$q = pg_query($sql);   	while($r = pg_fetch_assoc($q))   	{		echo $r['make'], "\n";	}
-	
-	$q = $conn->query("SELECT DISTINCT make FROM cars ORDER BY make");   	while($r = $q->fetch(PDO::FETCH_ASSOC))   	{
-		echo $r['make'], "\n";   	}
-   	
-	Besipiele liefern:   	PDO::FETCH_ASSOC	
-	PDO::FETCH_ROW
-	PDO::FETCH_NUM
-	…
-	   		   
+#### Prepared Statements
+Wie in Fußnote \footref{ftn:maskQueries} bereits erwähnt wird, müssen die SQL-Anfragen die an \inlinephp{pdo::query()} übergeben werden maskiert werden. Traditionell wird dafür die PHP-Methode \inlinephp{addslashes()} oder die MySQL-Methode \inlinephp{mysqli_real_escape_string()} verwendet, die entsprechende Zeichen mit einem \-Zeichen maskiert. Dies verhindert einen Angriff auf die Datenbankanwendung über SQL-Injections. Auch schon erwähnt wurde die Methode \inlinephp{pdo::quote()}, die diese Maskierung für \gls{pdo} vornimmt.
 
-  * Unterschiede der Queries von MySQL, Postgres und PDO zeigen
-  * $connection->query gibt PDOStatement Objekt zurück im Gegensatz zu PHP Resourcen [Was ist das?]
+Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements an.
+
+======
+* somit bietet es viele verschiedene Methoden auf der Ergebnismenge an
+  * fetch
+  * close
+  * *error
+  * count
+  * Metadata der Ergebnismenge. Traditionell mysql_num_rows
+   
   
 #### Prepared Statements
 * Traue keiner Benutzereingabe
@@ -161,3 +187,5 @@ Die beiden Funktionen \inlinephp{*_query} senden die Abfragen ebenfalls an die D
 #### Transactions (S. 128)
 * Wird in TYPO3 nicht benutzt. Trotzdem erwähnen?
 * Wie wird es von Doctrine genutzt
+
+Die Objekte PDOConnection und PDOStatement besitzen viele weitere nützliche Methoden, die hier jedoch nicht alle aufgezählt werden. In Kapitel [KAP zum praktischen Teil einfügen] werden jedoch die gängigen Methoden verwendet und teilweise erläutert. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
