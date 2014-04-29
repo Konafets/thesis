@@ -4,7 +4,7 @@ Wie wir im Kapitel über Doctrine sehen werden [Hängt davon ab, wo dieses Kapit
 Im diesem Kapitel wird auf den Hintergrund von \gls{pdo}. Es werden die Fähigkeiten und Grenzen aufgezeigt, sowie anhand von einfachen Beispielen die Funktionsweise illustriert.
 
 ### Was ist PDO
-PHP Data Objects (PDO) ist eine Extension aus der \gls{PECL} PHP Extension Community Library (PECL) für PHP5 und stellt eine Abstraktionsbibliothek für die Interaktion mit \gls{dbms} verschiedener Hersteller dar. Dabei orientiert sie sich an dem Konzept der Java Data Objects (JDO) \gls{jdo}.
+PHP Data Objects (PDO) stellt eine Abstraktionsbibliothek für die Interaktion mit \gls{dbms} verschiedener Hersteller dar und orientiert sich dabei an dem Konzept der Java Data Objects (JDO) \gls{jdo}[LINK zu jdo einfügen]. Es ist seit Version 5.1 in \gls{php} enthalten.
 
 Der Grund der Existenz einer solchen Bibliothek liegt darin begründet, dass man in PHP viele verschiedene \gls{dbms} über jeweils eigene Extensions ansprechen kann. Die dazu extra zu installierenden Extensions bringt jeweils eine eigene API für die \gls{dbms} mit, so das sich die Art des Aufbaues der Verbindung und das Absetzen von Anfragen von \gls{dbms} zu \gls{dbms} unterschiedlich ausgestaltet ist. 
 Dies kann zu einem hohem Aufwand führen, wenn die Anwendung von einem \gls{dbms} auf ein anderes umgestellt werden soll. \gls{pdo} hingegen definiert unabhängig vom zugrundeliegenden \gls{dbms} eine einheitliche Schnittstelle für das Verbindungsmanagement und die Kommunikation mit der Datenbank. 
@@ -30,7 +30,7 @@ Die Klasse (\inlinephp{PDO}) beinhaltet die Verbindung zur Datenbank und stellt 
 Im Folgenden wird die Verwendung der Klassen an einfachen Beispielen erläutert. Dabei werden die Unterschiede zur den klassischen Verfahren (MySQL und PostgreSQL) demonstriert. Damit \gls{pdo} mit verschiedenen \gls{dbms} benutzt werden kann, müssen die Treiber des entsprechenden \gls{dbms} installiert sein. Als Grundlage der Abfragen und Ergebnisse dient eine Datenbank mit den folgenden Tabellen. Es wird davon ausgegangen, dass sie bereits erstellt wurde.
     
     students
-	+----+------------+-----------+-------+	| id | first_name | last_name | house |	+----+------------+-----------+-------+	|  1 | Lucius     | Malfoy    |   4   |	|  2 | Harry      | Potter    |   1   |	|  3 | Herminone  | Granger   |   1   |
+	+----+------------+-----------+-------+	| id | first_name | last_name | house |	+----+------------+-----------+-------+	|  1 | Lucius     | Malfoy    |   4   |	|  3 | Herminone  | Granger   |   1   |
 	|  4 | Ronald     | Weasley   |   1   |
 	|  5 | Luna       | Lovegood  |   3   |	|  6 | Cedric     | Diggory   |   2   |	+----+------------+-----------+-------+
     
@@ -146,12 +146,134 @@ Dies stellt eine nicht abschließende Aufzählung dar. Die Dokumentation von \gl
 
 Zudem gibt es mit \inlinephp{fetch_column()} und \inlinephp{fetch_Object()} Alternativen für die Verwendung von \inlinephp{fetch()} in Verbindung mit den entsprechenden Konstanten. 
 
-Die \inlinephp{fetch*}-Methoden können alternativ zu \inlinephp{query()} genutzt werden, sind jedoch obligatorisch im Zusammenhang mit Prepared Statements.
+#### Prepared Statements (PS)
+Bereits MySQLi führt Prepared Statements ein, somit sind sie in der PHP-Welt nicht so neu. Während MySQLi nur einen Typ von Prepared Statements unterstützt, bietet \gls{pdo} eine weitere sinnvolle Variante an. Im Folgenden wird das Konzept und der Nutzen von Prepared Statements kurz erklärt.
 
-#### Prepared Statements
+Prepared Statements können als eine Vorlage für SQL-Abfragen verstanden werden, die immer wieder, mit verschiedenen Werten, ausgeführt werden. Dabei kann ein \gls{dbms} die Struktur dieses Templates einmalig analyisieren und vorkompiliert im Cache speichern. Bei jedem erneuten Aufruf setzt es lediglich die anderen Werte anstelle von Platzhaltern ein, was die Ausführung schneller macht. (vgl. \cite[S. 75]){book:popel2007pdo}
+
+Zur Demonstration soll je ein Codebeispiel dienen. Dabei fügen wir neue Studierende in die oben gezeigte Datenbanktabelle ein. Der sprechende Hut\footnote{\url{http://de.harry-potter.wikia.com/wiki/Sprechender_Hut}} hat bereits über die Häuser der Neuzugänge entschieden. Um die Abfrage einfach zu halten, wird der Fremdschlüssel der Tabelle für die Häuser direkt in dem Query angegeben.
+
+Die Daten der Studierenden liegen in einem assoziativen Array vor und können somit über eine For-Schleife durchiteriert werden. Pro Schleifendurchlauf wird ein Studierender der Datenbank hinzugefügt. Die Werte werden mit der \inlinephp{pdo::quote()}-Methode maskiert um SQL-Injections zu unterbinden.
+
+	\begin{phpcode}
+	$students = array (
+		array (
+			'last_name' => 'Ellesmere',
+			'first_name' => 'Corin',
+			'house' => 1
+		),
+		array (
+			'last_name' => 'Tugwood',
+			'first_name' => 'Havelock',
+			'house' => 4
+		),
+		array (
+			'last_name' => 'Fenetre',
+			'first_name' => 'Valentine',
+			'house' => 3
+		)
+		
+	)
+	
+	foreach ($students as $student) {
+		$sql = 'INSERT INTO students (last_name, first_name, house) 
+		          VALUES (' . $connection->quote($student['last_name']) . 
+		            ',' . $connection->quote($student['first_name']) . 
+		            ',' . $connection->quote($student['house']) . ')';
+		            
+		$connection->query($sql);
+		);
+	}
+	\end{phpcode}
+	
+Bei jedem Durchlauf wird eine neue Abfrage mit den aktuellen Daten erzeugt und an die Datenbank geschickt. In diesen Fall bietet sich die Benutzung von Prepared Statements an, da sich pro Iteration lediglich die Werte ändern.
+
+	\begin{phpcode}
+	$statement = $connection->prepare(
+	  'INSERT INTO students (last_name, first_name, house) VALUES (?, ?, ?)');
+
+	foreach ($students as $student) {		            
+		$statement->execute(
+		  array($student['last_name'], $student['first_name'], $student['house']);
+		);
+	}
+	\end{phpcode}
+
+Die hier, anstelle der eigentlichen Daten, verwendeten Fragezeichen stellen Platzhalter dar, die als ``Positional Placeholders'' (engl. Positions Platzhalter) bezeichnet werden. Die Daten werden der Methode \inlinephp{PDOStatement::execute()} in einem Array übergeben. Dabei ist die Reihenfolge wichtig, da ansonsten die Daten in die falschen Spalten der Tabelle geschrieben werden. 
+
+Bei der Benutzung von Prepared Statements kann auf die Maskierung per \inlinephp{PDO::quote()} verzichtet werden, da dies die Datenbank übernimmt.
+
+\gls{pdo} bietet - im Gegensatz zu MySQLi - mit den ``Named Paramentern'' noch eine weitere Möglichkeit für Platzhalter an. Anstelle von Fragezeichen werden Bezeichner mit einem vorangestellen Doppelpunkt verwendet. Der Vorteil von dieser Variante, dass die Reihenfolge bei der Übergabe der Daten an die \inlinephp{PDOStatement::execute()}-Methode keine Rolle mehr spielt. Das folgende Listing zeigt den gleichen Code von oben jedoch diesmal mit Named Parametern. Die Daten werden dieses Mal als Key/Value-Paar übergeben, bei dem der Key den benannten Platzhalter darstellt und der Value die einzufügenden Daten.
+ 
+	\begin{phpcode}
+	$statement = $connection->prepare(
+	  'INSERT INTO students (last_name, first_name, house) VALUES (:lastname, :firstname, :house)');
+
+	foreach ($students as $student) {		            
+		$statement->execute(
+		  array(
+		    ':firstname' => $student['first_name'],
+		    ':lastname'  => $student['last_name'], 
+		    ':house'     => $student['house']);
+		);
+	}
+	\end{phpcode} 
+ 
+Nun spielt die Reihenfolge keine Rolle mehr – die Daten werden in die richtige Spalten eingefügt.
+
+Die Zuordnung einer Variablen zu einem Platzhalter wird ``Binding'' genannt; gebundene Variablen werden demzufolge als ``Bounded Variables'' bezeichnet. Neben der gezeigten Bindung über \inlinephp{PDOStatement::execute()} bietet \gls{pdo} spezialisiserte Methoden an, was folgende Ursachen hat: 
+
+1. Bei der gezeigten Bindung werden die Variablen stets als String behandelt. Es ist nicht möglich dem \gls{dbms} mitzuteilen, das der übergebene Wert einem anderen Datentyp entspricht.  
+2. Die Variablen werden bei dieser Methode stets als In-Parameter übergeben. Auf den Wert der Variablen kann innerhalb der Funktion nur lesenend zugegiffen werden. Man nennt diese Übergabe auch ``by Value''. Es gibt jedoch Szenarien in denen der Wert der Variable innerhalb der Funktion geändert werden soll. Dann müssen die Parameter als Referenz (``by Reference'') übergeben werden und agieren als In/Out-Paramaeter. Einige \gls{dmbs} unterstützen dieses Vorgehen und speichern das Ergebnis der Abfrage wieder in der übergebenen Variable.
+
+Das Äquivalent zum obigen Beispiel ist die Methode \inlinephp{PDOStatement::bindValue()}, bei der die Variable als In-Parameter übergeben wird. Für jeden zu bindenden Platzhalter muß die Methode aufgerufen werden, die den Name des Platzhalters, den zu bindenen Wert und die optionale Angabe des Datentyps erwartet. \gls{pdo} bietet dazu vordefinierte Konstanten an, die den \gls{sql} Datentypen entsprechen.
+
+	\begin{phpcode}
+	$statement = $connection->prepare(
+	  'INSERT INTO students (last_name, first_name, house) VALUES (:lastname, :firstname, :house)');
+
+	foreach ($students as $student) {
+	    $statement->bindValue(':lastname', $student['first_name']);
+	    $statement->bindValue(':firstname', $student['last_name']);
+	    $statement->bindValue(':house', $student['house'], PDO::PARAM_INT);
+	    
+		$statement->execute();
+	}
+	\end{phpcode}
+
+Die Methode zur Übergabe der zu bindenden Werte per Referenz heißt \inlinephp{PDOStatement::bindParam()}. Die Funktionsweise unterscheidet sich dahingehend von \inlinephp{bindValue()}, als dass die Werte, welche in der Variablen gespeichert sind, erst dann aus der Adresse im Speicher ausgelesen werden, wenn \inlinephp{execute()} ausgeführt wird, während \inlinephp{bindValue()} die Werte sofort bei Aufruf der Funktion ausliest. Aus diesem Grund muß \inlinephp{bindValue()} innerhalb der Schleife stehen. 
+
+	\begin{phpcode}
+	$statement = $connection->prepare(
+	  'INSERT INTO students (last_name, first_name, house) VALUES (:lastname, :firstname, :house)');
+	  
+	$statement->bindParam(':lastname', $student['first_name']);
+	$statement->bindParam(':firstname', $student['last_name']);
+	$statement->bindParam(':house', $student['house'], PDO::PARAM_INT);  
+
+	foreach ($students as $student) {
+		$statement->execute();
+	}
+	\end{phpcode}
+
+
+Prepared Statement sind 
 Wie in Fußnote \footref{ftn:maskQueries} bereits erwähnt wird, müssen die SQL-Anfragen die an \inlinephp{pdo::query()} übergeben werden maskiert werden. Traditionell wird dafür die PHP-Methode \inlinephp{addslashes()} oder die MySQL-Methode \inlinephp{mysqli_real_escape_string()} verwendet, die entsprechende Zeichen mit einem \-Zeichen maskiert. Dies verhindert einen Angriff auf die Datenbankanwendung über SQL-Injections. Auch schon erwähnt wurde die Methode \inlinephp{pdo::quote()}, die diese Maskierung für \gls{pdo} vornimmt.
 
 Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements an.
+
+* kann als Vorlage / Template für eine Abfrage aufgefasst werden (vgl. \cite[S. 75]){book:popel2007pdo} √
+* gleicher Query aber jedesmal unterschideliche Werte √
+* Vorteile:
+  * Precompiling des Query -> schneller Ausführung √
+* Beispiel eines Queries mit/ohne PS das verschiedene neue Schüler in die DB einfügt (Beispiel für PS mit Positional Platzhalter)
+* Positionale Platzhalter / Benannte Platzhalter
+  * Erklärung des Unterschieds
+  * Beispiel Code
+* Bound Values
+  * bindValues()
+  * bindParam()  
+
 
 ======
 * somit bietet es viele verschiedene Methoden auf der Ergebnismenge an
@@ -176,6 +298,13 @@ Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements 
 #### Fehlerbehandlung
 
 #### SQL Injections (S. 60) (macht mehr Sinn im Kapitel Sicherheit)
+
+Ein bisher nur angedeuteter aber nicht zu unterschätzende Vorteil von PS ist die nahezu 100%ige Unterbindung von SQL-Injections
+
+
+Dies trägt erheblich zur Sicherheit einer Webanwendung bei und ist.
+
+, 
 	$sql = "SELECT sum(price) FROM cars WHERE make='Ford'"
 	
 	// MySQL:   	$m = mysql_real_escape_string($make);	$q = mysql_query("SELECT sum(price) FROM cars WHERE make='$m'");   	// and PostgreSQL:   	$m = pg_escape_string($make);   	$q = pg_query("SELECT sum(price) FROM cars WHERE make='$m'");
@@ -189,3 +318,5 @@ Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements 
 * Wie wird es von Doctrine genutzt
 
 Die Objekte PDOConnection und PDOStatement besitzen viele weitere nützliche Methoden, die hier jedoch nicht alle aufgezählt werden. In Kapitel [KAP zum praktischen Teil einfügen] werden jedoch die gängigen Methoden verwendet und teilweise erläutert. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
+
+All die bisher gezeigen Funktionen von \gls{pdo} sind im Grunde schon mit den \gls{php}-Extensions für Datenbanken abbildbar. MySQLi bietet durch seine duale \gls{api} auch eine Kapselung in Klassen an und führt Prepared Statements ein. Der 
