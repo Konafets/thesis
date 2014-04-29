@@ -7,3 +7,8 @@
 * Analyse der vorhandenen DBAL Extension
 * Anforderungen an den Prototyp
   * alte API unterstützen 
+  
+1. aktuelle Situation
+2. DBAL
+3. Überleitung zu den anderen Prototypen
+4. Mein Prototyp
