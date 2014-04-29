@@ -257,22 +257,49 @@ Die Methode zur Übergabe der zu bindenden Werte per Referenz heißt \inlinephp{
 	\end{phpcode}
 
 
-Prepared Statement sind 
-Wie in Fußnote \footref{ftn:maskQueries} bereits erwähnt wird, müssen die SQL-Anfragen die an \inlinephp{pdo::query()} übergeben werden maskiert werden. Traditionell wird dafür die PHP-Methode \inlinephp{addslashes()} oder die MySQL-Methode \inlinephp{mysqli_real_escape_string()} verwendet, die entsprechende Zeichen mit einem \-Zeichen maskiert. Dies verhindert einen Angriff auf die Datenbankanwendung über SQL-Injections. Auch schon erwähnt wurde die Methode \inlinephp{pdo::quote()}, die diese Maskierung für \gls{pdo} vornimmt.
+#### SQL-Injections
+[SQL injections Mummy image einfügen]
 
-Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements an.
+Bei SQL-Injections kann über das Frontend einer Anwendung eine Zeichenkette in eine SQL-Abfrage injiziert werden, die die Fähigkeit besitzt den betroffenen SQL-Code derart zu verändern, dass er  
 
-* kann als Vorlage / Template für eine Abfrage aufgefasst werden (vgl. \cite[S. 75]){book:popel2007pdo} √
-* gleicher Query aber jedesmal unterschideliche Werte √
-* Vorteile:
-  * Precompiling des Query -> schneller Ausführung √
-* Beispiel eines Queries mit/ohne PS das verschiedene neue Schüler in die DB einfügt (Beispiel für PS mit Positional Platzhalter)
-* Positionale Platzhalter / Benannte Platzhalter
-  * Erklärung des Unterschieds
-  * Beispiel Code
-* Bound Values
-  * bindValues()
-  * bindParam()  
+- Informationen wie den Adminbenutzer der Webanwendung zurückliefert
+- Daten in der Datenbank manipuliert um ein neuer Adminbenutzer anzugelegen
+- oder die Datenbank ganz- oder teilweise löscht
+
+Für ein kurzes Beispiel einer SQL-Injection soll ein Formular dienen, indem nach den Nachnamen der Studierenden aus Hogwarts gesucht werden kann. Der gesuchte  Datensatz wird ausgegeben wenn er gefungen wird, ansonsten erscheint eine entsprechende Meldung. Der in das Inputfeld eingegebene Wert wird von PHP automatisch in der Variablen \inlinephp{$_REQUEST} gespeichert und kann in der Anwendung ausgelesen werden. \inlinephp{'SELECT * FROM students WHERE last_name = Diggory'} stellt eine mögliche, zu erwartende SQL-Anfrage dar.
+
+[Balsamico Formular einfügen]
+
+	\begin{phpcode}
+	$sql = "SELECT * FROM students WHERE last_name = '" . $_REQUEST['lastName'] . "'";
+	
+	$statement = $connection->query($sql);
+	  
+	foreach($statement as $student) {
+	  echo 'Lastname: ' . $student['last_name'] . "\n";
+	  echo 'Firstname: ' . $student['first_name'] . "\n"; 
+	  echo 'Haus: ' . $student['house'] . "\n";
+	}	
+	\end{phpcode}
+
+Dieser Code beinhaltet zwei Fehler:
+
+1. Es wird nicht überprüft, ob \inlinephp{$_REQUEST['lastName']} leer ist oder was ganz anders enthält als erwartet. 
+2. die Benutzereingabe wird nicht maskiert
+
+Im Falle einer leeren Variable, sähe die Abfrage so aus: \inlinephp{'SELECT * FROM students WHERE last_name = '}. Im besten Fall gibt sie eine leere Ergebnismenge zurück im schlechtesten einen Fehler. Diese Problem ist leicht zu lösen, indem zum einen auf die Existenz der Variablen geprüft wird und zum anderen ob sie einen Wert enthält. Zusätzlich sollte noch auf den Datentyp des enthaltenen Wertes geprüft werden. Erst dann wird die Anfrage abgesetzt.
+
+Da die Eingabe nicht maskiert wird, interpretiert der SQL-Parser einige Zeichen als Teil als Steuerzeichen der SQL-Syntax. Beispiele solcher Zeichen sind das Semikolon, der Apostroph und ein Backslash.
+
+Selbst ein Websitebesucher ohne böse Ansichten könnte mit der Suche nach einem Studenten mit dem Namen O'Hara die SQL-Injection auslösen. Die in diesen Fall an die Datenbank gesendetet SQL-Anfrage \inlinephp{'SELECT * FROM students WHERE last_name = 'O'Hara';} würde wohl einen Fehler auslösen, da der Parser die Anfrage nach dem ``O'' anhand des Apostroph als beendet interpretiert und ``Hara'' kein gültiges Sprachkonstrukt von SQL darstellt.
+
+Ein Angreifer könnte hingegen die Eingabe in das Formular nach \inlinephp{' or '1'='1} verändern. Damit würde sich diese Abfrage inlinephp{'SELECT * FROM students WHERE last_name = '' or '1'='1';} ergeben.
+
+Wird die Maskierung mit einer entsprechenden Prüfung von Benutzereingaben kombinert, verhindert das die Gefahr von SQL-Injections – eine richtige Anwendung vorrausgesetzt. Wie in Fußnote \footref{ftn:maskQueries} bereits erwähnt wurde, müssen an \inlinephp{pdo::query()} übergebene SQL-Anfragen mit \inlinephp{PDO::quote()} maskiert werden. Traditionell wird dafür die PHP-Methode \inlinephp{addslashes()} oder die jeweiligen Maskierungsmethoden der \gls{dbms} verwendet. Für MySQLi wird \inlinephp{mysqli_real_escape_string()} verwendet. 
+
+Werden Prepared Statements genutzt, müssen die Benutzereingaben trotzdem überprüft, jedoch nicht mehr maskiert werden. Dies übernimmt dann die Datenbank. Wird dem Prepared Statement noch der Typ des Wertes mitgeteilt, kann das \gls{dbms} eine Typprüfung vornehmen und ggf. einen Fehler zurückgeben.
+
+#### Fehlerbehandlung
 
 
 ======
@@ -282,41 +309,10 @@ Eine weitaus sichere Möglichkeite bietet \gls{pdo} mit den Prepared Statements 
   * *error
   * count
   * Metadata der Ergebnismenge. Traditionell mysql_num_rows
-   
-  
-#### Prepared Statements
-* Traue keiner Benutzereingabe
-* Angiff über Suchfeld/Formulare (GET/POSt)
-* Angriff über GET Parameter
-* Beispielcode mit ungeschützten Eingaben
-* Beispielcode mit geschützten Eingaben per add_slashes
-* Beispeilcode mit Prepared Statements
-##### Positionale Platzhalter (Positional Placeholders)
-##### Benannte Platzhalter (Named Placeholders)
-##### Gebundene Werte (Bound values)
 
-#### Fehlerbehandlung
-
-#### SQL Injections (S. 60) (macht mehr Sinn im Kapitel Sicherheit)
-
-Ein bisher nur angedeuteter aber nicht zu unterschätzende Vorteil von PS ist die nahezu 100%ige Unterbindung von SQL-Injections
+Die Objekte PDO und PDOStatement besitzen weitere Methoden, von denen einige im Kapitel [KAP zum praktischen Teil einfügen] verwendet und erläutert werden. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
 
 
-Dies trägt erheblich zur Sicherheit einer Webanwendung bei und ist.
+Consider to take an example on 'The Hobbit' and split my thesis into 2 parts. Intro about #TYPO3, #PDO and #Doctrine goes into BA Thesis 1/2
 
-, 
-	$sql = "SELECT sum(price) FROM cars WHERE make='Ford'"
-	
-	// MySQL:   	$m = mysql_real_escape_string($make);	$q = mysql_query("SELECT sum(price) FROM cars WHERE make='$m'");   	// and PostgreSQL:   	$m = pg_escape_string($make);   	$q = pg_query("SELECT sum(price) FROM cars WHERE make='$m'");
-   	
-	// PDO   	$m = $conn->quote($make);	$q = $conn->query("SELECT sum(price) FROM cars WHERE make=$m");
-	
-	
-
-#### Transactions (S. 128)
-* Wird in TYPO3 nicht benutzt. Trotzdem erwähnen?
-* Wie wird es von Doctrine genutzt
-
-Die Objekte PDOConnection und PDOStatement besitzen viele weitere nützliche Methoden, die hier jedoch nicht alle aufgezählt werden. In Kapitel [KAP zum praktischen Teil einfügen] werden jedoch die gängigen Methoden verwendet und teilweise erläutert. Für weiterführende Informationen sei auf die Dokumentation verwiesen \url{http://mx2.php.net/manual/en/book.pdo.php}.
-
-All die bisher gezeigen Funktionen von \gls{pdo} sind im Grunde schon mit den \gls{php}-Extensions für Datenbanken abbildbar. MySQLi bietet durch seine duale \gls{api} auch eine Kapselung in Klassen an und führt Prepared Statements ein. Der 
+2/2 Analytics about the current situation, market survey and my prototyp into MA thesis. ;-) 
