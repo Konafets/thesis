@@ -17,6 +17,7 @@
 ]{scrbook}
 
 %\includeonly{Chapters/Doctrine}
+%\includeonly{Chapters/Basics,FrontBackmatter/Definitions}
 \PassOptionsToPackage{
     %layout,
     drafting,
@@ -207,11 +208,16 @@
 	bgcolor              = bg,
 	funcnamehighlighting = true
 }
-
+\newmintinline{sql}{}
 \newminted{mysql}{
 	linenos     = true,
 	bgcolor     = bg,
 	xleftmargin = 2em
 }
 
+\newminted{psql}{
+	linenos     = true,
+	bgcolor     = bg,
+	xleftmargin = 2em
+}
 \usepackage{thesis}
