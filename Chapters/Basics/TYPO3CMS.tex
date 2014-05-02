@@ -59,14 +59,14 @@ TYPO3 CMS wurde in \gls{php} - basierend auf dem Konzept der Objektorientierung 
 
 \gls{php} bildet zusammen mit einem Apache Webserver und einer MySQL Datenbank den sogenannten Webstack, der abhängig von dem eingesetzten Betriebssystem MAMP (OSX / {\bfseries M}ac), LAMP ({\bfseries L}inux) oder WAMP ({\bfseries W}indows) heißt.
 
-In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension\footnote{Eine kurze Einführung in die verschiedenen Arten von Extension findet sich im Kapitel \ref{subsubsec:sysext}} können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel [Kgls{api}TEL zur Analyse von ext:DBAL einfügen].
+In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension\footnote{Eine kurze Einführung in die verschiedenen Arten von Extension findet sich im Kapitel \ref{subsubsec:sysext}} \textit{DBAL} können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel~\ref{}[Kapitel zur Analyse von ext:DBAL einfügen].
 
 \subsubsection{Ansichtssache}
 Aus Anwendersicht teilt sich TYPO3 CMS in zwei Bereiche:
 
 \begin{itemize}
 	\item das Backend\\
-		stellt die Administrationsoberfläche dar. Hier erstellen und verändern Redaktuere die Inhalte während Administratoren das System von hier aus konfigurieren
+		stellt die Administrationsoberfläche dar. Hier erstellen und verändern Redaktuere die Inhalte; während Administratoren das System von hier aus konfigurieren
 	\item das Frontend\\
 		stellt die Website dar, die ein Besucher zu Gesicht bekommt.
 \end{itemize}
@@ -80,9 +80,9 @@ TYPO3 CMS besteht aus einem Systemkern, der lediglich grundlegende Funktionen zu
 
 Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten \gls{api}s, wird als die "TYPO3 \gls{api}" bezeichnet. Diese kann - analog zum Backend / Frontend Konzept - in eine Backend \gls{api} und eine Frontend \gls{api} unterteilt werden kann. Die Aufgabe der Frontend \gls{api} ist die Zusammenführung der getrennt vorliegenden Bestandteile (Inhalt, Struktur und Layout) aus der Datenbank oder dem Cache zu einer HTML-Seite. Die Backend \gls{api} stellt Funktionen zur Erstellung und Bearbeitung von Inhalten zur Verfügung. (vgl. \cite[S. 5 ff.]{book:dulepovTypo32008})
 
-Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet \cite[S. 5 ff.]{book:dulepovTypo32008} als "Common"-\gls{api}. Die Funktionen der Common-APi werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundanter Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
+Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet Dulepov \cite[S. 5 ff.]{book:dulepovTypo32008} als "Common"-\gls{api}. Die Funktionen der \textit{Common-\gls{api}} werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundante Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
 
-Auf die aktuelle Datenbank-\gls{api} wird in [KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
+Auf die aktuelle Datenbank-\gls{api} wird in Kapitel \ref{}[KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
 
 \subsubsection{Verzeichnisstruktur}
 
@@ -90,7 +90,7 @@ Im Gegensatz zu früheren TYPO3 CMS Versionen gibt es kein "Dummy"-Package\footn
 
 Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3\_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 CMS und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \pdf{typo3\_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3\_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{Verbatim}[samepage=true]
 .
 ├── Packages/
@@ -216,7 +216,7 @@ Systemextension werden mit dem System mitgeliefert und befinden sich ausschließ
 
 Neben Systemextensions gibt es noch globale\footnote{Da globale Extensions nur in bestimmten Szenarien einen Sinn ergeben und in der Realität so gut wie nicht vorkommen, wird von der TYPO3 Community der Begriff "Extension" synonym zum Begriff "lokale Extension" verwendet. Die Arbeit folgt dieser Regelung.} und lokale Extensions. Lokale Extensions werden im Ordner \pdf{typo3conf/ext/} und globale Extensions im Ordner \pdf{typo3/ext} installiert.
 
-Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Die Festlegung auf eine der folgenden Kategorien hat keine direkte Auswirkung auf die Funktion der Extension. Sie wird von TYPO3 CMS hauptsächlich als Sortiermerkmal im Extension Manager genutzt.
+Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Die Festlegung auf eine der folgenden Kategorien hat keine direkte Auswirkung auf die Funktion der Extension. Sie wird von TYPO3 CMS hauptsächlich als Sortiermerkmal im \gls{em} genutzt.
 
 [3. Bild von https://typo3.org/extensions/what-are-extensions/ einfügen oder eigenen Screenshot machen]
 
@@ -242,10 +242,13 @@ Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Di
 \end{itemize}
 
 \subsubsection{Extension Manager}
-Der Extension Manager (EM) \gls{em} ist ein \gls{be} Modul, über das die Extensions verwaltet werden können. Es erlaubt die Aktivierung, Deaktivierung, Herunterladen und das Löschen von Extensions. Darüberhinaus bietet der \gls{em} Möglichkeiten zur detailierten Anzeige von Informationen über die Extensions wie das Changelog\footnote{Das Protokoll der Codeänderungen, die ein Programm von Version zu Version erlebt}, Angaben zu den Autoren und Ansicht der Dateien der Extension.
+Der \gls{em} ist ein \gls{be} Modul, über das die Extensions verwaltet werden können. Es erlaubt die Aktivierung, Deaktivierung, Herunterladen und das Löschen von Extensions. Darüberhinaus bietet der \gls{em} Möglichkeiten zur detailierten Anzeige von Informationen über die Extensions wie das Changelog\footnote{Das Protokoll der Codeänderungen, die ein Programm im Laufe seines Lebens erlebt}, Angaben zu den Autoren und Ansicht der Dateien der Extension.
 
 \subsubsection{Verzeichnisstruktur}
 Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unterscheiden sie sich nicht in der Verzeichnis- und Dateistruktur. Mit der Integration von Extbase in TYPO3 CMS hat sich eine neue Verzeichnisstruktur etabliert. Sie folgt dem Paradigma \textit{Konvention statt Konfiguration}, was bedeutet, dass durch Einhaltung der Struktur keine weitere Konfiguration notwendig ist.
+
+[Beschreibung der Verzeichnisstruktur einfügen]
+
 \begin{figure}[t]
 \begin{Verbatim}[samepage=true]
 .
@@ -306,7 +309,7 @@ Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unt
 	\end{itemize}
 	\\ \hline
 	ext\_tables.sql & Diese Datei enthält Anweisungen um eine Datenbanktabelle zu erstellen. Sie sind im MySQL Format zu formulieren, auch wenn als Datenbank etwas anderes genutzt wird. TYPO3 CMS parst die Datei mit einem eigenen (sehr rudimentären) SQL-Parser und generiert einen eigene SQL-Abfrage. Dieses Vorgehen hat den Hintergrund, dass dadurch auf Fehler im diesen Dateien reagiert werden kann und zum anderen das die mitgelieferte Datenbankabstraktionsschicht die Anweisungen in das SQL der entsprechenden Hersteller übersetzen kann. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.\\ \hline
-	ext\_tables\_static+adt.sql & Auch diese Datei enthält SQL Code wie \pdf{ext\_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der Extension Manager genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.\\ \hline
+	ext\_tables\_static+adt.sql & Auch diese Datei enthält SQL Code wie \pdf{ext\_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der \gls{em} genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.\\ \hline
 	\caption{Erläuterung der Verzeichnisstruktur einer Extension}
 	\label{tab:extensionFolderStructure}
 \end{longtable}
