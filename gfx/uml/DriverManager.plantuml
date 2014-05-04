@@ -1,0 +1,9 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Doctrine.DBAL.DriverManager {
+  +getConnection(): Doctrine.DBAL.Connection
+}
+@enduml

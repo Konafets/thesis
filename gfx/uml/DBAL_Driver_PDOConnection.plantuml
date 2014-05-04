@@ -1,0 +1,36 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Doctrine.DBAL.Driver.Connection {
+  +prepare(): \Doctrine\DBAL\Driver\Statement 
+  +query(): \Doctrine\DBAL\Driver\Statement 
+  +quote(): string
+  +exec(): integer
+  +lastInsertId(): string
+  +beginTransaction(): boolean
+  +commit(): boolean
+  +rollBack(): boolean
+  +errorCode(): string|null
+  +errorInfo(): array
+}
+class PDO {
+  +prepare(): PDOStatement 
+  +query(): PDOStatement 
+  +quote(): string
+  +exec(): integer
+  +lastInsertId(): string
+  +beginTransaction(): boolean
+  +commit(): boolean
+  +rollBack(): boolean
+  +errorCode(): string|null
+  +errorInfo(): array
+  +getAttribute(): mixed
+  +{static} getAvailableDrivers(): array
+  +setAttribute(): boolean
+}
+class Doctrine.DBAL.Driver.PDOConnection extends PDO
+class Doctrine.DBAL.Driver.PDOConnection implements Doctrine.DBAL.Driver.Connection
+class Doctrine.DBAL.Driver.DB2Connection implements Doctrine.DBAL.Driver.Connection
+@enduml

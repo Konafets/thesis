@@ -1,0 +1,11 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Doctrine.DBAL.Driver.Connection
+
+class Docrine.DBAL.Connection implements Doctrine.DBAL.Driver.Connection {
+  #Doctrine.DBAL.Driver.PDOMySql.Driver $_conn
+}
+@enduml

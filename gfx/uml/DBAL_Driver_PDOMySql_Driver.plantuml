@@ -1,0 +1,26 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Doctrine.DBAL.Driver {
+  +connect(): \Doctrine\DBAL\Driver\Connection
+  +getDatabasePlatform(): \Doctrine\DBAL\Platforms\AbstractPlatform
+  +getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
+  +getName(): string
+  +getDatabase(): string
+}
+class Doctrine.DBAL.Driver.PDOMySql.Driver {
+  +connect(): Doctrine.DBAL.Driver.PDOConnection
+}
+
+class Doctrine.DBAL.Driver.PDOMySql.Driver extends Doctrine.DBAL.Driver.AbstractMySQLDriver
+class Doctrine.DBAL.Driver.AbstractMySQLDriver implements Doctrine.DBAL.Driver
+
+class Doctrine.DBAL.Driver.PDOPgSql.Driver {
+  +connect(): Doctrine.DBAL.Driver.PDOConnection
+}
+
+class Doctrine.DBAL.Driver.PDOPgSql.Driver extends Doctrine.DBAL.Driver.AbstractPostgreSQLDriver
+class Doctrine.DBAL.Driver.AbstractPostgreSQLDriver implements Doctrine.DBAL.Driver
+@enduml
