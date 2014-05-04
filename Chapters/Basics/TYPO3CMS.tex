@@ -72,23 +72,27 @@ Aus Anwendersicht teilt sich TYPO3 CMS in zwei Bereiche:
 \end{itemize}
 (vgl. \cite[S. 5]{book:dulepovTypo32008})
 
-%[Skizze Backend / Frontend einfügen]
-
-
 \subsubsection{Der Systemkern und die \gls{api}s}
 TYPO3 CMS besteht aus einem Systemkern, der lediglich grundlegende Funktionen zur Datenbank-, Datei- und Benutzerverwaltung zu Verfügung stellt. Dieser Kern ist nicht monolithisch aufgebaut, sondern besteht aus Systemextensions. (vgl. \cite[S. 32]{book:laborenzTypo32006})
 
-Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten \gls{api}s, wird als die "TYPO3 \gls{api}" bezeichnet. Diese kann - analog zum Backend / Frontend Konzept - in eine Backend \gls{api} und eine Frontend \gls{api} unterteilt werden kann. Die Aufgabe der Frontend \gls{api} ist die Zusammenführung der getrennt vorliegenden Bestandteile (Inhalt, Struktur und Layout) aus der Datenbank oder dem Cache zu einer HTML-Seite. Die Backend \gls{api} stellt Funktionen zur Erstellung und Bearbeitung von Inhalten zur Verfügung. (vgl. \cite[S. 5 ff.]{book:dulepovTypo32008})
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.77]{diagrams/TYPO3Architecture.eps}
+	\caption{Schematischer Aufbau von TYPO3}
+	\label{fig:typo3Architecture}
+\end{figure}
 
-Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet Dulepov \cite[S. 5 ff.]{book:dulepovTypo32008} als "Common"-\gls{api}. Die Funktionen der \textit{Common-\gls{api}} werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundante Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
+Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten \gls{api}s, wird als die \mbox{\textit{TYPO3 API}} bezeichnet. Diese kann - analog zum Konzept von Backend und Frontend - in eine \mbox{\textit{Backend \gls{api}}} und eine \mbox{\textit{Frontend \gls{api}}} unterteilt werden kann. Die Aufgabe der Frontend \gls{api} ist die Zusammenführung der getrennt vorliegenden Bestandteile (Inhalt, Struktur und Layout) aus der Datenbank oder dem Cache zu einer HTML-Seite. Die Backend \gls{api} stellt Funktionen zur Erstellung und Bearbeitung von Inhalten zur Verfügung. (vgl. \cite[S. 5 ff.]{book:dulepovTypo32008})
+
+Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet Dulepov \cite[S. 5 ff.]{book:dulepovTypo32008} als \mbox{\textit{Common-\gls{api}}}. Die Funktionen der Common-\gls{api} werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundante Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
 
 Auf die aktuelle Datenbank-\gls{api} wird in Kapitel \ref{}[KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
 
 \subsubsection{Verzeichnisstruktur}
 
-Im Gegensatz zu früheren TYPO3 CMS Versionen gibt es kein "Dummy"-Package\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enthält der Download lediglich den TYPO3 CMS Kern in Form des Verzeichnisses \pdf{typo3/}.
+Im Gegensatz zu früheren TYPO3 CMS Versionen gibt es kein \mbox{\textit{Dummy-Package}}\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enthält der Download lediglich den TYPO3 CMS Kern in Form des Verzeichnisses \pdf{typo3/}.
 
-Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3\_src/} ist ein (Linux) Symlink auf das Installationsverzeichnis von TYPO3 CMS und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher auf über den Symlink \pdf{typo3\_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3\_src} auf das Installationverzeichnis der neuen Version "umgebogen" werden muss.
+Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3\_src/} ist ein (Linux-)Symlink auf das Installationsverzeichnis von TYPO3 CMS und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher über den Symlink \pdf{typo3\_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3\_src} auf das Verzeichnis der neuen Version rekonfiguriert werden muss.
 
 \begin{figure}[H]
 \begin{Verbatim}[samepage=true]
@@ -181,7 +185,9 @@ Enthält eine Tabelle keinen Eintrag im TCA ist sie im Backend nicht sichtbar.(v
 \subsubsection{XCLASS}
 TYPO3 CMS besitzt einen Mechanismus, der es erlaubt Klassen zu erweitern oder Methoden mit eigenem Code zu überschreiben. Dies funktioniert für den Systemkern wie auch für andere Extensions. Dieses Feature nennt sich XCLASS und wird vom Prototypen eingesetzt um die Datenbankklasse von TYPO3 CMS zu überschreiben. Darauf wird im Kapitel [KAPITEL Analyse Ist-Zustand einfügen] näher eingegangen. Hier soll lediglich der Hintergrund zu XCLASS beschrieben werden.
 
-Damit eine Klasse per XCLASS erweiterbar ist, darf sie nicht per \phpinline{new()} Operator erzeugt werden, sondern mit der von TYPO3 CMS angebotenen Methode \phpinline{\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()}. Diese Methode sucht im globalen \gls{php}-Array \phpinline{$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']} nach angemeldeten Klassen, instanziiert diese und liefert sie anstelle der Originalklasse zurück. Dieses Array dient der Verwaltung der zu überschreibenden Klassen und erfolgt in der Datei \pdf{ext\_localconf.php} innerhalb des Extensionsverzeichnisses\footnote{Zur Erläuterung des Aufbaues einer Extension siehe Kapitel~\ref{tab:extensionFolderStructure}.}.
+Damit eine Klasse per XCLASS erweiterbar ist, darf sie nicht per \phpinline{new()} Operator erzeugt werden, sondern mit der von TYPO3 CMS angebotenen Methode\\
+\phpinline{\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()}.
+Diese Methode sucht im globalen \gls{php}-Array \phpinline{$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']} nach angemeldeten Klassen, instanziiert diese und liefert sie anstelle der Originalklasse zurück. Dieses Array dient der Verwaltung der zu überschreibenden Klassen und erfolgt in der Datei \pdf{ext\_localconf.php} innerhalb des Extensionsverzeichnisses\footnote{Zur Erläuterung des Aufbaues einer Extension siehe Kapitel~\ref{tab:extensionFolderStructure}.}.
 
 %\begin{phpcode}
 %$GLOBALS['TYPO3\_CONF\_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\Controller\\NewRecordController'] = array(
@@ -206,8 +212,6 @@ Der Mechanismus hat jedoch ein paar Einschränkungen:
 \subsection{Extensions}
 Extensions sind funktionale Erweiterungen. Sie interagieren mit dem Systemkern über die Extension API und stellen die Möglichkeit dar TYPO3 CMS zu erweitern und anzupassen.
 
-[2. Bild von https://typo3.org/extensions/what-are-extensions/ einfügen oder nachbauen]
-
 Extensions werden - je nach Kontext - in unterschiedliche Kategorien eingeteilt, die hier kurz vorgestellt werden.
 
 \subsubsection{Einteilung}
@@ -218,8 +222,7 @@ Neben Systemextensions gibt es noch globale\footnote{Da globale Extensions nur i
 
 Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Die Festlegung auf eine der folgenden Kategorien hat keine direkte Auswirkung auf die Funktion der Extension. Sie wird von TYPO3 CMS hauptsächlich als Sortiermerkmal im \gls{em} genutzt.
 
-[3. Bild von https://typo3.org/extensions/what-are-extensions/ einfügen oder eigenen Screenshot machen]
-
+[Ich denken diese Übersicht kann gelöscht werden, da irrelevant]
 \begin{itemize}
 	\item
 		Frontend
@@ -313,5 +316,3 @@ Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unt
 	\caption{Erläuterung der Verzeichnisstruktur einer Extension}
 	\label{tab:extensionFolderStructure}
 \end{longtable}
-
-Skizze mit Backend / Frontend / 
