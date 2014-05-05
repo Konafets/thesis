@@ -1,0 +1,23 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Doctrine.DBAL.Statement
+Doctrine.DBAL.Statement --> Doctrine.DBAL.Driver.Statement
+
+interface Doctrine.DBAL.Driver.Statement {
+  +prepare()
+}
+
+class PDOStatement implements Traversable {
+  +prepare()
+}
+
+class Doctrine.DBAL.Driver.PDOStatement extends PDOStatement
+class Doctrine.DBAL.Driver.PDOStatement implements Doctrine.DBAL.Driver.Statement {
+  +prepare()
+}
+note bottom of Doctrine.DBAL.Driver.PDOStatement : parent::prepare();
+
+@enduml

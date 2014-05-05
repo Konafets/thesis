@@ -1,0 +1,24 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Klient {
+}
+
+Klient --> Ziel
+
+interface Ziel {
+  +operation()
+}
+
+class Adaptee {
+  +externeOperation()
+}
+
+class Adapter extends Adaptee
+class Adapter implements Ziel {
+  +operation()
+}
+note bottom of Adapter : adaptee.externeOperation();
+@enduml

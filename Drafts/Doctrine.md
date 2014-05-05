@@ -182,47 +182,83 @@ Bei numerischen Datentypen beschreibt der Wert allerdings die Anzeigenbreite - a
 
 Doctrine spiegelt dieses Verhalten wider, indem die Angabe von \phpinline{length} bei der Deklaration eines Integers dem Wert der Anzeigenbreite entspricht; bei String-Typen den tatsächlichen speicherbaren Wertebreich und bei der Deklaration eines Text-Datentyps als Auswahlkriterium in Bezug auf die unterschiedlichen \sqlinline{*TEXT} Datentypen.
 
-\subsection{Verbreitung und ähnliche Projekte}
-- Symfony, TYPO3 Flow,
-- Propel
-- PDO
-
 \subsection{Unterstützte Datenbanken}
 
 \subsection{Konzepte und Architektur von Doctrine}
-Doctrine DBAL stellt eine Vielzahl von Funktionen und Objekten zur Verfügung, die in diesen Kapitel erklärt werden. Sie alle sind über Klasse **Doctrine\DBAL\Connection** erreichbar, die zunächst über die Methode **Doctrine\DBAL\DriverManager::getConnection()** instanziiert werden muß. 
 
-![Alt text](../gfx/uml/DriverManager.png)
+Wie aus Abbildung~\ref{fig:DoctrineArchitecure} ersichtlich ist und schon erwähnt wurde, setzt Doctrine DBAL auf \gls{pdo} auf. Im Grunde bildet Doctrine DBAL lediglich eine dünne Schicht auf PDO, während \gls{pdo} selbst die Datenbankabstraktion und eine einheitliche API für verschiedene \gls{dbms} zur Verfügung stellt. 
 
-**Doctrine\DBAL\Connection** agiert zwar als Verbindung zur Datenbank, ist jedoch lediglich ein Wrapper um die Verbindung, die sich in der internen Objektvariable **$_conn** befindet. Diese Variable enthält ein *Driver*-Objekt und stellt die eigentliche Verbindung dar. Der *Driver* wird anhand der angeforderten Verbindung dynamisch erstellt. Im Fall einer MySQL Datenbank enthält die Variable **$_conn** ein Objekt vom Typ **Doctrine\DBAL\Driver\PDOMySql\Driver**.
+PDO besteht aus der Klasse **PDO**, die eine Verbindung zur einer Datenbank darstellt und aus der Klasse **PDOStatement**, die zum einen ein (Prepared) Statement als auch das Ergebnis einer Datenbankabfrage repräsentiert. Abbildung~\ref{fig:pdoClasses} zeigt die Klassen mit einer Auswahl an Methoden.
 
-![Alt text](../gfx/uml/DBAL_Connection.png)
+![Alt text](../gfx/uml/PDOMainClasses.png)
 
-**Doctrine\DBAL\Driver\PDOMySql\Driver** erbt von einer Klasse **Doctrine\DBAL\Driver\AbstractMySQLDriver**, die als abstrakte Klasse die Basis für MySQL basierte *Driver* dient. Hier werden die verschiedenen Exceptions zu Doctrine DBAL Exceptions standardisiert und zum anderen Plattform-spezifische Objekte erstellt. Die Klasse implementiert das Interface **Doctrine\DBAL\Driver**, welches die grundlegenden Methoden eines *Driver* definiert. Das Interface muß von jeder *Driver*-Klasse implementiert werden.
+Die äquivalenten Klassen in Doctrine DBAL dazu sind **Doctrine\DBAL\Connection** und **Doctrine\DBAL\Statement**.
 
-![Alt text](../gfx/uml/DBAL_Driver_PDOMySql_Driver.png)
+Die Integration der beiden PDO-Klassen in Doctrine DBAL erfolgt über das Adapter Entwurfsmuster (siehe Abbildung~\ref{fig:AdapterPattern}). Das hat den Vorteil, dass Doctrine DBAL nicht auf PDO als Datenbanktreiber festgelegt ist, sondern um weitere Treiber erweitert werden kann. Neue Treiber müssen lediglich das jeweilige Interface implementieren.
 
-**Doctrine\DBAL\Driver\PDOConnection** stellt die eigentliche Verbindung zur Datenbank dar. Die Klasse erbt direkt von **PDO** und überschreibt einige Methoden  - hauptsächlich um sie durch eigene Exceptions zu erweitern. Sie implementiert außerdem das Interface **Doctrine\DBAL\Driver\Connection**. Dieses muß von jeder *Connection*-klasse implementiert werden.
+![Alt text](../gfx/uml/AdapterPattern.png)
 
-![Alt text](../gfx/uml/DBAL_Driver_PDOConnection.png)
+Ein Adapter hat die Aufgabe eine Schnittstelle in eine andere zu konvertieren. Ein Reisestecker oder ein Displayport-zu-VGA-Adapter stellen typische Beispiele aus der realen Welt dar.
 
-Abbildung \ref{fig:ConnectionAll} zeigt die unmittelbar involvierten Klassen und Interfaces zum erstellen einer Verbindung mit Doctrine DBAL.
+In der Softwareentwicklung wird ein Adapter genutzt wenn eine externe Bibliothek in das eigene Projekt eingebunden werden soll und weder die API des eigenen Projekts noch die der externen Bibliothek verändert werden kann. 
 
-![Alt text](../gfx/uml/Connection_All.png)
+Die Aktuere innerhalb des Adapter Entwurfsmusters sind:
 
-
-
-Wie zu sehen ist, setzt Doctrine DBAL massiv auf PDO auf. Aus diesem Grund folgt eine kurze Einleitung in PDO und dessen Konzepte. 
-
-
+- ein Klient: stellt die Klasse dar, die die API nutzt. Dazu enhält sie eine interne Variable die ein Objekt vom Typ des Interfaces erwartet.
+- ein Ziel: ist ein Interface, welches die zu adaptierenden Methoden definiert. Der Klient wird gegen dieses Interface programmiert.
+- ein Adapter: stellt eine konkrete Implementierung des Interfaces dar und ist eine Kindklasse des Adaptee. Die Methoden des Adapters rufen intern die Methoden der Elternklasse auf, entsprechen nach außen jedoch der vom Klienten erwarteten API 
+- ein Adaptee: die zu adaptierende externe Schnittstelle
 
 
-Wie in Abbildung~\ref{fig:doctrineArchitecture} zu sehen ist, bildet 
+Das UML Diagramm in Abbildung~\ref{fig:adapterPatternConnection} zeigt die Implementation der Connection API, die diesem Muster folgt.
 
-Es kann nicht oft genug darauf hingewiesen werden, dass Doctrine DBAL den Großteil seiner Funktionalität von PDO bezieht.
+![Alt text](../gfx/uml/AdapterPatternConnection.png)
+
+Die Klasse **Doctrine\DBAL\Connection** stellt die Wrapper-Klasse beziehungsweise den Klienten dar. In der geschützten Variable **$_conn** wird ein Objekt erwartet, welches das Interface **Doctrine\DBAL\Driver\Connection** erfüllt. Bei PDO-basierten Verbindungen ist **Doctrine\DBAL\Driver\PDOConnection** ein konkretes Objekt dieses Interfaces. Es erbt außerdem von **PDO** und stellt den Adapter dar.
+
+Die Klasse **PDOStatement** von PDO wird ebenfalls auf diese Art in Doctrine DBAL eingebunden
+
+![Alt text](../gfx/uml/AdapterPatternStatement.png)
 
 
-Die beiden Hauptklassen von Doctrine DBAL sind Connection und Statement, die als eine dünne Schicht über PDO implementiert sind. Doctrine nutzt die Funktionen von PDO und erweitert diese um eigene Funktionaliät.
+Wie in Abbildung~\ref{fig:AdapterPatternStatement} zu sehen ist, implementiert **PDOStatement** das Interface **Traversable**. Da ein Objekt diesen Typs auch die Ergebnismenge repräsentiert, kann über das Objekt mittels einer For-Schleife iteriert werden:
+
+\begin{phpcode}
+$sql = 'SELECT last_name FROM students ORDER BY last_name';
+
+// query() gibt ein PDOStatement-Objekt zurück, welches das Ergebnis beinhaltet
+$statement = $connection->query($sql);
+
+foreach($statement as $row) {
+  echo $row['last_name'] . ' ';
+}
+\end{phpcode}
+
+\subsection{Limitierungen}
+Bei einer Abstraktion wird stets etwas Spezifisches, durch das Weglassen von Details, in etwas Allgemeines überführt. Im Fall von \gls{pdo} wird der andere Weg gegangen – es werden allgemeine \gls{sql}-Anfragen in den Dialekt\footnote{Als Dialekt wird die Hersteller-eigene Implementation des \gls{sql}-Standards genannt, dass sich im Umfang und Syntax vom Standard unterscheidet.} des Herstellers übersetzt.
+
+Aus diesem Grund vermag es \gls{pdo} nicht eine SQL-Abfrage, die in dem Dialekt eines Herstellers formuliert wurde, in den eines anderen zu übersetzen. 
+
+Das folgende Beispiel zeigt die von MySQL unstützte vereinfachte Form eines \sqlinline{INSERT}-Statements. Dies stellt eine Abweichung vom SQL-Standard dar(vgl. \cite[S. 388]{website:SQLStandard1992}) und ist somit nicht portabel. 
+
+\begin{sqlcode}
+INSERT INTO students SET last_name='Kowalke', first_name='Stefano';
+\end{sqlcode}
+
+Stattdessen muss die Anfrage so nah wie möglich am Standard gestellt werden, um als portabel zu gelten.
+
+\begin{sqlcode}
+INSERT INTO students (last_name, first_name) VALUES('Kowalke', 'Stefano');
+\end{sqlcode}
+
+#### Verbindung aufbauen
+
+#### Einfache Datenbankanfragen
+
+#### Prepared Statements
+
+#### SQL-Injections
+
 
 \begin{figure}[H]
 	\centering
@@ -231,14 +267,4 @@ Die beiden Hauptklassen von Doctrine DBAL sind Connection und Statement, die als
 	\label{fig:typo3Architecture}
 \end{figure}
 
-
-1. [UML Diagramm] √
-2. Beschreibung der beiden Klassen
-3. Beschreibung von PDO
-4. BEschreibung der gemeinsammen Konzepte
-
-dd
-
-- UML Diagramm von Statement mit Verbindung zu PDO
-- UML Diagramm von Connection mit Verbindung zu PDO √
-- erweitert PDO √
+- Fascade Pattern for QueryBuilder

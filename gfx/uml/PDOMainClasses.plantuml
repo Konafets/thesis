@@ -1,0 +1,19 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class PDO {
+  +query(): PDOStatement
+  +prepare(): PDOStatement
+  +lastInsertId(): integer
+  .. weitere Methoden ..
+}
+
+class PDOStatement {
+  +fetch(): mixed
+  +execute(): boolean
+  +closeCursor(): boolean
+  .. weitere Methoden ..
+}
+@enduml
