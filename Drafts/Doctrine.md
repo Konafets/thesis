@@ -220,21 +220,344 @@ Die Klasse **PDOStatement** von PDO wird ebenfalls auf diese Art in Doctrine DBA
 
 ![Alt text](../gfx/uml/AdapterPatternStatement.png)
 
+#### Verbindung aufbauen
 
-Wie in Abbildung~\ref{fig:AdapterPatternStatement} zu sehen ist, implementiert **PDOStatement** das Interface **Traversable**. Da ein Objekt diesen Typs auch die Ergebnismenge repräsentiert, kann über das Objekt mittels einer For-Schleife iteriert werden:
+Eine Verbindung wird in Doctrine DBAL über **Doctrine\DBAL\DriverManager::getConnection()** angefordert. 
+
+listing
+phpcode
+$config = new \Doctrine\DBAL\Configuration();
+
+$connectionParams = array(
+    'dbname' => 'hogwartsDB',
+    'user' => 'snape',
+    'password' => 'secret',
+    'host' => 'localhost',
+    'driver' => 'pdo_mysql',
+);
+
+$connection = \Doctrine\DBAL\DriverManager::getConnection($connectionParams, $config);
+phpcode
+lst:DBALConnection
+listing
+
+Anhand des angegebenen Wertes in \phpinline{'driver'} wählt Doctrine den entsprechenden Datenbanktreiber aus und erstellt ein **PDOConnection**-Objekt, da es sich bei \phpinline{'pdo_mysql'} um eine PDO-basierte Verbindung handelt.
+
+Über den zweiten Parameter \phpinline{$config} kann eine Konfiguration an Doctrine DBAL übergeben werden. Außerdem ist es möglich ein Loggerobjekt zu definieren, welches über dieses Objekt in Doctrine DBAL injiziert wird.
+
+#### Einfache Datenbankanfragen
+
+Im Folgenden wird die Verwendung von Doctrine DBAL an einfachen Beispielen erläutert. Als Grundlage der Abfragen und Ergebnisse dient eine Datenbank mit der folgenden Tabelle. Um die Beispiele einfach zu halten wurde auf eine korrekte Normalisierung der Tabelle, bei der die letzte Spalte in eine eigene Tabelle überführt und per Fremdschlüssel referenziert wird, verzichtet.
+
+\begin{Verbatim}[samepage=true]
+students
++----+------------+-----------+------------+
+| id | first_name | last_name |   house    |
++----+------------+-----------+------------+
+|  1 | Lucius     | Malfoy    | Slytherin  |
+|  3 | Herminone  | Granger   | Gryffindor |
+|  4 | Ronald     | Weasley   | Gryffindor |
+|  5 | Luna       | Lovegood  | Ravenclaw  |
+|  6 | Cedric     | Diggory   | Huffelpuff |
++----+------------+-----------+------------+
+\end{Verbatim}
+
+Die als Beispiel dienende Abfrage soll die Nachnamen aller Studierenden in alphabetischer Reihenfolge ausgeben. Die in einer Variablen gespeicherten SQL-Abfrage wird an die Datenbank gesendet und das Ergebnis über eine Schleife ausgegeben. Zunächst wird der althergebrachte Weg gezeigt. Beide PHP-Extensions stellen dafür \phpinline{*_query} Funktionen zur Verfügung, die eine Kennung der Datenbankverbindung zurückgeben. Im Fall eines Fehlers geben sie \phpinline{FALSE} zurück.
 
 \begin{phpcode}
 $sql = 'SELECT last_name FROM students ORDER BY last_name';
+// For MySQLi:
+$result = mysqli_query($connection, $query);
+while($row = mysqli_fetch_assoc($result)) {
+	echo $row['last_name'] . ' ';
+}
 
-// query() gibt ein PDOStatement-Objekt zurück, welches das Ergebnis beinhaltet
+// PostgreSQL:
+$result = pg_query($query);
+while($row = pg_fetch_assoc($result)) {
+	echo $row['last_name'] . ' ';
+}
+\end{phpcode}
+
+In Doctrine DBAL enthält **Doctrine\DBAL\Connection** die Verbindung zur Datenbank. Um eine Anfrage an die Datenbank zu senden, bietet die Klasse die Methode **query()** an. Die Methode gibt ein Objekt vom Typ **Doctrine\DBAL\Statement** zurück. Da **Doctrine\DBAL\Statement** das Interface **IteratorAggregate** von PHP implementiert, kann über das Objekt mittels einer For-Schleife iteriert werden. 
+
+
+listing
+\begin{phpcode}
+$sql = 'SELECT last_name FROM students ORDER BY last_name';
+
 $statement = $connection->query($sql);
 
 foreach($statement as $row) {
   echo $row['last_name'] . ' ';
 }
 \end{phpcode}
+lst:DBALSimpleQuery
+listing
 
-\subsection{Limitierungen}
+Die Ausgabe aller Bespiele lautet:
+\begin{Verbatim}
+Diggory Granger Lovegood Malfoy Weasly
+\end{Verbatim}
+
+
+#### Funktioen auf der Ergebnismenge
+
+Um das Ergebnis der Abfrage sinnvoll nutzen zu können, gibt es verschiedene Formate (engl. fetch styles) in denen das Ergebnis ausgegeben werden kann. In dem Bespielcode~\ref{lst:DBALSimpleQuery} wird als Standardeinstellung \phpinline{PDO:FETCH_BOTH} genutzt. Dabei kann auf die Werte sowohl über einen Index als auch über den Spaltenbezeichner zugegriffen werden.
+
+listing
+\begin{phpcode}
+foreach($statement as $row) {
+  print_r($row);
+}
+\end{phpcode}
+lst:DBALSimpleQuery
+listing
+
+\begin{Verbatim}
+Array
+(
+    [last_name] => Diggory
+    [0] => Diggory
+)
+Array
+(
+    [last_name] => Granger
+    [0] => Granger
+)
+Array
+(
+    [last_name] => Lovegood
+    [0] => Lovegood
+)
+...
+\end{Verbatim}
+
+Die Formatierung der Ergebnismenge  wird über Konstanten gesteuert, die von \gls{pdo} definiert und an die Methode **query()** als optionales Argument übergeben werden können. \phpinline{PDO:FETCH_BOTH} ist ein solche Konstante.
+
+\begin{phpcode}
+$statement = $connection->query($sql, PDO::FETCH_NUM);
+
+foreach($statement as $row) {
+  echo $row[0];
+}
+\end{phpcode}
+
+Die aus der traditionellen Datenbankprogrammierung bekannten Methoden zur Formatierung der Ergebnismenge werden in PDO über diese Konstanten abgebildet. 
+
+Zu den \phpinline{*_fetch_*}-Methoden aus der traditionellen Datenbankprogrammierung gibt es das entsprechende Äquivalent als \gls{pdo}-Konstante. Anstellt des Platzhalters *\** kann wahlweise mysql, mysqli oder pg eingesetzt werden.
+
+\begin{itemize}
+	\item \phpinline{PDO::FETCH_ASSOC} = \phpinline{*_fetch_assoc()}
+	\item \phpinline{PDO::FETCH_NUM} = \phpinline{*_fetch_array()}
+	\item \phpinline{PDO::FETCH_ROW} = \phpinline{*_fetch_row()}
+\end{itemize}
+
+Darüberhinaus definiert \gls{pdo} noch weitere Konstanten, die keine Ensprechung haben.
+
+\begin{itemize}
+	\item \phpinline{PDO::FETCH_OBJ} - liefert jede Zeile der Ergebnisrelation als Objekt zurück. Die Spaltenbezeichner werden dabei zu Eigenschaften der Klasse.
+	\item \phpinline{PDO::FETCH_LAZY} - wie \phpinline{PDO::FETCH_OBJ}. Das Objekt wird jedoch erst dann erstellt, wenn darauf zugegriffen wird.
+	\item \phpinline{PDO::FETCH_CLASS} - liefert eine neue Instanz der angeforderten Klasse zurück. Die Spaltenbezeichner werden dabei zu Eigenschaften der Klasse.
+	\item \phpinline{PDO::FETCH_COLUMN} - liefert nur eine Spalte aus der Ergebnismenge zurück.
+\end{itemize}
+
+Dies stellt eine nicht abschließende Aufzählung dar. Die Dokumentation von \gls{pdo} benennt weitere Konstanten\footnote{\url{http://mx2.php.net/manual/en/pdo.constants.php}}, die für diese Arbeit jedoch nicht von Interesse sind.
+
+
+
+
+
+
+
+Über das \phpinline{PDOStatement}\footnote{Leider ist der Begriff dieser Klasse etwas unglücklich gewählt oder es ist ein Designfehler von \gls{pdo}, denn ein Objekt dieser Klasse repräsentiert zum einen ein (Prepared) Statement und, nachdem die Anfrage ausgeführt wurde, die Ergebnisrelation. Die Methoden der Klasse agieren somit einmal auf dem Statement und einmal auf dem Ergebnis.} werden weitere Möglichkeiten wie die Methoden \phpinline{fetch()} und \phpinline{fetchAll()} angeboten, um das Ergebnis zu erhalten. Diese Methoden müssen auch genutzt werden, wenn statt der \phpinline{foreach}-Schleife eine \phpinline{while}-Schleife genutzt werden soll:
+
+\begin{phpcode}
+$statement = $connection->query($sql);
+
+while($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+  echo $row['last_name'];
+}
+\end{phpcode}
+
+Zudem gibt es mit \phpinline{fetch_column()} und \phpinline{fetch_Object()} Alternativen für die Verwendung von \phpinline{fetch()} in Verbindung mit den entsprechenden Konstanten.
+
+#### Prepared Statements
+\label{subsec:preparedStatements}
+Prepared Statements wurden bereits von der Datenbankerweiterung MySQLi eingeführt und sind keine Neuheit in der PHP Welt. Während MySQLi nur einen Typ der Prepared Statements unterstüzt, stellt \gls{pdo} eine weitere Variante zur Verfügung. Mit Doctrine DBAL können beide Ansätze genutzt werden.
+
+Prepared Statements stellen normalen SQL-Code dar, bei dem die variablen Teile durch Platzhalter ersetzt wurden. Sie können als eine Vorlage für SQL-Abfragen verstanden werden, die mit verschiedenen Werten immer wieder ausgeführt werden sollen. 
+
+Ein Prepared Statements wird zunächst an die Datenbank gesendet, wo der SQL-Parser die Struktur des Templates einmalig analysieren und vorkompiliert im Cache speichern kann. In einer zweiten Anfrage werden der Datenbank die Werte übermittelt, die bei jedem erneuten Aufruf vom Parser anstelle der Platzhalter eingesetzt werden. Dies macht zum einen die Ausfühung der Anfrage schneller (vgl. \cite[S. 75]{book:popel2007pdo}) und erhöht zudem die Sicherheit, da es SQL-Injections nahezu unmöglich macht. Mehr zu SQL-Injections in Kapitel~\ref{subsec:sqlInjections}.
+
+ setzt es lediglich die anderen Werte anstelle von Platzhaltern ein, was die Ausführung schneller macht. 
+
+Zur Demonstration soll je ein Codebeispiel dienen. Dabei fügen wir neue Studierende in die oben gezeigte Datenbanktabelle ein. Der sprechende Hut\footnote{\url{http://de.harry-potter.wikia.com/wiki/Sprechender_Hut}} hat bereits über die Häuser der Neuzugänge entschieden.
+
+Die Daten der Studierenden liegen in einem assoziativen Array vor und können somit über eine For-Schleife durchmustert werden. Pro Schleifendurchlauf wird ein Studierender der Datenbank hinzugefügt. Die Werte werden durch \phpinline{Doctrine\DBAL\Connection::quote()} maskiert, um SQL-Injections zu unterbinden.
+
+\begin{phpcode}
+$students = array (
+	array (
+		'last_name' => 'Ellesmere',
+		'first_name' => 'Corin',
+		'house' => 1
+	),
+	array (
+		'last_name' => 'Tugwood',
+		'first_name' => 'Havelock',
+		'house' => 4
+	),
+	array (
+		'last_name' => 'Fenetre',
+		'first_name' => 'Valentine',
+		'house' => 3
+	)
+)
+
+foreach ($students as $student) {
+	$sql = 'INSERT INTO students (last_name, first_name, house)
+	  VALUES (' . $connection->quote($student['last_name']) .
+	    ',' . $connection->quote($student['first_name']) .
+	    ',' . $connection->quote($student['house']) . ')');
+
+	$connection->query($sql);
+}
+\end{phpcode}
+
+Bei jedem Durchlauf wird eine neue Abfrage mit den aktuellen Daten erzeugt und an die Datenbank geschickt. In diesen Fall bietet sich die Benutzung von Prepared Statements an, da sich pro Iteration lediglich die Werte ändern.
+
+\begin{phpcode}
+$statement = $connection->prepare(
+  'INSERT INTO students (last_name, first_name, house)
+    VALUES (?, ?, ?)');
+
+foreach ($students as $student) {
+	$statement->execute(
+	  array(
+	    $student['last_name'],
+	    $student['first_name'],
+	    $student['house']);
+	);
+}
+\end{phpcode}
+
+Die hier, anstelle der eigentlichen Daten, verwendeten Fragezeichen stellen Platzhalter dar, die als \textit{Positional Placeholders} bezeichnet werden. Die Daten werden der Methode \phpinline{Doctrine\DBAL\Statement::execute()} in einem Array übergeben. Dabei ist die Reihenfolge wichtig, da ansonsten die Daten in die falschen Spalten der Tabelle geschrieben werden. Bei der Benutzung von Prepared Statements kann auf die Maskierung durch \phpinline{Doctrine\DBAL\Connection::quote()} verzichtet werden, da dies die Datenbank übernimmt.
+
+\gls{pdo} bietet - im Gegensatz zu MySQLi - mit den \textit{Named Paramentern} noch eine weitere Möglichkeit für Platzhalter an. Anstelle von Fragezeichen werden Bezeichner mit einem vorangestellen Doppelpunkt verwendet. Der Vorteil dieser Variante ist, dass die Reihenfolge bei der Übergabe der Daten an die \phpinline{Doctrine\DBAL\Statement::execute()}-Methode keine Rolle mehr spielt. Das folgende Listing zeigt den gleichen Code von oben jedoch diesmal mit Named Parametern. Die Daten werden dieses Mal als Key/Value-Paar übergeben, bei dem der Key den benannten Platzhalter darstellt und der Value die einzufügenden Werte.
+
+\begin{phpcode}
+$statement = $connection->prepare(
+  'INSERT INTO students (last_name, first_name, house)
+    VALUES (:lastname, :firstname, :house)');
+
+foreach ($students as $student) {
+	$statement->execute(
+	  array(
+	    ':firstname' => $student['first_name'],
+	    ':lastname'  => $student['last_name'],
+	    ':house'     => $student['house']);
+	);
+}
+\end{phpcode}
+
+Die Daten werden unabhängig der Reihenfolge in die richtige Spalte eingetragen.
+
+Die Zuordnung einer Variablen zu einem Platzhalter wird \textit{Binding} genannt - gebundene Variablen werden demzufolge als \textit{Bounded Variables} bezeichnet. 
+
+Neben der gezeigten Bindung über\\
+\phpinline{PDOStatement::execute()} bietet \gls{pdo} spezialisiserte Methoden an, was folgende Ursachen hat:
+
+\begin{enumerate}
+	\item Bei der gezeigten Bindung werden die Variablen stets als String behandelt. Es ist nicht möglich dem \gls{dbms} mitzuteilen, das der übergebene Wert einem anderen Datentyp entspricht.
+	\item Die Variablen werden bei dieser Methode stets als In-Parameter übergeben. Auf den Wert der Variablen kann innerhalb der Funktion nur lesenend zugegriffen werden. Man nennt diese Übergabe auch \textit{by Value}. Es gibt jedoch Szenarien in denen der Wert der Variable innerhalb der Funktion geändert werden soll. Dann müssen die Parameter als Referenz (\textit{by Reference}) übergeben werden und agieren als In/Out-Paramaeter. Einige \gls{dbms} unterstützen dieses Vorgehen und speichern das Ergebnis der Abfrage wieder in der übergebenen Variable.
+\end{enumerate}
+
+Das Äquivalent zum obigen Beispiel ist die Methode \phpinline{Doctrine\DBAL\Statement::bindValue()}, bei der die Variable als In-Parameter übergeben wird. Für jeden zu bindenden Platzhalter muß die Methode aufgerufen werden, die dessen Bezeichner, den zu bindenden Wert und die optionale Angabe des Datentyps erwartet. Der Datentyp wird der Datenbank über \gls{pdo}-Konstanten mitgeteilt. \phpinline{PDO::PARAM_STR} ist der Standardwert des zweiten Parameters.
+
+\begin{phpcode}
+$statement = $connection->prepare(
+  'INSERT INTO students (last_name, first_name, house)
+    VALUES (:lastname, :firstname, :house)');
+
+foreach ($students as $student) {
+    $statement->bindValue(':lastname', $student['first_name']);
+    $statement->bindValue(':firstname', $student['last_name']);
+    $statement->bindValue(':house', $student['house'], PDO::PARAM_INT);
+
+	$statement->execute();
+}
+\end{phpcode}
+
+Die Methode zur Übergabe der zu bindenden Werte per Referenz heißt \phpinline{Doctrine\DBAL\Statement::bindParam()} und unterscheidet sich grundlegend von \phpinline{Doctrine\DBAL\Statement::bindValue()}. Der in der Variable gespeicherte Wert wird erst dann aus dem Speicher ausgelesen, wenn \phpinline{Doctrine\DBAL\Statement::execute()} ausgeführt wird. Im Vergleich darzu wird der Wert schon bei dem Aufruf von \phpinline{Doctrine\DBAL\Statement::bindValue()} vom SQL-Parser ausgelesen und in das Prepared Statement eingesetzt. Aus diesem Grund muß \phpinline{Doctrine\DBAL\Statement::bindValue()} innerhalb der Schleife stehen.
+
+\begin{phpcode}
+$statement = $connection->prepare(
+  'INSERT INTO students (last_name, first_name, house)
+    VALUES (:lastname, :firstname, :house)');
+
+$statement->bindParam(':lastname', $student['first_name']);
+$statement->bindParam(':firstname', $student['last_name']);
+$statement->bindParam(':house', $student['house'], PDO::PARAM_INT);
+
+foreach ($students as $student) {
+	$statement->execute();
+}
+\end{phpcode}
+
+
+#### SQL-Injections
+\subsection{SQL-Injections}
+\label{subsec:sqlInjections}
+[SQL injections Mummy image einfügen]
+
+Bei SQL-Injections kann über das Frontend einer Anwendung eine Zeichenkette in eine SQL-Abfrage injiziert werden, die die Fähigkeit besitzt den betroffenen SQL-Code derart zu verändern, dass er
+
+\begin{itemize}
+	\item Informationen wie den Adminbenutzer der Webanwendung zurückliefert
+	\item Daten in der Datenbank manipuliert um ein neuer Adminbenutzer anzugelegen
+	\item oder die Datenbank ganz- oder teilweise löscht
+\end{itemize}
+
+Für ein kurzes Beispiel einer SQL-Injection soll ein Formular dienen, indem nach den Nachnamen der Studierenden aus Hogwarts gesucht werden kann. Der gesuchte  Datensatz wird ausgegeben wenn er gefungen wird, ansonsten erscheint eine entsprechende Meldung das nichts gefunden wurde. Der in das Inputfeld eingegebene Wert wird von PHP automatisch in der Variablen \phpinline{$_REQUEST} gespeichert und kann in der Anwendung ausgelesen werden. \phpinline{'SELECT * FROM students WHERE last_name = Diggory'} stellt eine mögliche, zu erwartende SQL-Anfrage dar.
+
+[Balsamico Formular einfügen]
+
+\begin{phpcode}
+$sql = "SELECT * FROM students
+  WHERE last_name = '" . $_REQUEST['lastName'] . "'";
+
+$statement = $connection->query($sql);
+
+foreach($statement as $student) {
+  echo 'Lastname: ' . $student['last_name'] . "\n";
+  echo 'Firstname: ' . $student['first_name'] . "\n";
+  echo 'Haus: ' . $student['house'] . "\n";
+}
+\end{phpcode}
+
+Dieser Code beinhaltet zwei Fehler:
+
+\begin{enumerate}
+	\item Es wird nicht überprüft, ob \phpinline{$_REQUEST['lastName']} leer ist oder was ganz anders enthält als erwartet wie zum Beispiel ein Objekt oder Array.
+	\item die Benutzereingabe wird nicht maskiert
+\end{enumerate}
+
+Im Falle einer leeren Variable, sähe die Abfrage so aus: \phpinline{'SELECT * FROM students WHERE last_name = '}. Im besten Fall gibt sie eine leere Ergebnismenge zurück, im schlechtesten einen Fehler. Diese Problem ist leicht zu lösen, indem zum einen auf die Existenz der Variablen geprüft wird und zum anderen ob sie einen Wert enthält. Zusätzlich sollte noch auf den Datentyp des enthaltenen Wertes geprüft werden. Erst dann wird die Anfrage abgesetzt.
+
+Da die Eingabe nicht maskiert wird, interpretiert der SQL-Parser einige Zeichen als Steuerzeichen der SQL-Syntax. Beispiele solcher Zeichen sind das Semikolon (;), der Apostroph ('), der Backslash (\) oder zwei Minuszeichen (--).
+
+Selbst ein Websitebesucher ohne böse Ansichten könnte mit der Suche nach einem Studenten mit dem Namen O'Hara die SQL-Injection auslösen. Die in diesen Fall an die Datenbank gesendetet SQL-Anfrage \phpinline{'SELECT * FROM students WHERE last_name = 'O'Hara';} würde wohl einen Fehler auslösen, da der Parser die Anfrage nach dem \textit{O} anhand des Apostroph als beendet interpretiert und \textit{Hara} kein gültiges Sprachkonstrukt von SQL darstellt.
+
+Ein Angreifer könnte hingegen die Eingabe in das Formular nach \phpinline{' or '1'='1} verändern. Damit würde sich diese Abfrage \phpinline{'SELECT * FROM students WHERE last_name = '' or '1'='1';} ergeben.
+
+Wird die Maskierung mit einer entsprechenden Prüfung von Benutzereingaben kombinert, verhindert das die Gefahr von SQL-Injections – eine richtige Anwendung vorrausgesetzt. 
+
+Wie in Kapitel~\ref{subsec:preparedStatements} bereits erwähnt wurde, müssen an \phpinline{pdo::query()} übergebene SQL-Anfragen mit \phpinline{PDO::quote()} maskiert werden. Traditionell wird dafür die PHP-Methode \phpinline{addslashes()} oder die jeweiligen Maskierungsmethoden der \gls{dbms} verwendet. Für MySQLi wird zum Beispiel \phpinline{mysqli_real_escape_string()} verwendet.
+
+Werden Prepared Statements genutzt, müssen die Benutzereingaben trotzdem überprüft, jedoch nicht mehr maskiert werden. Dies übernimmt der SQL-Parser, der legiglich die Werte in das vorkompilierte Prepared Statement einsetzt. Wird dem Prepared Statement noch der Typ des Wertes mitgeteilt, kann das \gls{dbms} eine Typprüfung vornehmen und ggf. einen Fehler zurückgeben.
+
+#### Limitierungen
 Bei einer Abstraktion wird stets etwas Spezifisches, durch das Weglassen von Details, in etwas Allgemeines überführt. Im Fall von \gls{pdo} wird der andere Weg gegangen – es werden allgemeine \gls{sql}-Anfragen in den Dialekt\footnote{Als Dialekt wird die Hersteller-eigene Implementation des \gls{sql}-Standards genannt, dass sich im Umfang und Syntax vom Standard unterscheidet.} des Herstellers übersetzt.
 
 Aus diesem Grund vermag es \gls{pdo} nicht eine SQL-Abfrage, die in dem Dialekt eines Herstellers formuliert wurde, in den eines anderen zu übersetzen. 
@@ -250,15 +573,6 @@ Stattdessen muss die Anfrage so nah wie möglich am Standard gestellt werden, um
 \begin{sqlcode}
 INSERT INTO students (last_name, first_name) VALUES('Kowalke', 'Stefano');
 \end{sqlcode}
-
-#### Verbindung aufbauen
-
-#### Einfache Datenbankanfragen
-
-#### Prepared Statements
-
-#### SQL-Injections
-
 
 \begin{figure}[H]
 	\centering
