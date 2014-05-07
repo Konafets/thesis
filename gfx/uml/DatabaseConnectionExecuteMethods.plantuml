@@ -1,0 +1,18 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Database.DatabaseConnection {
+  +exec_INSERTquery($table, $fields_values, $no_quote_fields = FALSE): mysqli_result object
+  +exec_UPDATEquery($table, $where, $fields_values, $no_quote_fields = FALSE): mysqli_result object
+  +exec_SELECTquery($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = ''): mysqli_result object
+  +exec_SELECT_mm_query($select, $local_table, $mm_table, $foreign_table, $whereClause = '', $groupBy = '', $orderBy = '', $limit = '')
+  +exec_SELECT_queryArray($queryParts)
+  +exec_SELECTgetRows($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = '', $uidIndexField = '')
+  +exec_SELECTgetSingleRow($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $numIndex = FALSE)
+  +exec_SELECTcountRows($field, $table, $where = '')
+  +exec_TRUNCATEquery($table): mixed
+  +exec_DELETEquery($table, $where): mysqli_result object
+}
+@enduml
