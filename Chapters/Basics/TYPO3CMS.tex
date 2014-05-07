@@ -59,7 +59,7 @@ TYPO3 CMS wurde in \gls{php} - basierend auf dem Konzept der Objektorientierung 
 
 \gls{php} bildet zusammen mit einem Apache Webserver und einer MySQL Datenbank den sogenannten Webstack, der abhängig von dem eingesetzten Betriebssystem MAMP (OSX / {\bfseries M}ac), LAMP ({\bfseries L}inux) oder WAMP ({\bfseries W}indows) heißt.
 
-In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension\footnote{Eine kurze Einführung in die verschiedenen Arten von Extension findet sich im Kapitel \ref{subsubsec:sysext}} \textit{DBAL} können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel~\ref{}[Kapitel zur Analyse von ext:DBAL einfügen].
+In der Standardeinstellung kommt MySQL als Datenbank zum Einsatz - durch die Systemextension\footnote{Eine kurze Einführung in die verschiedenen Arten von Extension findet sich im Kapitel \ref{subsubsec:sysext}} \textit{DBAL} können jedoch auch Datenbanken anderer Hersteller angesprochen werden. Eine genaue Analyse dieser Extension erfolgt im Kapitel~\ref{extDBAL}[Kapitel zur Analyse von ext:DBAL einfügen].
 
 \subsubsection{Ansichtssache}
 Aus Anwendersicht teilt sich TYPO3 CMS in zwei Bereiche:
@@ -73,6 +73,7 @@ Aus Anwendersicht teilt sich TYPO3 CMS in zwei Bereiche:
 (vgl. \cite[S. 5]{book:dulepovTypo32008})
 
 \subsubsection{Der Systemkern und die \gls{api}s}
+\label{basics:typo3:subsubsec:coreAndApi}
 TYPO3 CMS besteht aus einem Systemkern, der lediglich grundlegende Funktionen zur Datenbank-, Datei- und Benutzerverwaltung zu Verfügung stellt. Dieser Kern ist nicht monolithisch aufgebaut, sondern besteht aus Systemextensions. (vgl. \cite[S. 32]{book:laborenzTypo32006})
 
 \begin{figure}[H]
@@ -86,7 +87,7 @@ Die Gesamtheit aller von TYPO3 CMS zur Verfügung gestellten \gls{api}s, wird al
 
 Die \gls{api}s, die keiner der beiden Kategorien zugeordnet werden kann, bezeichnet Dulepov \cite[S. 5 ff.]{book:dulepovTypo32008} als \mbox{\textit{Common-\gls{api}}}. Die Funktionen der Common-\gls{api} werden von allen anderen \gls{api}s genutzt. Ein Beispiel dafür stellt die Datenbank \gls{api} dar, welche in der Regel nur einfache Funktionen wie das Erstellen, Einfügen, Aktualisieren, Löschen und Leeren\footnote{CRUD - {\bfseries C}reate, {\bfseries R}etrieve, {\bfseries U}pdate und {\bfseries D}elete} von Datensätzen bereitzustellen hat. Würde man je eine Datenbank \gls{api} für das Frontend und das Backend zur Verfügung stellen, bricht man eine wichtige Regel der Objekt-orientierten Programmierung - Don't repeat yourself. Dieser - mit hoher Wahrscheinlichkeit - redundante Code würde die Wartbarkeit des Programms verschlechtern und die Fehleranfälligkeit erhöhen.
 
-Auf die aktuelle Datenbank-\gls{api} wird in Kapitel \ref{}[KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
+Auf die aktuelle Datenbank-\gls{api} wird in Kapitel \ref{currentSituation}[KAPITEL zur Analyse der aktuellen Situation einfügen] näher eingegangen.
 
 \subsubsection{Verzeichnisstruktur}
 
@@ -311,8 +312,8 @@ Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unt
 	\item \gls{fe} Plugins und \gls{be} Module werden hier registiert
 	\end{itemize}
 	\\ \hline
-	ext\_tables.sql & Diese Datei enthält Anweisungen um eine Datenbanktabelle zu erstellen. Sie sind im MySQL Format zu formulieren, auch wenn als Datenbank etwas anderes genutzt wird. TYPO3 CMS parst die Datei mit einem eigenen (sehr rudimentären) SQL-Parser und generiert einen eigene SQL-Abfrage. Dieses Vorgehen hat den Hintergrund, dass dadurch auf Fehler im diesen Dateien reagiert werden kann und zum anderen das die mitgelieferte Datenbankabstraktionsschicht die Anweisungen in das SQL der entsprechenden Hersteller übersetzen kann. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.\\ \hline
-	ext\_tables\_static+adt.sql & Auch diese Datei enthält SQL Code wie \pdf{ext\_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der \gls{em} genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{} [KAPITEL REFERENZ einfügen] noch genauer eingegangen.\\ \hline
+	ext\_tables.sql & Diese Datei enthält Anweisungen um eine Datenbanktabelle zu erstellen. Sie sind im MySQL Format zu formulieren, auch wenn als Datenbank etwas anderes genutzt wird. TYPO3 CMS parst die Datei mit einem eigenen (sehr rudimentären) SQL-Parser und generiert einen eigene SQL-Abfrage. Dieses Vorgehen hat den Hintergrund, dass dadurch auf Fehler im diesen Dateien reagiert werden kann und zum anderen das die mitgelieferte Datenbankabstraktionsschicht die Anweisungen in das SQL der entsprechenden Hersteller übersetzen kann. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{subsec:extTables} noch genauer eingegangen.\\ \hline
+	ext\_tables\_static+adt.sql & Auch diese Datei enthält SQL Code wie \pdf{ext\_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der \gls{em} genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{subsec:extTables} noch genauer eingegangen.\\ \hline
 	\caption{Erläuterung der Verzeichnisstruktur einer Extension}
 	\label{tab:extensionFolderStructure}
 \end{longtable}
