@@ -55,7 +55,7 @@ auch was nicht bearbeitet wird und warum nicht
 ### DataHandler
 ### Typo3DatabaseBackend (Extbase Portal to TYPO3 Database)
 
-## DBAL 
+## Extension DBAL 
 
 * Installation
 * handlerCfg
