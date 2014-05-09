@@ -250,7 +250,7 @@ TYPO3 CMS nutzt weder Datenbankseitige \textit{Constraints} noch Fremdschlüssel
 - globales Array ist nicht so gut -> besser die Einbindung per Dependency Injection
 - lange Klasse √
 - nur minimale UnitTests für DatabaseConnection vorhanden √
-- Namen der Methoden folgen nicht der CGL
+
 - kein richtiges Query Objekt √
 - keine Unterscheidung zwischen Verbindung / Query / Result √
 - Aufbau der Datenbank
