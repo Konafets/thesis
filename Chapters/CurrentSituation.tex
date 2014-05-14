@@ -99,7 +99,7 @@ Die letzte Gruppe besteht aus einer Reihe von Methoden, die verschiedene Metadat
 
 Aus historischen Gründen nutzt die Datenbank API die prozedualen MySQLi Funktionen anstelle der Objekt-orientierten API von MySQLi. Dadurch stellt\\ \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} kein Verbindungsobjekt dar - wie zum Beispiel \phpinline{PDO} - sondern eine Sammlung an Datenbankfunktionen. Dadurch gibt es auch kein Objekt, welches die Ergebnismenge repräsentiert, was \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} zu einer recht große Klasse mit 1950 Zeilen Code und 76 Methoden.
 
-Im Gegensatz dazu steht die Anzahl von 9 UnitTests für diese Klasse, die lediglich ein paar Hilfsmethoden testen. Es ist somit nicht sichergestellt, ob die Methoden das tun, was sie vorgeben zu tun. In den letzten Monaten wurde jedoch ein Framework für Funktionale Tests in TYPO3 CMS integriert, so dass die Methoden immerhin indirekt getest werden.
+Im Gegensatz dazu steht die Anzahl von 40 UnitTests mit 49 Assertions für diese Klasse, die lediglich ein paar Hilfsmethoden testen. Es ist somit nicht sichergestellt, ob die Methoden das tun, was sie vorgeben zu tun. In den letzten Monaten wurde jedoch ein Framework für Funktionale Tests in TYPO3 CMS integriert, so dass die Methoden immerhin indirekt getest werden.
 
 [Und dass obwohl TYPO3 CMS mit aktuell 5527 Unit Tests und 8667 Assertions schon eine recht gute Testabdeckung hat 27\% der Dateien und 36\% der abgedeckten Zeilen]
 
