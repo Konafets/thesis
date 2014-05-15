@@ -1,0 +1,21 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Tests.Unit.Database.DatabaseConnection {
+	+storedFullAsciiRangeCallsLinkObjectWithGivenData()
+	+storedGzipCompressedDataReturnsSameData()
+	+listQueryWithIntegerCommaAsValue()
+	+listQueryThrowsExceptionIfValueContainsComma()
+	+searchQueryDataProvider()
+	+searchQueryCreatesQuery()
+	+escapeStringForLikeComparison()
+	+stripOrderByForOrderByKeywordDataProvider()
+	+stripOrderByForOrderByKeyword()
+	+stripGroupByForGroupByKeywordDataProvider()
+	+stripGroupByForGroupByKeyword()
+	+cleanIntArrayDataProvider()
+	+cleanIntArray()
+}
+@enduml
