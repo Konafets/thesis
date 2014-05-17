@@ -1,0 +1,38 @@
+%-----------------------------------------------
+% Dateiname: Concept.tex
+% Autor    : Stefano Kowalke <blueduck@gmx.net>
+% Lizenz   : BSD
+%-----------------------------------------------
+\section{Definition der Zielstellungen}
+\label{prototype:sec:concept}
+Der Prototyp wurde als normale Extension konzipiert, die über das \textit{Install Tool} installierbar ist. Diese ist notwendig, da bereits bei der Installation das zu nutzende \gls{dbms} auswählbar sein muß.
+
+Desweiteren muß die Extension weiterhin die alte \gls{api} unterstützen, damit TYPO3 CMS und, vor allem die Extensions der externen Entwickler, weiterhin funktionieren. Dazu zählt auch das von TYPO3 CMS angebotene Prepared Statement, welches intern die \textit{Prepared Statements} von MySQLi nutzt und die \textit{Named Paramenter} lediglich simuliert. Die Extension wird die Prepared Statement von Doctrine DBAL / PDO nutzen, ohne die alte \gls{api} zu verändern.
+Es wird lediglich die Unterstützung von MySQL als Datenbank angestrebt.
+
+Die Methodennamen der neuen \gls{api} folgen der CGL.
+
+Die Erstellung der Basisdatenbank erfolgt durch Doctrine DBAL und nutzt dessen abstakte Darstellung des Datenbankschemas.
+
+Die Extension wurde zunächst als normale Extension konzipiert, die gegenfalls ohne größeren Aufwand in eine Systemextension überführt werden kann.
+
+Die Extension führt eine Query Syntax ein, damit auf die manuelle Formulierung von SQL Anfragen verzichtet werden kann.
+
+Intern werden stets Prepared Statements genutzt
+
+Anfragen in selbst formuliertem SQL sind nicht mehr möglich
+
+die Methodennamen der neuen \gls{api} folgen den TYPO3 CMS Coding Guidelines.
+
+Daraus ergeben sich folgende zusammenhängende Aufgaben, welche zugleich die Meilensteine sind:
+
+\begin{itemize}
+\item Erstellen der Extension -> TYPO3 nutzt die Extension als DB Layer
+\item Extension ist per Installtool installierbar
+\item Extension nutzt Doctrine DBAL
+\item Umwandlung der SQL Dateien in Schema Dateien
+\item Implementation einer Fluent \gls{api}
+\item Umbau des Cores auf die \gls{api}
+\end{itemize}
+
+Ein Großteil dieser Anforderungen ist erreichbar ohne eine Veränderung an TYPO3 CMS vorzunehmen, da die Extension lediglich die neue \gls{api} als ein Angebot darstellt. Ein massiver Eingriff in den Code von TYPO3 CMS stellt der Meilenstein 6 dar. Hier muß jede Datenbankfunktion auf die neue \gls{api} umgestellt werden. Bevor das jedoch geschehen kann, müssen minimale Anpassungen an der Installationsroutine von TYPO3 CMS vorgenommen werden. Dabei diente die Systemextension DBAL als Vorbild, da sie ebenfalls während der Installation installierbar sein muß.

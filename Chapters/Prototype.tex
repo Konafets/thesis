@@ -6,23 +6,36 @@
 \chapter{Prototypischer Nachweis der Herstellbarkeit}
 \label{ch:protoype}
 
-\section{Refactoring der alten Datenbank API}
-\subsection{Tests für die alte Datenbank API}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.65]{gfx/the_art_of_happy_programming.png}
+    \label{fig:bobRoss}
+\end{figure}
 
-\section{Testgetriebene Implementierung der neuen Datenbank API}
-- Adapter
-- alte API Klasse erbt von neuer API Klasse
-- Verbindung mit der Datenbank via Doctrine
-- Methodenübername wenn sinnvoll
-- Neue Methoden
+Die Erstellung des Prototyps begann mit der Definition verschiedener Zielstellungen. Diese wurden in zusammenhängenden Arbeitspaketen zusammengefasst und dienten als Meileinsteine.
 
-\subsection{Einführung von Query Objekten}
-\subsubsection{SELECT}
-\subsubsection{INSERT}
-\subsubsection{UPDATE}
-\subsubsection{DELETE}
-\subsubsection{TRUNCATE}
+\input{Chapters/Prototype/01-Concept.tex}
+\input{Chapters/Prototype/02-InstallTYPO3.tex}
+\input{Chapters/Prototype/03-CreateTestsForOldAPI.tex}
+\input{Chapters/Prototype/04-CreatePrototype.tex}
 
-\section{Anwendung der neuen Datenbank API}
+%\section{Refactoring der alten Datenbank API}
+%\subsection{Tests für die alte Datenbank API}
+
+%\section{Testgetriebene Implementierung der neuen Datenbank API}
+%- Adapter
+%- alte API Klasse erbt von neuer API Klasse
+%- Verbindung mit der Datenbank via Doctrine
+%- Methodenübername wenn sinnvoll
+%- Neue Methoden
+
+%\subsection{Einführung von Query Objekten}
+%\subsubsection{SELECT}
+%\subsubsection{INSERT}
+%\subsubsection{UPDATE}
+%\subsubsection{DELETE}
+%\subsubsection{TRUNCATE}
+
+%\section{Anwendung der neuen Datenbank API}
 %\subsection{Anpassungen an TYPO3}
-\section{Überprüfen der Funktionalität}
+%\section{Überprüfen der Funktionalität}
