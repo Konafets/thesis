@@ -37,18 +37,6 @@ TYPO3 CMS ist ein klassisches \gls{cms}, welches auf die Erstellung, die Bearbei
 
 Daneben findet man auch die Bezeichnung \gls{ecms}\footnote{\url{http://www.typo3.org}}, was als Hinweis auf den Einsatz des Systems für mittel- bis große Webprojekte dient.
 
-Als letztes sei noch erwähnt, dass TYPO3 CMS ebenso zu den \gls{cmf} gezählt werden kann, da es dem Entwickler verschiedene \gls{api}s zur Verfügung stellt. Dieser Begriff findet sich unter anderen in einem Kommentar im – von TYPO3 CMS erzeugten – HTML-Code:
-\begin{minted}[mathescape]{html}
-<!--
-    This website is powered by TYPO3 - inspiring people to share!
-    TYPO3 is a free open source Content Management Framework
-    initially created by Kasper Skaarhoj and licensed under GNU/GPL.
-    TYPO3 is copyright 1998-2012 of Kasper Skaarhoj. Extensions
-    are copyright of their respective owners.
-    Information and contribution at http://typo3.org/
--->
-\end{minted}
-
 \subsection{Architektur und Aufbau von TYPO3 CMS}
 \label{subsec:architectureTypo3}
 Im folgenden werden die grundlegenden Konzepte von TYPO3 CMS vorgestellt. Dort wo es für das weitere Verständnis notwendig ist, wird tiefer in das Thema eingestiegen. Ansonsten werden die Konzepte lediglich angerissen um einen generellen Überblick zu erhalten.
@@ -93,108 +81,12 @@ Auf die aktuelle Datenbank-\gls{api} wird in Kapitel \ref{currentSituation}[KAPI
 
 Im Gegensatz zu früheren TYPO3 CMS Versionen gibt es kein \mbox{\textit{Dummy-Package}}\footnote{Damit ist ein weitgehend leeres Paket gemeint, dass alle Dateien enthält die im Web\-root des Servers laufen sollen. Es stellt einen Container für die spätere Website dar.} mehr. Ab Version 6.2 enthält der Download lediglich den TYPO3 CMS Kern in Form des Verzeichnisses \pdf{typo3/}.
 
-Dieses Verzeichnis ist außerhalb des Webroots abzulegen. Im Webroot ist ein Verzeichnis \pdf{www.example.com} anzulegen, in dem die Verzeichnisse \pdf{fileadmin/}, \pdf{typo3conf/}, \pdf{typo3temp/} und \pdf{uploads/} anzulegen sind. Das Verzeichnis \pdf{typo3\_src/} ist ein (Linux-)Symlink auf das Installationsverzeichnis von TYPO3 CMS und das Verzichnis \pdf{typo3/} ist ebenfalls ein Symlink, welcher über den Symlink \pdf{typo3\_src} auf \pdf{typo3} zeigt. Dieser Aufbau macht ein Update recht einfach, da lediglich der Symlink \pdf{typo3\_src} auf das Verzeichnis der neuen Version rekonfiguriert werden muss.
-
-\begin{figure}[H]
-\begin{Verbatim}[samepage=true]
-.
-├── Packages/
-│   └── Libraries/
-├── fileadmin/
-├── typo3_src/ -> ../../typo3-6.2.0
-├── typo3/ -> typo3_src/typo3
-│   ├── contrib/
-│   ├── ext/
-│   ├── gfx/
-│   ├── install/
-│   ├── js/
-│   ├── mod/
-│   └── sysext/
-├── typo3conf/
-│   ├── ext/
-│   │   ├── doctrine_dbal/
-│   │   └── phpunit/
-│   └── l10n/
-├── typo3temp/
-├── uploads/
-├── media/
-├── pics/
-├── tf/
-└── tx_phpunit/
-\end{Verbatim}
-\caption{Verzeichnisstruktur von TYPO3 CMS}
-\label{pic:typo3FolderStructure}
-\end{figure}
-Im folgenden werden die einzelnen Verzeichnisse näher erklärt:
-
-\begin{table}
-	\begin{tabularx}{\textwidth}{|X|X|}
-		\hline
-		Verzeichnis & Erklärung\\ \hline
-		Packages/Libraries/ & Dieser Ordner wurde von der von TYPO3 Flow übernommen. In einer der nächsten Versionen sollen hier die Extensions gespeichert werden. Im aktuellen Fall liegen hier externe Bibliotheken, die mit Composer\footnote{Ein Kommandozeilen Programm, um Abhängigkeiten in \gls{php} Projekten aufzulösen \url{https://getcomposer.org/}} installiert wurden, wie zum Beispiel Doctrine\\ \hline
-		fileadmin/ & In diesem Ordner werden Dateien gespeichert, die über die Website erreichbar und ausgeliefert werden sollen. Dazu zählen CSS-, Image, HTML-Template- und TypoScriptdateien. Allgemein also Dateien, die vom Websitebetreiber hochgeladen werden.\\ \hline
-		typo3/ & Der TYPO3 CMS Kern\\ \hline
-		contrib/ & Bibliotheken von Drittanbietern\\ \hline
-		contrib/ext/ & Das Verzeichnis für globale Extensions \\ \hline
-		gfx/ & Jegliche Grafiken, die im Core verwendet werden \\ \hline
-		gfx/install/ & Hier befand sich in früheren Versionen das Installtool. Aktuell existiert das Verzeichnis nur noch aus Kompatibilitätsgründen und wird in einer der nächsten Versionen entfernt. Das Installtool wurde als Sytemextension realisiert und ist im entsprechenden Ordner unter \pdf{sysext/install/} zu finden\\ \hline
-		gfx/js/ & Hier befinden sich die JavaScript Bibliotheken, die von Core genutzt werden.\\ \hline
-		gfx/mod/ & Enthält die Konfiguration der Hauptmodule des Backends (File, Help, System, Tools, User, Web).\\ \hline
-		sysext/ & Enthält die Systemextensions.\\ \hline
-		typo3conf/ & Lokale Extensions und die lokale Konfiguration\\ \hline
-		typo3temp/ & Temporäre Dateien\\ \hline
-		uploads/ & Dateien die vom Websitebesucher hochgeladen werden - zum Beispiel über ein Formular.\\ \hline
-	\end{tabularx}
-	\caption{Erläuterung der Verzeichnisstruktur von TYPO3 CMS}
-	\label{tab:typo3FolderStructure}
-\end{table}
-Im Verzeichnis \pdf{www.example.com} muss noch ein Symlink \pdf{index.php} angelegt werden, welcher auf \pdf{typo3\_src/index.php} zeigt.
-
-Unter \pdf{www.example.com/typo3conf/} befindet sich die Datei \pdf{LocalConfiguration.php}. Diese enthält die Grundkonfiguration in Form eines Arrays. Darin sind verschiedenen Einstellungen festgelegt:
-\begin{itemize}
-	\item Debug Mode
-	\item Sicherheitslevel für den Login (Fronend und Backend)
-	\item das Passwort für das Installtool (mit MD5 und Salt gehasht)
-	\item die Zugangsdaten zur Datenbank (Benutzername, Password, Datenbankname, Socket, …)
-	\item Einstellungen zum Caching
-	\item Titel der Website
-	\item Einstellungen zum Erzeugen von Graphiken
-\end{itemize}
-
-Die Einstellungen zur Datenbank werden im praktischen Teil näher beleuchtet.
-
-\subsubsection{TCA}
-
-Wie bereits geschrieben wurde, stellt das \gls{be} eine Ansicht auf die Datenbank dar. Die Inhalte werden dabei mittels Formulare eingegeben und in der Datenbank gespeichert. Die Konfiguration dieser Formulare erfolgt über ein globales \gls{php}-Array - dem \gls{tca}.
-
-Über das TCA werden die Metadaten einer Tabelle (Datentyp, Länge, Engine) mit weiteren Daten angereichert. So können mit dem \gls{tca}
-
-\begin{itemize}
-	\itemsep1pt\parskip0pt\parsep0pt
-	\item
-		die Beziehungen einer Tabelle zu anderen Tabellen beschrieben werden
-	\item
-		in welchem Layout soll ein Feld im Formular dargestellt werden
-	\item
-		und wie soll das Feld validiert werden.
-\end{itemize}
-
-Enthält eine Tabelle keinen Eintrag im TCA ist sie im Backend nicht sichtbar.(vgl. \cite{web:typo3TCA})
-
-[HINWEIS: Vielleicht kann das TCA auch einfach im Glossar beschrieben werden. Einen Eintrag gibt es schon unter tcag]
-
 \subsubsection{XCLASS}
 TYPO3 CMS besitzt einen Mechanismus, der es erlaubt Klassen zu erweitern oder Methoden mit eigenem Code zu überschreiben. Dies funktioniert für den Systemkern wie auch für andere Extensions. Dieses Feature nennt sich XCLASS und wird vom Prototypen eingesetzt um die Datenbankklasse von TYPO3 CMS zu überschreiben. Darauf wird im Kapitel [KAPITEL Analyse Ist-Zustand einfügen] näher eingegangen. Hier soll lediglich der Hintergrund zu XCLASS beschrieben werden.
 
 Damit eine Klasse per XCLASS erweiterbar ist, darf sie nicht per \phpinline{new()} Operator erzeugt werden, sondern mit der von TYPO3 CMS angebotenen Methode\\
 \phpinline{\TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance()}.
 Diese Methode sucht im globalen \gls{php}-Array \phpinline{$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']} nach angemeldeten Klassen, instanziiert diese und liefert sie anstelle der Originalklasse zurück. Dieses Array dient der Verwaltung der zu überschreibenden Klassen und erfolgt in der Datei \pdf{ext\_localconf.php} innerhalb des Extensionsverzeichnisses\footnote{Zur Erläuterung des Aufbaues einer Extension siehe Kapitel~\ref{tab:extensionFolderStructure}.}.
-
-%\begin{phpcode}
-%$GLOBALS['TYPO3\_CONF\_VARS']['SYS']['Objects']['TYPO3\\CMS\\Backend\\Controller\\NewRecordController'] = array(
-%'className' => 'Documentation\\Examples\\Xclass\\NewRecordController'
-%);
-%\end{phpcode}
 
 Der Mechanismus hat jedoch ein paar Einschränkungen:
 
@@ -223,97 +115,8 @@ Neben Systemextensions gibt es noch globale\footnote{Da globale Extensions nur i
 
 Eine weitere Kategorisierung erfolgt nach dem Aufgabengebiet einer Extension. Die Festlegung auf eine der folgenden Kategorien hat keine direkte Auswirkung auf die Funktion der Extension. Sie wird von TYPO3 CMS hauptsächlich als Sortiermerkmal im \gls{em} genutzt.
 
-[Ich denken diese Übersicht kann gelöscht werden, da irrelevant]
-\begin{itemize}
-	\item
-		Frontend
-	\item
-		Frontend Plugins
-	\item
-		Backend
-	\item
-		Backend Modul
-	\item
-		Service
-	\item
-		Example
-	\item
-		Templates
-	\item
-		Documentation
-	\item
-		Verschiedenens
-\end{itemize}
-
 \subsubsection{Extension Manager}
 Der \gls{em} ist ein \gls{be} Modul, über das die Extensions verwaltet werden können. Es erlaubt die Aktivierung, Deaktivierung, Herunterladen und das Löschen von Extensions. Darüberhinaus bietet der \gls{em} Möglichkeiten zur detailierten Anzeige von Informationen über die Extensions wie das Changelog\footnote{Das Protokoll der Codeänderungen, die ein Programm im Laufe seines Lebens erlebt}, Angaben zu den Autoren und Ansicht der Dateien der Extension.
 
 \subsubsection{Verzeichnisstruktur}
 Unabhängig von der Einteilung der Extensions in die veschiedenen Kategorien unterscheiden sie sich nicht in der Verzeichnis- und Dateistruktur. Mit der Integration von Extbase in TYPO3 CMS hat sich eine neue Verzeichnisstruktur etabliert. Sie folgt dem Paradigma \textit{Konvention statt Konfiguration}, was bedeutet, dass durch Einhaltung der Struktur keine weitere Konfiguration notwendig ist.
-
-[Beschreibung der Verzeichnisstruktur einfügen]
-
-\begin{figure}[t]
-\begin{Verbatim}[samepage=true]
-.
-├── Classes/
-│   ├── Install/
-│   ├── Loggers/
-│   └── Persistence/
-├── Configuration/
-│   ├── ExtensionBuilder/
-│   ├── TCA/
-│   └── TypoScript/
-├── Documentation/
-├── Resources/
-│   ├── Private/
-│   └── Public/
-├── Tests/
-│   ├── Build/
-│   └── Unit/
-├── vendor/
-│   ├── bin/
-│   ├── composer/
-│   ├── doctrine/
-│   └── symfony/
-├── composer.json
-├── ext_emconf.php
-├── ext_icon.gif
-├── ext_localconf.php
-├── ext_tables.php
-├── ext_tables.sql
-└── ext_tables_static+adt.sql
-\end{Verbatim}
-\caption{Verzeichnisstruktur einer Extension}
-\label{pic:extensionFolderStructure}
-\end{figure}
-%\begin{sidewaystable}
-%\begin{tabularx}{\textwidth}{|X|X|}
-%\centering
-\pagebreak
-\begin{longtable}{|l|p{.60\textwidth}|}
-	\hline
-	Verzeichnis / Datei & Erklärung \\ \hline
-	Classes/ & Hier erwartet TYPO3 CMS alle Klassendateien. Diese können in weiteren Unterverzeichnissen nach ihren Zweck unterteilt werden (Controller, Service, Loggers, Persistence)\\ \hline
-	Configuration/ & Enthält Konfigurationsdateien wie TypoScript oder TCA.\\ \hline
-	Documentation/ & Enthält die Dokumentation im ReST\footnote{reStructuredText \url{http://docutils.sourceforge.net/rst.html}} Format aus der HTML und ein PDF generiert werden kann.\\ \hline
-	Resources/Private/ & Enthält die Fluid-Template\footnote{TYPO3s Templating Sprache}, Sprach- und Sassdateien. Kurz alle Dateien, die für die Struktur und das Aussehen einer Website notwendig sind, jedoch lediglich Templates darstellen und noch verarbeitet werden müssen\\ \hline
-	Resources/Public/ & Hier liegen Grafiken, CSS- und Javasciptdateien\\ \hline
-	Tests/ & Hier werden die PHPUnit-, Akzeptanz- und/oder Verhaltenstests abgelegt.\\ \hline
-	vendor/ & Dieses Verzeichnis wird von Composer angelegt und enthält externe Abhängigkeiten wie in dem Fall Doctrine \gls{dbal}. Im Moment ist dies redunant, da der selbe Inhalt auch im Webroot der Site unter \pdf{Packages/Libraries/} verfügbar sein muss. Das liegt an der noch nicht vollständig umgesetzten Kompatibilität von TYPO3 CMS zu Composer, die jedoch in einer späteren Version noch nachgereicht wird.\\ \hline
-	composer.json & Seit Version 6.2 von TYPO3 CMS ist eine Composer.json erforderlich. In ihr werden Metadaten der Extensions wie Name, Typ (System- oder lokale Extension), Lizenz, Version und Abhängigkeiten definiert. Sie wird in Zukunft wahrscheinleich die Datei \pdf{ext\_emconf.php} ablösen.\\  \hline
-	ext\_emconf.php & Diese Datei ist unabdinglich für die Funktionsweise der Extensions. Sie definiert ebenso wie die \pdf{composer.json} Metadaten jedoch in einem \gls{php}-Array und nicht im JSON-Format\footnote{\url{http://json.org/}}. Diese Datei existiert seit den Anfängen von TYPO3 CMS und wird wahrscheinlich bald von der composer.json abgelöst werden.\\ \hline
-	ext\_icon.gif & Ein Icon für die Extension, welches im \gls{be} angezeigt wird\\ \hline
-	ext\_localconf.php & In dieser Datei wird die Extension für einen Hook oder eine XCLASS registiert.\\ \hline
-	ext\_tables.php & Die Datei hat drei Aufgaben:
-	\begin{itemize}
-	\item Definition von Extensionstabellen
-	\item Definition von Feldern und Tabellen, die von dieser Extension erweitert werden
-	\item \gls{fe} Plugins und \gls{be} Module werden hier registiert
-	\end{itemize}
-	\\ \hline
-	ext\_tables.sql & Diese Datei enthält Anweisungen um eine Datenbanktabelle zu erstellen. Sie sind im MySQL Format zu formulieren, auch wenn als Datenbank etwas anderes genutzt wird. TYPO3 CMS parst die Datei mit einem eigenen (sehr rudimentären) SQL-Parser und generiert einen eigene SQL-Abfrage. Dieses Vorgehen hat den Hintergrund, dass dadurch auf Fehler im diesen Dateien reagiert werden kann und zum anderen das die mitgelieferte Datenbankabstraktionsschicht die Anweisungen in das SQL der entsprechenden Hersteller übersetzen kann. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{subsec:extTables} noch genauer eingegangen.\\ \hline
-	ext\_tables\_static+adt.sql & Auch diese Datei enthält SQL Code wie \pdf{ext\_tables.sql}. Der Unterschied besteht darin, dass sie \pdf{INSERT} Statements enhalten kann um statische Daten in eine Tabelle bei der Installation einer Extensions einzufügen. Als Beispiel sei hier der \gls{em} genannt, in dessen Tabelle wird über diese Datei die URL zum \gls{ter} eingefügt. Auf dem Inhalt dieser Datei wird im praktischen Teil in Kaptitel~\ref{subsec:extTables} noch genauer eingegangen.\\ \hline
-	\caption{Erläuterung der Verzeichnisstruktur einer Extension}
-	\label{tab:extensionFolderStructure}
-\end{longtable}
