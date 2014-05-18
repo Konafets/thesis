@@ -61,8 +61,10 @@
 		\include{Chapters/Conclusion}
 	\appendix
 		\printbibliography[title={Quellenverzeichnis}]
-		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
-		\printglossary[type=main, title=Glossar,toctitle=Glossar]
+		% Print glossar
+		\printglossary[type=main,title=Glossar,toctitle=Glossar,style=altlist]
+		% Print Akronyms
+		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis,style=long]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
 		\listoftables
 		\listoffigures
 		\listoflistings
