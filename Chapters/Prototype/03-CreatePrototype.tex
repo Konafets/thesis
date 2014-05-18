@@ -5,20 +5,18 @@
 %-----------------------------------------------
 \section{Erstellung des Prototypen}
 \label{prototype:sec:createPrototype}
-
-Die Grundstruktur der Extension wurde unter \pdf{thesis/http/typo3conf/ext/doctrine\_dbal} erstellt.
+Die Grundstruktur des Prototypen wurde unter \pdf{thesis/http/typo3conf/ext/doctrine\_dbal} erstellt.
 
 \begin{Verbatim}[samepage=true]
-thesis.dev/http/typo3con/ext/
-├── doctrine_dbal/
-│   ├── Configuration/
-│   ├── Resources/
-│   ├── ext_emconf.php
-│   ├── ext_icon.gif
-│   └── ext_tables.php
+└── doctrine_dbal/
+    ├── Configuration/
+    ├── Resources/
+    ├── ext_emconf.php
+    ├── ext_icon.gif
+    └── ext_tables.php
 \end{Verbatim}
 
-Die Datei \pdf{ext\_emconf.php} enthält die Metainformationen der Extension, die von dem Extension Manager verarbeitet werden.
+Die Datei \pdf{ext\_emconf.php} enthält die Metainformationen der Extension, die vom Extension Manager verarbeitet werden.
 
 \begin{listing}
 \begin{phpcode}
@@ -55,9 +53,46 @@ $EM_CONF[$_EXTKEY] = array(
 \label{lst:extEmconf}
 \end{listing}
 
-Danach wurden die Datei \pdf{DatabaseConnection.php} von TYPO3 CMS in den Ordner \pdf{Classes/Persistence/Legacy} des Prototypen kopiert.
+Anschließend wurde Doctrine DBAL über \textit{Composer} installiert, indem es als externe Abhängigkeit in der \pdf{composer.json} definiert und durch das Kommando\\ \shinline{composer install} in den Ordner \pdf{vendor/doctrine} installiert wurde.
 
-Damit TYPO3 CMS diese Dateien anstelle der Originalen verwendet, wurde diese per XCLASS in der Datei \pdf{ext\_localconf.php} registiert.
+\begin{listing}[H]
+\begin{jsoncode}
+{
+	"name": "typo3/doctrine_dbal",
+	"type": "typo3-cms-extension",
+	"description": "This brings Doctrine2 to TYPO3",
+	"homepage": "http://typo3.org",
+	"license": ["GPL-2.0+"],
+	"version": "6.2.0",
+	"require": {
+		"doctrine/dbal": "dev-master"
+	},
+	"mininum-stability": "dev",
+}
+\end{jsoncode}
+\caption{Die Datei composer.json}
+\label{lst:composer}
+\end{listing}
+
+
+Die Integration von Doctrine DBAL sollte so transparent für TYPO3 CMS und die Extensions erfolgen, dass weiterhin über die Methoden der alten API auf die Datenbank zugegriffen werden kann. Die alte API steht dabei vergleichbar einer Fassade vor der neuen API, die ankommende Anfragen selbst behandelt oder an die neue API delegiert. Dieses Vorgehen erlaubt die sukzessive Integration von Doctrine DBAL.
+
+Dazu wurde
+
+\begin{itemize}
+	\item im Ordner \pdf{doctrine\_dbal/Classes/Persistence/Doctrine} die Datei \pdf{DatabaseConnection.php} erstellt (im weiteren Verlauf als \textit{neue API} bezeichnet),
+	\item die Datei \pdf{DatabaseConnection.php} aus der Codebasis von TYPO3 CMS in den Ordner \pdf{doctrine\_dbal/Classes/Persistence/Legacy} des Prototypen kopiert (im weiteren Verlauf als \textit{alte API} bezeichnet),
+	\item die Datei \pdf{DatabaseConnectionTests.php} mit den neu implementierten Unit Tests aus der Codebasis von TYPO3 CMS in den Ordner \pdf{doctrine\_dbal/Tests/Persistence/Legacy} des Prototypen kopiert,
+	\item eine Vererbung realisiert, die die Klasse der alten API von der Klasse der neuen API erben lässt (siehe Abb:.~\ref{fig:oldAPIextendsNewAPI} und
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{gfx/uml/NewAPI/OldDatabaseConnectionExtentsFromNewAPI.eps}
+    \caption{Alte API-Klasse erbt von neuer API-Klasse}
+    \label{fig:oldAPIextendsNewAPI}
+\end{figure}
+	\item die Klasse der alten API per XCLASS in der Datei \pdf{ext\_localconf.php} registiert (Listing~\ref{lst:xclassDatabaseAPI}).
+\end{itemize}
+
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -72,63 +107,55 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\Datab
 \label{lst:xclassDatabaseAPI}
 \end{listing}
 
-Zur Überprüfung ob TYPO3 CMS tatsächlich diese Klasse nutzt, wurde der Prototyp über den Extension Manager installiert und in der \gls{ide} ein Debug-Breakpoint in die Klasse\\ \phpinline{Konafets\DoctrineDbal\Persistence\Legacy\DatabaseConnection} innerhalb der \phpinline{connectDB} gesetzt, an dem die \gls{ide} die Ausfühung von TYPO3 CMS anhält, wenn dieser erreicht wird.
+Danach wurden alle Eigenschaften aus der alten API in die neue API verschoben und mit Setter/Getter-Methoden versehen, die von der alten API ab diessem Zeitpunkt genutzt wurden.
 
-Die \gls{ide} verfügt über einen Debug Listener, der auf ein vom Browser gesendetes Token wartet und bei Empfang den Debug Prozess startet. Für den verwendeten Browser \textit{Chrome} ist ein Addon verfügbar, mittels diesem das Senden des Debug-Tokens per Knopfdruck ein- und ausgeschaltet werden kann.
+Die Umstellung auf Doctrine begann mit dem Refactoring der Methode \phpinline{connectDB()} der alten API. Dabei wurde lediglich die Implementation der Methode vereinfacht, da sie unübersichtlich war und mehrere unterschiedliche Aufgaben ausführte, die nichts mit deren Aufgabengebiet - der Herstellung einer Verbindung zur Datenbank - gemein hatten.
 
-Wird der Browser und die \gls{ide} in den Debug-Modus gesetzt und TYPO3 CMS neugeladen, bleibt das Programm an dem gesetzten Breakpoint stehen.
-
-Die Klasse, die die neue API beherbergen wird, wurde in unter\\ \pdf{doctrine\_dbal/Classes/Persistence/Doctrine} mit dem Namen \pdf{DatabaseConnection.php} erstellt. Da die alte API vorerst nicht verändert werden soll, denoch die Methoden der neuen API definiert und getestet werden sollen, erbt die Klasse\\ \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatabaseConnection} von der alten Klasse \phpinline{\Konafets\DoctrineDbal\Persistence\Legacy\DatabaseConnection}.
-Intern rufen sie die Methoden der Elternklasse auf.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.5]{gfx/uml/NewAPI/DatabaseConnectionExtentsFromOldAPI.eps}
-    \caption{Neue API-Klasse erbt von alter API-Klasse}
-    \label{fig:newDatabaseConnectionExtendsFromOldOne}
-\end{figure}
-
-\begin{phpcode}
-class DatabaseConnection extends
-\Konafets\DoctrineDbal\Persistence\Legacy\DatabaseConnection {
-    /**
-	 * Select a SQL database
-	 *
-	 * @return boolean Returns TRUE on success or FALSE on failure.
-	 */
-	public function selectDatabase() {
-		return parent::sql_select_db();
-	}
-
-	/**
-	 * Connects to database for TYPO3 sites:
-	 *
-	 * @throws \RuntimeException
-	 * @throws \UnexpectedValueException
-	 *
-	 * @return void
-	 * @api
-	 */
-	public function connectDatabase() {
-		parent::connectDB();
-	}
-\end{phpcode}
-
-Parallel dazu wurden die Unit Tests der alten API nach \pdf{doctrine\_dbal/Tests/Persistence/Legacy/} kopiert und an die neue API angepasst. Da die Anfragen an die neue API zu diesem Zeitpunkt von ihr lediglich an die alte API delegiert werden, funktionieren die Unit Tests weiterhin.
-
-Die letzte Aufgabe des ersten Meilensteins bestand aus dem Refactoring der Methode \phpinline{connectDB()}. Dabei wird der Code der Methode verändert ohne die Funktion zu veränderen. Refactorings werden durchgeführt, um den Code zu vereinfachen.
-
-Anhand des Methodennamen ist zu erkennen, dass sie für die Etablierung einer Verbindung zur Datenbank zuständig ist, tatsächlich unterschiedliche Aufgaben selbst implementiert. So hat sie:
+Neben ihrer eigentlichen Aufgabe hast sie
 
 \begin{itemize}
 	\item einen Test durchgeführt, ob eine Datenbank konfiguriert ist
-	\item die Verbindung angefordert
 	\item die konfigurierte Datenbank ausgewählt und
 	\item verschiedene Hooks ausgeführt
 \end{itemize}
 
-Das folgende Listing zeigt die Methode vor dem Refactoring.
+Code, der nicht zur definierten Aufgabe der Methode gehörte, wurde in eigene Methoden ausgelagert. Die Methode zur Überprüfung der veralteten Parameter konnte gänzlich entfallen, da die Änderungen an der neuen API stattfanden. Die Methode wurde anhand des aufgestellten Namensschemas umbenannt und wird von der alten Methode aufgerufen. Zusätzlich fängt die Methode nun die von Doctrine DBAL kommende Exception wenn keine Verbindung erstellt werden konnte und wirft eine eigene \phpinline{ConnectionException}. Die entsprechenden Exceptionklassen wurden in \pdf{doctrine\_dbal/Classes/Exeptions/} erstellt. Listing~\ref{lst:connectDatabaseAfterRefactoring} zeigt die Methode nach dem Refactoring; Listing~\ref{lst:connectDBcallsConnectDatabase()} zeigt den Aufruf der neuen Methode.
 
+\begin{listing}[H]
+\begin{phpcode}
+public function connectDatabase($isInitialInstallationInProgress = FALSE) {
+	// Early return if connected already
+	if ($this->isConnected) {
+		return;
+	}
+
+	if (!$isInitialInstallationInProgress) {
+		$this->checkDatabasePreconditions();
+	}
+
+	try {
+		$this->link = $this->getConnection();
+	} catch (\Exception $e) {
+		throw new ConnectionException($e->getMessage());
+	}
+
+	$this->isConnected = $this->checkConnectivity();
+
+	if (!$isInitialInstallationInProgress) {
+		if ($this->isConnected) {
+			$this->initCommandsAfterConnect();
+			$this->selectDatabase();
+		}
+
+		$this->prepareHooks();
+	}
+}
+\end{phpcode}
+\caption{connectDatabase() nach dem Refactoring}
+\label{lst:connectDatabaseAfterRefactoring}
+\end{listing}
+
+\begin{listing}[H]
 \begin{phpcode}
 public function connectDB($host = NULL, $username = NULL, $password = NULL, $db = NULL) {
 	// Early return if connected already
@@ -136,114 +163,190 @@ public function connectDB($host = NULL, $username = NULL, $password = NULL, $db 
 		return;
 	}
 
-	if (!$this->databaseName && !$db) {
-		throw new \RuntimeException(
-			'TYPO3 Fatal Error: No database selected!',
-			1270853882
-		);
-	}
-
 	if ($host || $username || $password || $db) {
 		$this->handleDeprecatedConnectArguments($host, $username, $password, $db);
 	}
 
-	if ($this->sql_pconnect()) {
-		if (!$this->sql_select_db()) {
-			throw new \RuntimeException(
-				'TYPO3 Fatal Error: Cannot connect to the current database, "' .
-				  $this->databaseName . '"!',
-				1270853883
-			);
-		}
+	$this->connectDatabase();
+}
+\end{phpcode}
+\caption{connectDB() delegiert an die neue API-Methode}
+\label{lst:connectDBcallsConnectDatabase()}
+\end{listing}
+
+Die originale Implementation der Mehode ist in \pdf{typo3/sysext/core/Classes/Database/DatabaseConnection.php} ab Zeile 1578 zu finden.\footnote{\url{https://github.com/Konafets/TYPO3CMSDoctrineDBAL/blob/master/typo3/sysext/core/Classes/Database/DatabaseConnection.php\#L1578}}
+
+Die Erstellung der Verbindung wurde in der alten API an die Methode \phpinline{sql_pconnect()} ausgelagert. \phpinline{getConnection()} ist der Name der Methode die diese Aufgabe in der neuen API übernimmt.
+
+Zunächst wurde Code, welcher nicht zum Aufgabengebiet der Methode gehört, in eigene Klassen ausgelagert. In dem Fall betraf das den Test nach einer installierten MySQLi PHP-Erweiterung, welcher im gleichen Zuge auf PDO geändert wurde. Die Initialisierung von Doctrine erfolgt in einer eigenen Methode. Dort wird je eine Instanz von \phpinline{\Doctrine\DBAL\Configuration} und \phpinline{\Doctrine\DBAL\Schema\Schema} erstellt. In der alten API bot Die Methode die Möglichkeit einer persistenten Verbindung zur Datenbank. Dies wurde implementiert, in dem ein eigenes \phpinline{PDO}-Objekt mit dem Konstrukturparameter \phpinline{\PDO::ATTR_PERSISTENT => true} erstellt und in dem Konfigurationsarray gespeichert wurde. Dieses Konfigurationsarray (siehe Listing~\ref{lst:DoctrineConfigArray}) wird \phpinline{\Doctrine\DBAL\DriverManager::getConnection()} übergeben.
+
+\begin{listing}[H]
+\begin{phpcode}
+protected $connectionParams = array(
+	'dbname'   => '',
+	'user'     => '',
+	'password' => '',
+	'host'     => 'localhost',
+	'driver'   => 'pdo_mysql',
+	'port'     => 3306,
+	'charset'  => 'utf8',
+);
+\end{phpcode}
+\caption{Das Konfigruationsarray für Doctrine DBAL}
+\label{lst:DoctrineConfigArray}
+\end{listing}
+
+Zudem muß Doctrine DBAL der Datentyp \sqlinline{Enum} bekanntgemacht werden. Anschließend wird der Schema Manager erstellt, welcher zur Verwaltung des Datenbankschemas notwendig ist. Am Schluß wird das Verbindungsobjekt zurückgegeben.
+\begin{listing}[H]
+\begin{phpcode}
+/**
+ * Open a (persistent) connection to a MySQL server
+ *
+ * @return boolean|void
+ * @throws \RuntimeException
+ */
+public function getConnection() {
+	if ($this->isConnected) {
+		return $this->link;
+	}
+
+	$this->checkForDatabaseExtensionLoaded();
+
+	$this->initDoctrine();
+
+	// If the user want a persistent connection we have to create the PDO instance by ourself and pass it to Doctrine.
+	// See http://stackoverflow.com/questions/16217426/is-it-possible-to-use-doctrine-with-persistent-pdo-connections
+	// http://www.mysqlperformanceblog.com/2006/11/12/are-php-persistent-connections-evil/
+	if ($this->persistentDatabaseConnection) {
+		// pattern: mysql:host=localhost;dbname=databaseName
+		$cdn = substr($this->getDatabaseDriver(), 3) . ':host=' . $this->getDatabaseHost() . ';dbname=' . $this->getDatabaseName();
+		$pdoHandle = new \PDO($cdn, $this->getDatabaseUsername(), $this->getDatabasePassword(), array(\PDO::ATTR_PERSISTENT => true));
+		$this->connectionParams['pdo'] = $pdoHandle;
+	}
+
+	$connection = DriverManager::getConnection($this->connectionParams, $this->databaseConfiguration);
+	$this->platform = $connection->getDatabasePlatform();
+
+	$connection->connect();
+
+	// We need to map the enum type to string because Doctrine don't support it native
+	// This is necessary when the installer loops through all tables of all databases it found using this connection
+	// See https://github.com/barryvdh/laravel-ide-helper/issues/19
+	$this->platform->registerDoctrineTypeMapping('enum', 'string');
+	$this->schemaManager = $connection->getSchemaManager();
+
+	return $connection;
+}
+\end{phpcode}
+\caption{getConnection() der neuen API}
+\label{lst:getConnectionNewAPI}
+\end{listing}
+
+Nachdem durch Doctrine DBAL die Verbindung hergestellt werden konnte, wurde die Methode \phpinline{query()} der alten API übernommen. Sie stellt die zentrale Schnittstelle aller API-Methoden zum Senden ihrer Anfragen an die Datenbank dar. Sie kapselt die gleichnamige Methode \phpinline{\Doctrine\DBAL\Connection::query()}.
+
+\begin{listing}
+\begin{phpcode}
+protected function query($query) {
+	if (!$this->isConnected) {
+		$this->connectDatabase();
+	}
+
+	$stmt = $this->link->query($query);
+
+	return $stmt;
+}
+\end{phpcode}
+\caption{getConnection() der neuen API}
+\label{lst:getConnectionNewAPI}
+\end{listing}
+
+Wie bereits in Kapitel~\ref{sec:doctrine} erwähnt wurde, gibt \phpinline{query()} ein Statementobjekt zurück, welches die Ergebnismenge bereithält. Dort wurde ebenfalls dargestellt, dass diese Menge durch die Methode \phpinline{fetch()} in Verbindung mit PDO-Konstanten in Index-basierte oder Assoziative Arrays formatiert werden kann.
+
+Um die Arbeit mit der Ergebnismenge zu erleichtern wurden die drei Methoden \phpinline{fetchAssoc($stmt)}, \phpinline{fetchRow($stmt)} und \phpinline{$fetchColumn($stmt)} implementiert, die die am Häufigsten vorkommenden  \textit{Fetch-Styles} kapseln.
+
+\begin{phpcode}
+/**
+ * Returns an associative array that corresponds to the fetched row,
+ * or FALSE if there are no more rows.
+ * Wrapper function for Statement::fetch(\PDO::FETCH_ASSOC)
+ *
+ * @param \Doctrine\DBAL\Driver\Statement $stmt A PDOStatement object
+ *
+ * @return boolean|array Associative array of result row.
+ * @api
+ */
+public function fetchAssoc($stmt) {
+	if ($this->debugCheckRecordset($stmt)) {
+		return $stmt->fetch(\PDO::FETCH_ASSOC);
 	} else {
+		return FALSE;
+	}
+}
+
+	public function fetchColumn($stmt, $index = 0) {
+	if ($this->debugCheckRecordset($stmt)) {
+		return $stmt->fetchColumn($index);
+	} else {
+		return FALSE;
+	}
+}
+
+	public function fetchRow($stmt) {
+	if ($this->debugCheckRecordset($stmt)) {
+		return $stmt->fetch(\PDO::FETCH_NUM);
+	} else {
+		return FALSE;
+	}
+}
+\end{phpcode}
+
+Die ehemaligen \phpinline{admin_*}-Methoden wurden in \phpinline{list_*}-Methoden umbenannt, da die Unterscheidung in Admin und Nicht-Admin Methoden nicht nachvollziehbar war. Diese Mehoden stellen wichtige Metainformation zur darunterliegenden Datenbank bereit, die nicht nur für das \textit{Install Tool} von Nutzen sind.
+
+Als Beipiel der Abstraktion, die Doctrine DBAL mitbringt, sei die Implementation der Methode \phpinline{listDatabases()} angeführt. Nach dem obligatorischen Verbindungstest, gibt der \phpinline{SchemaManager} eine Liste aller Datenbanken zurück - vollkommen unabhängig von der zugrundeliegenden \gls{dbms}.
+
+\begin{phpcode}
+public function listDatabases() {
+	if (!$this->isConnected) {
+		$this->connectDatabase();
+	}
+
+	$databases = $this->schemaManager->listDatabases();
+	if (empty($databases)) {
 		throw new \RuntimeException(
-			'TYPO3 Fatal Error: The current username, password or host was not
-			accepted when the connection to the database was attempted to be established!',
-			1270853884
+			'MySQL Error: Cannot get databases: "' . $this->getErrorMessage() . '"!',
+			1378457171
 		);
 	}
 
-	// Prepare user defined objects (if any) for hooks which extend query methods
-	$this->preProcessHookObjects = array();
-	$this->postProcessHookObjects = array();
-	if (is_array($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_db.php']
-				['queryProcessors'])) {
-		foreach ($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_db.php']
-				['queryProcessors'] as $classRef) {
-			$hookObject = GeneralUtility::getUserObj($classRef);
-			if (!(
-				$hookObject instanceof PreProcessQueryHookInterface
-				|| $hookObject instanceof PostProcessQueryHookInterface
-			)) {
-				throw new \UnexpectedValueException(
-					'$hookObject must either implement interface
-					TYPO3\\CMS\\Core\\Database\\PreProcessQueryHookInterface or interface
-					TYPO3\\CMS\\Core\\Database\\PostProcessQueryHookInterface',
-					1299158548
-				);
-			}
-			if ($hookObject instanceof PreProcessQueryHookInterface) {
-				$this->preProcessHookObjects[] = $hookObject;
-			}
-			if ($hookObject instanceof PostProcessQueryHookInterface) {
-				$this->postProcessHookObjects[] = $hookObject;
-			}
-		}
-	}
+	return $databases;
 }
 \end{phpcode}
 
-Das folgende Listing zeigt die Methode bereits unter neuen Namen nach dem Refactoring. Code, der nicht zur definierten Aufgabe der Methode gehörte, wurde in eigene Methoden ausgelagert. Die Methode zur Überprüfung der veralteten Parameter konnte gänzlich entfallen. Zudem wurden für alle Eigenschaften der Klasse \textit{Getter}-Methoden eingeführt, die intern genutzt werden.
+Doctrine stellt zum Maskieren von Benutzereingaben die Methode \phpinline{\Doctrine\DBAL\Connection::quote()} bereit. Im Gegensatz zur alten API, dessen Methode ein Backslash (\phpinline{\}) den zu maskierenden Zeichen voranstellt, werden die Zeichen von Doctrine durch ein Hochkomma (\phpinline{'}) maskiert. Die Methode \phpinline{\Doctrine\DBAL\Connection::quote()} wurde in der neuen API durch eine gleichnamige Methode gekapselt und stellt die Basis für alle weitere Methoden wie \phpinline{fullQuoteString()}, \phpinline{fullQuoteArray()}, \phpinline{quoteString()} und \phpinline{escapeStringForLike()} dar, welche das Verhalten der alten Methoden implementieren.
+
+Die neue API bietet dagegen die Methoden \phpinline{quoteColumn()}, \phpinline{quoteTable()} und \phpinline{quoteIdentifier()} zum Maskieren an. Es kann weiterhin \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatabaseConnection::quote()} genutzt werden; sicherer ist es jedoch von Anfang die Benutzung von Prepared Statements, welche von TYPO3 CMS seit Version 6.2 in Form eines Wrappers um die \textit{Prepared Statements} von MySQLi angeboten werden. Sie besitzen die gleichen API, wie sie in Kapitel~\ref{sec:doctrinePreparedStatemtens} vorgestellt wurde.
+
+Durch den Aufruf der Methode \phpinline{$stmt = $GLOBALS['TYPO3_DB']->prepare($sql)} wird zunächst ein Objekt vom Typ \phpinline{\TYPO3\CMS\Core\Database\PreparedStatement} erstellt, dem der in \phpinline{$sql} gespeicherte Prepared Statemnt übergeben wird. Ein Aufruf von \phpinline{$stmt->bind(':lastName', 'Potter')} fügt einem internen Array des Objekts diese Werte hinzu. Zusätzlich wird versucht den Datentyp zu erkennen und ebenfalls zu speichern. Erst mit dem Aufruf von \phpinline{$stmt->execute()} wird die Datenbank kontaktiert. Zuvor wird jedoch erst die gespeicherte SQL-Anfrage und - die durch \phpinline{bind()} - übergebenen Parameter von \textit{Named Placeholder} in \textit{Positional Parameter} transformiert, da MySQLi nur diese unterstützt. Daraufhin wird die SQL-Abfrage über \phpinline{mysqli::prepare()} an die Datenbank gesendet. Danach werden die in dem Array gespeicherten  Parameter per \phpinline{mysqli::bind()} an die Abfrage gebunden und abschließend per \phpinline{mysqli::execute()} ausgeführt. Zur Definition des Datentypes und des \textit{Fetch-Styles} werden – analog zu PDO – Konstanten wie \phpinline{PreparedStatement::PARAM_INT} oder \phpinline{PreparedStatement::FETCH_ASSOC} verwendet.
+
+Für die Umstellung auf Doctrine wurde die Datei \pdf{typo3/sysext/core/Classes/Database/PreparedStatement.php} in das Verzeichnis \pdf{doctrine\_dbal/Classes/Persistence/Doctrine/} des Prototypen kopiert. Es wurden die eigens verwendeten Konstanten auf PDO-Konstanten umgemappt und die Transformation in \textit{Positional Parameter} wurde entfernt, da von Doctrine beide Varianten unterstützt.
 
 \begin{phpcode}
-public function connectDatabase() {
-	// Early return if connected already
-	if ($this->isConnected) {
-		return;
+protected function guessValueType($value) {
+	if (is_bool($value)) {
+		$type = PDO::PARAM_BOOL;
+	} elseif (is_int($value)) {
+		$type = PDO::PARAM_INT;
+	} elseif (is_null($value)) {
+		$type = PDO::PARAM_NULL;
+	} else {
+		$type = PDO::PARAM_STR;
 	}
 
-	$this->checkDatabasePreconditions();
-
-	try {
-		$this->link = $this->getConnection();
-	} catch (\Exception $e) {
-		echo $e->getMessage();
-	}
-
-	$this->isConnected = $this->checkConnectivity();
-	if ($this->isConnected) {
-		$this->initCommandsAfterConnect();
-		$this->selectDatabase();
-	}
-
-	$this->prepareHooks();
+	return $type;
 }
 \end{phpcode}
 
-Die Funktion der Methode konnte erfolgreich überprüft werden, indem von der Kindklasse die Methode \phpinline{connectDB()} der Elternklasse überschrieben wurde und intern \phpinline{connectDatabase()} aufruft.
-
-Zum Ende des ersten Meilensteins bestand der Prototyp aus den folgenden Verzeichnissen und Dateien.
-
-\begin{Verbatim}[samepage=true]
-doctrine_dbal
-├── Classes
-│   └── Persistence
-│       ├── Doctrine
-│       │   ├── DatabaseConnection.php
-│       └── Legacy
-│           └── DatabaseConnection.php
-├── Tests
-│   └── Unit
-│       └── Persistence
-│           └── Legacy
-│                └── DatabaseConnectionTest.php
-├── ext_emconf.php
-├── ext_icon.gif
-├── ext_localconf.php
-└── ext_tables.php
-\end{Verbatim}
-
-\subsection{Prototype über das Install Tool installieren}
+\subsection{Prototyp über das Install Tool installieren}
 Für eine Datenbankabstraktionsschicht ist es wichtig, dass sie bereits während der Installation verfügbar ist um ein alternatives \gls{dbms} nutzen zu können. Demnach muß der Prototyp – analog zur Systemextension DBAL - über das Install Tool installierbar sein, was zu geringfügigen Anpassungen am Install Tool führt.
 
 Wie bei der Installation von TYPO3 CMS zu sehen war, führt das Install Tool in fünf Schritten durch die Installation. Diese Schritte werden von Klassen zur Verfügung gestellt, die sich im Ordner \pdf{typo3/sysext/install/Classes/Controller/Action/Step} befinden. Sie werden über den StepController \pdf{typo3/sysext/install/Classes/Controller/Action/StepController} gesteuert. Dabei iteriert der Controller bei jedem Reload des Installtools über alle Schritte und prüft ob der jeweils aktuelle Schritt bereits ausgeführt wurde oder noch ausgeführt werden muß. Der Controller erkennt dies an Bedingungen, die von jedem Schritt definiert werden.
@@ -328,247 +431,6 @@ Die nächste Aufgabe bestand darin den Prototypen auf Doctrine DBAL umzustellen,
 
 Um den Überblick zu behalten werden zunächst die Änderungen beschrieben, die am Prototypen notwendig wurden. Danach folgen die Anpassungen an TYPO3 CMS.
 
-\subsubsection{Installation von Doctrine DBAL}
-Doctrine DBAL wurde über \textit{Composer} installiert.
-
-Composer ist ein Dependency Manager\footnote{https://getcomposer.org/} für PHP, welcher von der Kommandozeile aufgerufen wird. Es dient zum Auflösen von Abhängigkeiten eines Projektes. Diese Abhängigkeiten werden in einer \pdf{composer.json}-Datei definiert und durch Ausführung des Programms in Verbindung mit der Konfigurationsdatei in dem Ordner \pdf{vendor} installiert.
-
-Für den Prototypen wurde Doctrine DBAL als externe Abhängigkeit in der \pdf{composer.json} wie folgt definiert:
-
-\begin{listing}
-\begin{jsoncode}
-{
-	"name": "typo3/doctrine_dbal",
-	"type": "typo3-cms-extension",
-	"description": "This brings Doctrine2 to TYPO3",
-	"homepage": "http://typo3.org",
-	"license": ["GPL-2.0+"],
-	"version": "6.2.0",
-	"require": {
-		"doctrine/dbal": "dev-master"
-	},
-	"mininum-stability": "dev",
-}
-\end{jsoncode}
-\caption{Die Datei composer.json}
-\label{lst:composer}
-\end{listing}
-
-Durch das Kommando \shinline{composer install} erfolgt die Installation von Doctrine DBAL in den Ordner \pdf{vendor/doctrine}.
-
-Composer Konfigurationsdateien werden seit TYPO3 CMS 6.2 analysiert. Aus den definierten Abhängigkeiten und den (System)-Extensions wird vom Package Mananger ein Graph von Abhängigkeiten aufgebaut welcher in \pdf{thesis.dev/http/typo3conf/PackagesStates.php} gespeichert wird. Diese Datei wird bei der Installation erstellt und stetig aktualisiert. Da diese Funktionalität relativ neu ist, mußte diese Datei bei der Installation des Prototypen manuell angepasst werden. Das wird später detailierter beschrieben.
-
-Externe Abhängigkeiten werden vom Package Manager in \pdf{thesis.dev/http/Packages/Library} erwartet. Aus diesem Grund muß der Ordner \pdf{thesis.dev/http/typo3conf/ext/doctrine\_dbal/vendor/doctrine} nach \pdf{thesis.dev/http/Packages/Library/} kopiert werden.
-
-Die Installation von Doctrine ist damit vorest abgeschlossen.
-
-\subsubsection{Umstellung der neuen API auf Doctrine DBAL}
-Die Integration von Doctrine DBAL sollte so transparent für TYPO3 CMS und die Extensions erfolgen, dass weiterhin über die Methoden der alten API auf die Datenbank zugegriffen werden konnte. Die alte API steht dabei vergleichbar einer Fassade vor der neuen API, die ankommende Anfragen selbst behandelt oder an die neue API delegiert. Dieses Vorgehen erlaubt die sukzessive Integration von Doctrine DBAL.
-
-Um dies zu erreichen wurde die in Abbildung~\ref{fig:newDatabaseConnectionExtendsFromOldOne} vorgestellte Hierachie umgekehrt - die Klasse \phpinline{\Konafets\DoctrineDbal\Persistence\Legacy\DatbaseConnection} erbt nun von der neuen Klasse \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatbaseConnection}.
-
-![image](../gfx/uml/NewAPI/OldDatabaseConnectionExtentsFromNewAPI.png)
-
-Anschließend wurde die Änderung der Klassenhierachie in \pdf{doctrine\_dbal/ext\_localconf.php}  bekannt gemacht.
-
-\begin{phpcode}
-$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Core\\Database\\DatabaseConnection'] = array('className' => 'Konafets\\DoctrineDbal\\Persistence\\Legacy\\DatabaseConnection');
-\end{phpcode}
-
-Im nächsten Schritt wurden alle notwendigen Eigenschaften der alten Klasse in die neue Klasse verschoben. Jede Eigenschaft bekam zudem Setter- und Getter Methode, über die darauf zugegriffen werden soll.
-
-\begin{phpcode}
-	public function setDatabaseUsername($username) {
-		$this->disconnectIfConnected();
-		$this->connectionParams['user'] = $username;
-
-		return $this;
-	}
-
-	public function getDatabaseUsername() {
-		return $this->connectionParams['user'];
-	}
-
-	public function setStoreLastBuildQuery($value) {
-		$this->store_lastBuiltQuery = (bool)$value;
-	}
-\end{phpcode}
-
-
-Die Eigenschaften die die Konfigurationsinformation für die Datenbank bereithielten wurden entfernt und durch ein Konfigurationsarray ersetzt, welches Doctrine DBAL zum Anfordern einer Verbindung erwartet.
-
-\begin{phpcode}
-	protected $connectionParams = array(
-		'dbname'   => '',
-		'user'     => '',
-		'password' => '',
-		'host'     => 'localhost',
-		'driver'   => 'pdo_mysql',
-		'port'     => 3306,
-		'charset'  => 'utf8',
-	);
-\end{phpcode}
-
-Zum wurden verschiedene Doctrine-spezische Eigenschaften und Setter/Getter-Methoden der Klasse hinzugefügt.
-
-Die eigentliche Umstellung auf Doctrine DBAL erfolgte in der Methode \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatabaseConnection::getConnection()}, da sie das Verbindungsobjekt erstellt und zurückgibt.
-
-Zunächst wurde Code, welcher nicht zum Aufgabengebiet der Methode gehört, in eigene Klassen ausgelagert. In dem Fall betraf das den Test nach einer installierten MySQLi PHP-Erweiterung, welcher im gleichen Zuge auf PDO geändert wurde.
-
-Die Initialisierung von Doctrine erfolgt in einer eigenen Methode. Dort wird je eine Instanz von \phpinline{\Doctrine\DBAL\Configuration} und \phpinline{\Doctrine\DBAL\Schema\Schema}.
-
-Die Methode der \phpinline{sql_pconnect()} der alten API bot die Möglichkeit einer persistenten Verbindung zur Datenbank. Dies wurde implementiert, in dem ein eigenes \phpinline{PDO}-Objekt mit dem Konstrukturparameter \phpinline{\PDO::ATTR_PERSISTENT => true} erstellt und in dem Konfigurationsarray gespeichert wurde.
-
-Dieses Konfigurationsarray (siehe Listing~\ref{lst:DoctrineConfigArray}) wird \phpinline{\Doctrine\DBAL\DriverManager::getConnection()} übergeben, welches ein Verbindungsobjekt zurückgibt.
-
-Zudem muß Doctrine DBAL der Datentyp \sqlinline{Enum} bekanntgemacht werden. Anschließend wird der Schema Manager erstellt, welcher zur Verwaltung des Datenbankschemas notwendig ist.
-
-Am Schluß wird das Verbindungsobjekt zurückgegeben.
-
-\begin{phpcode}
-	/**
-	 * Open a (persistent) connection to a MySQL server
-	 *
-	 * @return boolean|void
-	 * @throws \RuntimeException
-	 */
-	public function getConnection() {
-		if ($this->isConnected) {
-			return $this->link;
-		}
-
-		$this->checkForDatabaseExtensionLoaded();
-
-		$this->initDoctrine();
-
-		// If the user want a persistent connection we have to create the PDO instance by ourself and pass it to Doctrine.
-		// See http://stackoverflow.com/questions/16217426/is-it-possible-to-use-doctrine-with-persistent-pdo-connections
-		// http://www.mysqlperformanceblog.com/2006/11/12/are-php-persistent-connections-evil/
-		if ($this->persistentDatabaseConnection) {
-			// pattern: mysql:host=localhost;dbname=databaseName
-			$cdn = substr($this->getDatabaseDriver(), 3) . ':host=' . $this->getDatabaseHost() . ';dbname=' . $this->getDatabaseName();
-			$pdoHandle = new \PDO($cdn, $this->getDatabaseUsername(), $this->getDatabasePassword(), array(\PDO::ATTR_PERSISTENT => true));
-			$this->connectionParams['pdo'] = $pdoHandle;
-		}
-
-		$connection = DriverManager::getConnection($this->connectionParams, $this->databaseConfiguration);
-		$this->platform = $connection->getDatabasePlatform();
-
-		$connection->connect();
-
-		// We need to map the enum type to string because Doctrine don't support it native
-		// This is necessary when the installer loops through all tables of all databases it found using this connection
-		// See https://github.com/barryvdh/laravel-ide-helper/issues/19
-		$this->platform->registerDoctrineTypeMapping('enum', 'string');
-		$this->schemaManager = $connection->getSchemaManager();
-
-		return $connection;
-	}
-\end{phpcode}
-
-Die Methode \phpinline{connectDatabase()} wurden dahingehen verändert, dass sie eine \phpinline{ConnectionException} wirft, wenn von \phpinline{getConnection()} keine Verbindung erstellt werden konnte. Die entsprechenden Exceptionklassen wurden in \pdf{doctrine\_dbal/Classes/Exeptions/} erstellt.
-
-Die Methode \phpinline{query()} stellte in der alten API die zentrale Schnittstelle zum Senden der Anfragen an die Datenbank dar. Sie wird intern von allen Methoden verwendet um dessen SQL-Anfragen abzusenden. Intern nutzte sie die gleichnamige Methode von MySQLi. Die neue API übernimmt diese Funktionalität vollständig.
-
-Wie bereits in Kapitel~\ref{sec:doctrine} erwähnt wurde, gibt \phpinline{query()} ein Statementobjekt zurück, welches die Ergebnismenge bereithält. Dort wurde ebenfalls dargestellt, dass diese Menge durch die Methode \phpinline{fetch()} in Verbindung mit PDO-Konstanten zum Beispiel in Index-basierte oder Assoziative Arrays formatiert werden kann.
-
-Um die Arbeit mit der Ergebnismenge zu erleichtern wurden die drei Methoden \phpinline{fetchAssoc($stmt)}, \phpinline{fetchRow($stmt)} und \phpinline{$fetchColumn($stmt)} implementiert, die die am Häufigsten vorkommenden  \textit{Fetch-Styles} kapseln.
-
-\begin{phpcode}
-	/**
-	 * Returns an associative array that corresponds to the fetched row, or FALSE if there are no more rows.
-	 * Wrapper function for Statement::fetch(\PDO::FETCH_ASSOC)
-	 *
-	 * @param \Doctrine\DBAL\Driver\Statement $stmt A PDOStatement object
-	 *
-	 * @return boolean|array Associative array of result row.
-	 * @api
-	 */
-	public function fetchAssoc($stmt) {
-		if ($this->debugCheckRecordset($stmt)) {
-			return $stmt->fetch(\PDO::FETCH_ASSOC);
-		} else {
-			return FALSE;
-		}
-	}
-
-		public function fetchColumn($stmt, $index = 0) {
-		if ($this->debugCheckRecordset($stmt)) {
-			return $stmt->fetchColumn($index);
-		} else {
-			return FALSE;
-		}
-	}
-
-		public function fetchRow($stmt) {
-		if ($this->debugCheckRecordset($stmt)) {
-			return $stmt->fetch(\PDO::FETCH_NUM);
-		} else {
-			return FALSE;
-		}
-	}
-\end{phpcode}
-
-Die ehemaligen \phpinline{admin_*}-Methoden wurden laut der Tabelle~\ref{tab:cglNames} in \phpinline{list_*}-Methoden umbenannt, da die Unterscheidung in sogenannte Admin und Nicht-Admin Methoden nicht nachvollziehbar war. Diese Mehoden stellen wichtige Metainformation zur darunterliegenden Datenbank bereit, die nicht nur für das Install Tool von Nutzen sind.
-
-Als Beipiel der Abstraktion, die Doctrine DBAL mitbringt, sei die Implementation der Methode \phpinline{listDatabases()} angeführt.
-
-Nach dem obligatorischen Verbindungstest, wird der Schema Manager nach einer Liste alle Datenbanken im System befragt - vollkommen unabhängig von der zugrundeliegenden \gls{dbms}.
-
-\begin{phpcode}
-	public function listDatabases() {
-		if (!$this->isConnected) {
-			$this->connectDatabase();
-		}
-
-		$databases = $this->schemaManager->listDatabases();
-		if (empty($databases)) {
-			throw new \RuntimeException(
-				'MySQL Error: Cannot get databases: "' . $this->getErrorMessage() . '"!',
-				1378457171
-			);
-		}
-
-		return $databases;
-	}
-\end{phpcode}
-
-Alle Methoden der alten API, die sich um die Maskierung von Eingaben kümmerten, mußten hingegen vollständig angepasst werden, da Doctrine lediglich die Methode \phpinline{quote()} zum Maskieren breitstellt. Diese stellt dem zu maskierenden Zeichen ein Hochkomma (') voran. Im Gegensatz dazu mußte für MySQLi mit Backslashes (\\) maskiert werden.
-
-Die von Doctrine kommende \phpinline{quote()} wurde in der neuen API durch eine gleichnamige Methode gekapselt. Diese stellt die Basis für alle weitere Methoden wie \phpinline{fullQuoteString()}, \phpinline{fullQuoteArray()}, \phpinline{quoteString()} und \phpinline{escapeStringForLike()} dar. Diese Methoden simulieren lediglich das Verhalten der alten API. Die neue API bietet die Methoden \phpinline{quoteColumn()}, \phpinline{quoteTable()} und \phpinline{quoteIdentifier()} an. Das Maskieren von Benutzereingaben kann weiterhin mit \phpinline{quote()} vollzogen werden; sicherer ist es jedoch von Anfang an Prepared Statements zu verwenden.
-
-Damit der Prototyp funktioniert, mußte das von der alten API implementierte Prepared Statement auf Doctrines Prepared Statements umgestellt werden.
-
-[UML Diagramm Prepared Statement]
-
-Die von TYPO3 CMS implementierten Prepared Statements bieten nach außen die gleiche API wie in Kapitel~\ref{sec:doctrinePreparedStatemtens} vorgestellt, stellen jedoch seit Version 6.2 einen \textit{Wrapper} um das Prepared Statement von MySQLi dar. Durch den Aufruf der Methode \phpinline{$stmt = $GLOBALS['TYPO3_DB']->prepare($sql)} wird zunächst ein Objekt vom Typ \phpinline{\TYPO3\CMS\Core\Database\PreparedStatement} erstellt, dem der in \phpinline{$sql} gespeicherte Prepared Statemnt übergeben wird.
-Ein Aufruf von \phpinline{$stmt->bind(':lastName', 'Potter')} fügt einem internen Array des Objekts lediglich diese Werte hinzu. Zusätzlich wird versucht den Datentyp zu erkennen und ebenfalls zu speichern.
-
-Erst mit dem Aufruf von \phpinline{$stmt->execute()} wird die Datenbank kontaktiert. Zuvor wird jedoch erst die gespeicherte SQL-Anfrage und die durch \phpinline{bind()} übergebenen Parameter von \textit{Named Placeholder} in \textit{Positional Parameter} transformiert, da MySQLi nur diese unterstützt. Daraufhin wird die SQL-Abfrage nun über \phpinline{mysqli::prepare()} an die Datenbank gesendet. Danach werden die, in dem Array gespeicherten, Parameter per \phpinline{mysqli::bind()} gebunden und abschließend per \phpinline{mysqli::execute} ausgeführt.
-
-Zusätzlich wird die Anfrage gecached.
-
-Für die Umstellung auf Doctrine wurden die eigens verwendeten Konstanten auf PDO-Konstanten umgemappt und die Transformation in \textit{Positional Parameter} konnte gänzlich entfallen, da von Doctrine beide Varianten unterstützt werden.
-
-\begin{phpcode}
-	protected function guessValueType($value) {
-		if (is_bool($value)) {
-			$type = PDO::PARAM_BOOL;
-		} elseif (is_int($value)) {
-			$type = PDO::PARAM_INT;
-		} elseif (is_null($value)) {
-			$type = PDO::PARAM_NULL;
-		} else {
-			$type = PDO::PARAM_STR;
-		}
-
-		return $type;
-	}
-\end{phpcode}
-
-Dem Konstruktur mußte noch der das aktuelle Verbindungsobjekt übergeben werden.
-
-\subsubsection{Änderungen an TYPO3 CMS}
 Die von Composer erstellte \textit{Autoload}-Datei, muß von TYPO3 CMS in die Datei \phpinline{\TYPO3\CMS\Core\Core\Bootstrap} eingebunden werden, damit die von Doctrine DBAL zur Verfügung gestellten Klassen geladen werden können.
 
 \begin{listing}
