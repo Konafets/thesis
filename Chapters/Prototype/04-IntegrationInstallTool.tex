@@ -1,0 +1,124 @@
+%-----------------------------------------------
+% Dateiname: IntegrationInstallTool.tex
+% Autor    : Stefano Kowalke <blueduck@gmx.net>
+% Lizenz   : BSD
+%-----------------------------------------------
+\section{Integration des Prototypen in das Install Tool}
+\label{prototype:sec:integrateIntoInstallTool}
+Für eine Datenbankabstraktionsschicht ist es wichtig, dass sie bereits während der Installation verfügbar ist um ein alternatives \gls{dbms} nutzen zu können. Demnach muß der Prototyp – analog zur Systemextension DBAL - über das \textit{Install Tool} installierbar sein, was zu geringfügigen Anpassungen am \textit{Install Tool} führte. Diese Änderungen im Überblick:
+
+\begin{itemize}
+\item im zweiten Schritt wurde eine Schaltfläche hinzugefügt, über die der Prototyp installiert wird
+\item es wurde ein Auswahlfeld integriert, dass die installierten PDO-Datenbanktreiber auflistet
+\item es wurde ein – vom ausgewählten Datenbanktreiber abhängiges – Formular zur Eingabe von Datenbank-spezifischen Informationen wie Benutzername, Passwort und Datenbankname erstellt
+\end{itemize}
+
+Die notwendigen Änderungen wurden an den HTML-Templates, sowie an den Klassen vorgenommen die die fünf Schritte der Installation bereitstellen, die bei der Installation von TYPO3 CMS zu sehen waren und sich im Ordner \pdf{typo3/sysext/install/Classes/Controller/Action/Step} befinden. Sie werden über den StepController \pdf{typo3/sysext/install/Classes/Controller/Action/StepController} gesteuert. Dabei iteriert der Controller bei jedem Reload des Installtools über alle Schritte und prüft ob der jeweils aktuelle Schritt bereits ausgeführt wurde oder noch ausgeführt werden muß. Der Controller erkennt dies an Bedingungen, die von jedem Schritt definiert werden.
+Sind alle Bedingungen erfüllt, findet ein Redirekt auf den nächsten Schritt statt.
+
+Die Ausgabe der Schritte erfolgt über verschiedene HTML-Template Dateien, die in der TYPO3 eigenen Template-Sprache \textit{Fluid} verfasst sind. Das \textit{Install Tool} setzt hier das \gls{mvc}-Pattern ein, um die Geschäftslogik von der Präsentation zu trennen.
+
+Die HTML-Templates unterteilen sich in \textit{Layouts}, \textit{Templates} und \textit{Partials}, die in den jeweilig gleichnamigen Verzeichnissen in \pdf{typo3/sysext/install/Resources/Privat/} zu finden sind.
+
+\begin{itemize}
+	\item Ein Template beschreibt die grundlegende Struktur einer Seite. Typischerweise befindet sich darin der Seitenkopf und -fuß.
+	\item Die Struktur einer einzelnen Seite wird von einem Template festgelegt.
+	\item Partials stellen wiederkehrende Elemente dar. Sie können in Layout- und Templatedateien eingebunden werden. Die Schaltfläche \textit{I do not use MySQL} aus Abbildung~\ref{fig:installTYPO3LegacyStepTwo} im zweiten Schritt ist ein Beispiel eines Partials.
+\end{itemize}
+
+Für die Schaltfläche zur De- und Installation des Prototypen und das Auswahlfeld für die Datenbanktreiber wurden die Partials in \pdf{DoctrineDbalDriverSelection}, \pdf{LoadDoctrineDbal} und \pdf{UnloadDoctrineDbal} in \pdf{typo3/sysext/install/Resources/Private/Partials/Action/Step/DatabaseConnect/} erstellt.
+
+Dem zweiten Schritt \pdf{typo3/sysext/install/Resources/Private/Partials/Action/Step/DatabaseConnect.html} wurde eine Bedingung zu hinzugefügt, die anhand der Variablen \texttt{isDoctrineEnabled} entweder die Schaltfläche zur Installation des Prototypen oder das Auswahlfeld für die Datenbanktreiber und die Schaltfläche zur Deinstallation des Prototypen anzeigt.
+
+\begin{listing}
+\begin{htmlcode}
+<f:if condition="{isDoctrineEnabled}">
+	<f:then>
+		<f:render partial="Action/Step/DatabaseConnect/DoctrineDbalDriverSelection" arguments="{_all}" />
+		<f:if condition="{selectedDoctrineDriver}">
+			<f:render partial="Action/Step/DatabaseConnect/ConnectDetails" arguments="{_all}" />
+		</f:if>
+		<f:render partial="Action/Step/DatabaseConnect/UnloadDoctrineDbal" arguments="{_all}" />
+	</f:then>
+
+	<f:else>
+		<f:render partial="Action/Step/DatabaseConnect/ConnectDetails" arguments="{_all}" />
+		<f:render partial="Action/Step/DatabaseConnect/LoadDoctrineDbal" arguments="{_all}" />
+		<f:render partial="Action/Step/DatabaseConnect/LoadDbal" arguments="{_all}" />
+	</f:else>
+</f:if>
+\end{htmlcode}
+\caption{Integration der Partials in den zweiten Installationsschritt [DatabaseConnect.html]}
+\label{lst:integrateInstallPartial}
+\end{listing}
+
+Damit die Bedingung \texttt{isDoctrineEnabled} einen Wert enthält, muß diese von der \textit{Action} des Schrittes definiert und an die View übergeben werden. In diesem Fall ist dafür die Klasse \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect} zuständig. Hier wird der Extension Manager gefragt, ob der Prototyp installiert ist.
+
+\begin{listing}
+\begin{phpcode}
+$isDbalEnabled =
+  \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('doctrine_dbal');
+
+$this->view
+  ->assign('isDoctrineEnabled', $isDoctrineEnabled)
+  ->assign('username', $this->getConfiguredUsername())
+  ->assign('password', $this->getConfiguredPassword())
+  ->assign('host', $this->getConfiguredHost())
+  ->assign('port', $this->getConfiguredOrDefaultPort())
+  ->assign('database', $GLOBALS['TYPO3_CONF_VARS']['DB']['database'] ?: '')
+  ->assign('socket', $GLOBALS['TYPO3_CONF_VARS']['DB']['socket'] ?: '');
+\end{phpcode}
+\caption{Zuweisung von in PHP definierten Variablen an die View [DatabaseConnect.php]}
+\end{listing}
+
+Durch den Klick auf die neu hinzugefügte Schaltfläche wird der Prototyp installiert. Dazu wird der per POST-Request gesendete Wert \texttt{loadDoctrine} von dem gleichen Schritt auswertet und per Extension Manager installiert (Siehe \pdf{typo3/sysext/install/Classes/Controller/Action/Step/DatabaseConnect.php} Zeilen 59-63 und 815-844). Daraufhin erhält der Benutzer ein visuelles Feedback, dass der Protoyp installiert wurde. Danach wird zunächst das  Auswahlfeld eingeblendet, über das das zu verwendende \gls{dbms} festgelegt wird.
+
+Das Feld wird dymamisch mit den installierten PDO-Datenbanktreiber befüllt. Der entsprechende Code ist in der Datei \pdf{typo3/sysext/install/Classes/Controller/Action/Step/DatabaseConnect.php} ab Zeile 606 zu finden. Nach der Auswahl des Treibers werden die Inputfelder eingeblendet. Da die verschiedenen \gls{dbms} unterschiedliche Daten für den Aufbau einer Verbindung zur Datenbank benötigen, ist die Anzahl und Art der Felder von dem ausgewählten Treiber abhängig. Der Codeteil ist in der Datei \pdf{typo3/sysext/install/Classes/Controller/Action/Step/DatabaseConnect.php} ab Zeile 556 zu finden. Abbildung~\ref{fig:sqlCredentials} zeigt die  Felder für MySQL.
+
+Generell wurde das Eingabefeld für die Datenbank entfernt, da diese im nächsten Schritt ausgewählt wird. Hinzugefügt wurde das Eingabefeld für das Datenbank Charset.
+
+Damit die eingebenen Daten weiterverarbeitet werden konnten wurden diese in der Datei \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect.php} ergänzt. Dort werden sie auch permanent in der Konfigurationsdatei pdf{thesis.dev/http/typo3conf/LocalConfiguration.php} gepeichert.
+
+\begin{listing}
+\begin{phpcode}
+if (!empty($postValues['database'])) {
+  $value = $postValues['database'];
+  if (strlen($value) <= 50) {
+    $localConfigurationPathValuePairs['DB/database'] = $value;
+  }
+}
+\end{phpcode}
+\caption{Speicherung der Eingabe in der Konfigurationsdatei [DatabaseConnect.php]}
+\end{listing}
+
+Die in den Formularen eingegeben Datenbankinformationen werden über POST Variablen an das Install Tool gesendet und anschließend in der Konfigurationsdatei \pdf{thesis.dev/http/typo3conf/LocalConfiguration.php} gepeichert. Während der Laufzeit stehen sie entweder in dem Array \phpinline{$postValues} oder in dem globalen Array \phpinline{$GLOBALS['TYPO3_CONF_VARS']['DB']} zur Verfügung.
+
+
+Bevor diese Werte verwendet werden konnten, wurde im Orignalcode per \phpinline{isset()} geprüft, ob sie vorhanden sind. Dies schließt jedoch nicht aus, dass die Variablen leer sind. Als Folge dessen wird ein leerer Wert übergeben. Als Beispiel sei die Möglichkeit der Wahl zwischen einer Socket basierten Datenbankverbindung oder einer Verbindung per Port erwähnt. Da beide Eingabefelder im HTML Code definiert und per htmlinline{name}-Attribut ein Variable zugewiesen bekommen haben, die per POST-Request an das Install Tool gesendet werde, wertet PHP diese Variable als gesetzt und verarbeitet speichert einen leeren Wert für den Port. Um das zu verhindern, wurden an allen notwendigen Stellen der Aufruf von \phpinline{isset()} zu \phpinline{!empty()} geändert. Diese fand in den Klassen \phpinline{\TYPO3\CMS\Core\Core\Bootstrap}, \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect} und \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseSelect} statt.
+
+Die von Composer erstellte \textit{Autoload}-Datei, muß von TYPO3 CMS in die Datei \phpinline{\TYPO3\CMS\Core\Core\Bootstrap} eingebunden werden, damit die von Doctrine DBAL zur Verfügung gestellten Klassen geladen werden können.
+
+\begin{listing}[H]
+\begin{phpcode}
+/**
+ * Initializes the Class Loader
+ *
+ * @return Bootstrap
+ * @internal This is not a public API method, do not use in own extensions
+ */
+public function initializeClassLoader() {
+	/** Composer loader */
+	require_once PATH_typo3conf . 'ext/doctrine_dbal/vendor/autoload.php';
+
+	$classLoader = new ClassLoader($this->applicationContext);
+	...
+}
+\end{phpcode}
+\caption{Einbinden der von Composer erstellten Autoloaddatei [Bootstrap.php]}
+\label{lst:composerAutoload}
+\end{listing}
+
+\subsection{Doctrines Schemarepräsentation}
+
+\subsection{Implementation einer fluenten Query-Language}
+
