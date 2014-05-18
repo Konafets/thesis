@@ -8,102 +8,28 @@
 % Abkürzungen
 %-----------------
 % http://tex.stackexchange.com/questions/8946/how-to-combine-acronym-and-glossary
-\newglossaryentry{ide}
-{
-	type=\acronymtype,
-	name={IDE},
-	description={Integrated Development Environment},
-	first={Integrated Development Environment (IDE)}
-}
-
-\newglossaryentry{cgl}
-{
-	type=\acronymtype,
-	name={CGL},
-	description={Coding Guidelines},
-	first={Coding Guidelines (CGL)}
-}
-
-\newglossaryentry{sql}
-{
-	type=\acronymtype,
-	name={SQL},
-	description={Structured Query Language},
-	first={Structured Query Language (SQL)}
-}
-
-\newglossaryentry{dbms}
-{
-	type=\acronymtype,
-	name={DBMS},
-	description={Database Management System},
-	first={Database Management System (DBMS)}
-}
-
-\newglossaryentry{jdo}
-{
-	type=\acronymtype,
-	name={JDO},
-	description={Java Data Objects},
-	first={Java Data Objects (JDO)}
-}
-
-\newglossaryentry{pdo}
-{
-	type=\acronymtype,
-	name={PDO},
-	description={PHP Data Objects},
-	first={PHP Data Objects (PDO)}
-}
-
-\newglossaryentry{ter}
-{
-	type=\acronymtype,
-	name={TER},
-	description={TYPO3 Extension Repository},
-	first={TYPO3 Extension Repository (TER)}
-}
-
-\newglossaryentry{em}
-{
-	type=\acronymtype,
-	name={EM},
-	description={Extension Manager},
-	first={Extension Manager (EM)}
-}
-
-\newglossaryentry{php}
-{
-	type=\acronymtype,
-	name={PHP},
-	description={PHP: Hypertext Processor},
-	first={PHP: Hypertext Processor (PHP)}
-}
-
-\newglossaryentry{fe}
-{
-	type=\acronymtype,
-	name={FE},
-	description={Frontend},
-	first={Frontend (FE)}
-}
-
-\newglossaryentry{be}
-{
-	type=\acronymtype,
-	name={BE},
-	description={Backend},
-	first={Backend (BE)}
-}
-
-\newglossaryentry{tca}
-{
-	type=\acronymtype,
-	name={TCA},
-	description={Table Content Array},
-	first={Table Content Array (TCA)},
-	see=[Glossary:]{tcag}
-}
+\newacronym{ide}{IDE}{Integrated Development Environment}
+\newacronym{cgl}{CGL}{Coding Guidelines}
+\newacronym{sql}{SQL}{Structured Query Language}
+\newacronym{dbms}{DBMS}{Database Management System}
+\newacronym{jdo}{JDO}{Java Data Objects}
+\newacronym{pdo}{PDO}{PHP Data Objects}
+\newacronym{ter}{TER}{TYPO3 Extension Repository}
+\newacronym{em}{EM}{Extension Manager}
+\newacronym{php}{PHP}{PHP: Hypertext Processor}
+\newacronym{fe}{FE}{Frontend}
+\newacronym{be}{BE}{Backend}
+\newacronym{tca}{TCA}{Table Content Array\protect\glsadd{glos:tca}}
+\newacronym{dbal}{DBAL}{Database Abstraction Layer\protect\glsadd{glos:dbal}}
+\newacronym{cms}{CMS}{Content Management-System}
+\newacronym{cmf}{CMF}{Content Management-Framework}
+\newacronym{ecms}{ECMS}{Enterprise Content Management-Sytem}
+\newacronym{wcms}{WCMS}{Web Content Management-Sytem}
+\newacronym{orm}{ORM}{Object-relational mapping}
+\newacronym{jcr}{JCR}{Content Repository for Java Technology API}
+\newacronym{mvc}{MVC}{Model-View-Controller}
+\newacronym{api}{API}{Application Programming Interface}
+\newacronym{gpl2}{GPL2}{GNU General Public License v.2}
 
 \newglossaryentry{t3assoc}
 {
@@ -113,112 +39,23 @@
 	first={TYPO3 Association (T3Assoc)}
 }
 
-\newglossaryentry{dbal}
-{
-	type=\acronymtype,
-	name={DBAL},
-	description={Database Abstraction Layer},
-	first={Database Abstraction Layer (DBAL)},
-	see=[Glossary:]{dbalg}
-}
-
-\newglossaryentry{bafög}
-{
-	type=\acronymtype,
-	name={BAföG},
-	description={Bundesausbildungsförderungsgesetz},
-	first={Bundesausbildungsförderungsgesetz (BAföG)}
-}
-
-\newglossaryentry{cms}
-{
-	type=\acronymtype,
-	name={CMS},
-	description={Content-Management-System},
-	first={Content-Management-Sytem (CMS)}
-}
-\newglossaryentry{ecms}
-{
-	type=\acronymtype,
-	name={ECMS},
-	description={Enterprise Content Management-System},
-	first={Enterprise Content Management-Sytem (ECMS)}
-}
-
-\newglossaryentry{wcms}
-{
-	type=\acronymtype,
-	name={WCMS},
-	description={Web Content Management-System},
-	first={Web Content Management-Sytem (WCMS)}
-}
-
-\newglossaryentry{orm}
-{
-	type=\acronymtype,
-	name={ORM},
-	description={Object-relational mapping},
-	first={Object-relational mapping (ORM)}
-}
-
-\newglossaryentry{jcr}
-{
-	type=\acronymtype,
-	name={JCR},
-	description={Content Repository for Java Technology API},
-	first={Content Repository for Java Technology API (JCR)}
-}
-
-\newglossaryentry{mvc}
-{
-	type=\acronymtype,
-	name={MVC},
-	description={Model-View-Controller},
-	first={Model-View-Controller (MVC)}
-}
-
-\newglossaryentry{api}
-{
-	type=\acronymtype,
-	name={API},
-	description={Application Programming Interface},
-	first={Application Programming Interface (API)}
-}
-
-\newglossaryentry{apis}
-{
-	type=\acronymtype,
-	name={APIs},
-	description={Application Programming Interface},
-	first={Application Programming Interface (API)}
-}
-
-\newglossaryentry{gpl2}
-{
-	type=\acronymtype,
-	name={GPL2},
-	description={GNU General Public License v.2},
-	first={GNU General Public License v.2 (GPL2)}
-}
-
-\newglossaryentry{cmf}
-{
-	type=\acronymtype,
-	name={CMF},
-	description={Content Management Framework},
-	first={Content Management Framework (CMF)}
-}
 %-------------
 % glossareinträge
 %-------------
-\newglossaryentry{dbalg}
+\newglossaryentry{glos:dbal}
 {
 	name={dbal},
 	description={a very long description of of what is dbal}
 }
 
-\newglossaryentry{tcag}
+\newglossaryentry{glos:tca}
 {
 	name={TCA},
 	description={Das TCA ist ein globales PHP Array, welches die Definition von Datanbanktabellen weit über die Möglichkeiten herkömmlichen SQLs erweitert. Seine Hauptaufgabe besteht in der Definition der, durch das TYPO3 CMS Backend, editierbaren Tabellen. Es beschreibt die Beziehungen zu anderen Tabellen, welches Feld einer Tabelle soll in welchen Layout im \gls{be} dargestellt werden und wie soll das Feld validiert werden. Enthält eine Tabelle keinen Eintrag im TCA ist sie im Backend nicht sichtbar.}
+}
+
+\newglossaryentry{composer}
+{
+	name={Composer},
+	description={Composer ist ein Dependency Manager\footnote{https://getcomposer.org/} für PHP, welcher von der Kommandozeile aufgerufen wird. Es dient zum Auflösen von Abhängigkeiten eines Projektes. Diese Abhängigkeiten werden in einer \pdf{composer.json}-Datei definiert und durch Ausführung des Programms in Verbindung mit der Konfigurationsdatei in dem Ordner \pdf{vendor} installiert.}
 }
