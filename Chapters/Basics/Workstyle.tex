@@ -10,9 +10,9 @@ Aufgrund seiner Aufgabe stellt der Protoyp einen tiefen Eingriff in die Architek
 Dies fängt mit der Einhaltung der TYPO3 Coding Guidelines an, geht über die Versionierung des Codes hin zum Einbinden in das TYPO3 Testframework
 
 \subsection{Formatierung des Quellcodes}
-Programmier neigen zu unterschiedlichen Programmierstilen, was solange kein Problem darstellt, solange sie allein an einem Projekt arbeiten. Kommen mehr Entwickler hinzu und es vermischen sich verschiedene Stile, kann es schnell unübersichtlich werden. Um den Sinn eines Programms zu verstehen, hilft es allmein, wenn die Codebasis in einer konsistenten Form formatiert wurde. Dies erhöht die Wartbarkeit und verbessert die Code Qualität. 
+Programmier neigen zu unterschiedlichen Programmierstilen, was solange kein Problem darstellt, solange sie allein an einem Projekt arbeiten. Kommen mehr Entwickler hinzu und es vermischen sich verschiedene Stile, kann es schnell unübersichtlich werden. Um den Sinn eines Programms zu verstehen, hilft es allmein, wenn die Codebasis in einer konsistenten Form formatiert wurde. Dies erhöht die Wartbarkeit und verbessert die Code Qualität.
 
-Coding Guidelines stellen dabei das Regelwerk dar auf das sich die Entwickler eines Projekts geeingt haben. 
+Coding Guidelines stellen dabei das Regelwerk dar auf das sich die Entwickler eines Projekts geeingt haben.
 
 In den TYPO3 Coding Guidelines (CGL)\footnote{\url{http://docs.typo3.org/typo3cms/CodingGuidelinesReference/6.2/_pdf/manual.t3cgl-6.2.pdf}} wird die Verzeichnisstruktur von TYPO3 selbst, sowie die von Extensions erläutert. Sie erklären die Namenskonventionen für Dateien, Klassen, Methoden und Variablen und beschreiben den Aufbau einer Klassendatei mit notwendigen Inhalt, der unabhängig von dem Zweck der Klasse vorhanden sein muss.
 
@@ -27,29 +27,16 @@ Ein möglicher Ansatz wäre es, mit zwei identischen TYPO3 Installationen zu sta
 
 Ein andere Ansatz würde auf der Code Ebene ansetzen und pro Methode der alten API verschiedene Testfälle definieren, welche nachvollziehbar wären und immer wieder ausgeführt werden könnten.
 
-Das dafür in Frage kommende Framework heißt PHPUnit\footnote{LINK}. Es stellt das PHP Pedant von dem aus der Javawelt bekannten JUnit dar und wird von TYPO3 unterstützt. TYPO3 bringt selbst schon über 6000 UnitTests mit\footnote{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}. 
+Das dafür in Frage kommende Framework heißt PHPUnit\footnote{LINK}. Es stellt das PHP Pedant von dem aus der Javawelt bekannten JUnit dar und wird von TYPO3 unterstützt. TYPO3 bringt selbst schon über 6000 UnitTests mit\footnote{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}.
 
-Das eingangs umrissene Szenario stellt lediglich ein greifbares Beispiel für den Nutzen von Unit Tests dar und ist keineswegs auf Spezialfälle wie Refactorings oder dem Austausch einer API beschränkt. In der vorliegenden Arbeit wurden alle implementierten Methoden der neuen API mit Unit Tests - in Verbindung mit PHPUnit -abgedeckt. 
+Das eingangs umrissene Szenario stellt lediglich ein greifbares Beispiel für den Nutzen von Unit Tests dar und ist keineswegs auf Spezialfälle wie Refactorings oder dem Austausch einer API beschränkt. In der vorliegenden Arbeit wurden alle implementierten Methoden der neuen API mit Unit Tests - in Verbindung mit PHPUnit -abgedeckt.
 
-Um die Tests zu starten gibt es mehre Möglichkeiten:
-
-\subsubsection{Im TYPO3 Backend}
-[Bild einfügen]
-
-\subsubsection{Auf der Konsole}
-[Bild einfügen]
-
-\subsubsection{In der IDE}
-[Bild einfügen]
-
-\subsection{Versionsverwaltung} 
-[Bild einfügen]
+\subsection{Versionsverwaltung}
 Als Versionsverwaltung wurde GIT\footnote{http://git-scm.com/} in Verbindung mit dem Code Hostingdienst GiHub\footnote{http://github.com} genutzt. Github dient zum einen als Backup im Falle eines Festplattenausfalls und zum anderen als späterer Anlaufpunkt der Extension für Interessierte.
 
 GitHub bietet zudem auch eine Aufgabenverwaltung\footnote{Issuetracking} an, dass bei dem Projekt mehr oder minder intensiv genutzt wurde, dem jedoch nach der Veröffentlich als OpenSource Software mehr Bedeutung zukommen wird.
 
 Ferner hat sich um GitHub eine Vielzahl von Services entwickelt, welche unter anderen dabei hilft, die CodeQualität zu analysieren. Die zwei zu erwähnenden Projekte sind Travis\footnote{LINK} und Scrutinizer\footnote{LINK}, welche für das Projekt genutzt wurden.
-
 
 \subsection{Travis-CI}
 [Bild einfügen]
@@ -57,8 +44,8 @@ Travis-CI ist ein Continuous Integration\footnote{Kontinuierliche Integration} (
 
 Der Begriff "bauen" kommt von Sprachen wie C oder Java, die erst kompiliert werden müssen (engl. to compile oder to build), bevor sie ein ausführbares Programm darstellen. Im Gegesatz zu interpretierten Sprachen, die zur Laufzeit von einem Interpreter übersetzt werden. Hier definiert der Begriff "bauen" im Zusammmenhang mit CI das auschecken des Codes aus einem Repository und die Ausführung von:
 	\begin{itemize}
-		\item Tests (Unit-, Smoke-, Akteptanz- und Behaviortests), 
-		\item statischer Codeanalysen wie den oben genannten PHP\_CodeSniffer, PHPDepend\footnote{LINK}, PHP Mess Detection\footnote{LINK} oder PHP Copy and Paste\footnote{LINK} 
+		\item Tests (Unit-, Smoke-, Akteptanz- und Behaviortests),
+		\item statischer Codeanalysen wie den oben genannten PHP\_CodeSniffer, PHPDepend\footnote{LINK}, PHP Mess Detection\footnote{LINK} oder PHP Copy and Paste\footnote{LINK}
 		\item oder das Verpacken der Software in ein Realease fähiges Format wie PHAR\footnote{LINK} oder einen Tarball\footnote{LINK}.
 	\end{itemize}
 
@@ -79,8 +66,6 @@ Ziel war eine möglichst 100\% Testabdeckung zu erreichen.
 
 \subsubsection{Konfiguration für den TYPO3 Kern}
 Während bei den Tests der Extension auf eine innere Konsistenz des Programmcodes geschaut wurde, wurde bei den Tests des Kerns Augenmerk auf die Integration der Extension in das modifizierte TYPO3 gelegt. Ziel war es, dass alle mitgelieferten Tests des Cores erfüllt werden.
-
-PHPUNit
 
 \subsection{Scrutinizer}
 [Bild einfügen]
@@ -104,18 +89,8 @@ Eins wird bei 10.000 Issues\footnote{Mit Issues sind Stellen gemeint, die laut S
 Der Grund für die Verbindung mit Scrutinizer war auch hier der Gedanke an die spätere Veröffentlichung der Extension und stellt die Grundsteinlegung für eine gleichbeleibend hohe Codequalität dar, die überprüfbar sein soll.
 
 \subsection{IDE}
-Als Editor wurde die \gls{ide} PHPStorm. 
-
-[Bild einfügen]
-
-PHPStorm verfügt über Autovervollständig von Variablen, Methoden und Klassen, unterstützt den Programmierer bei der Erstellung von Klassen durch Templates und bietet vielseitige Integration von externen Programmen. 
+Als Editor wurde die \gls{ide} PHPStorm verwendet, die über Autovervollständig von Variablen, Methoden und Klassen, unterstützt den Programmierer bei der Erstellung von Klassen durch Templates und bietet vielseitige Integration von externen Programmen.
 
 So ist es zum Beispiel möglich die PHPUnit Tests von PHPStorm aus zu starten und mit ein wenig Konfiguraton\cite{web:kowalke14} kann man sich die CodeCoverage im Editor anzeigen lassen.
 
-[Bild einfügen]
-
-Besonders hilfreich ist es jedoch sich die Ergebnisse des PHP\_CodeSniffers anzeigen zu lassen um zumindest beim Feinschliff den Code GCL konform zu formatieren.
-
 Die überaus leistungsfähige Integraton von XDebug runden die Funktionaliät, die der Editor bildet, ab.
-
-Mit Hilfe von PHPStorm war es möglich sich schnell und umfassend in den Quellcode von TYPO3 und der Extension DBAL einzuarbeiten
