@@ -18,7 +18,7 @@ In den TYPO3 Coding Guidelines (CGL)\footnote{\url{http://docs.typo3.org/typo3cm
 
 Der größter Teil der CGL behandelt die Formatierung verschiedene Sprachkonstrukte wie Schleifen, Arrays und Bedingungen.
 
-Da das Regelwerk mit 28 Seiten recht umfangreich aussfällt, wird zur Überprüfung des Quellcodes das Programm PHP\_CodeSniffer\footnote{Link} in Zusammenhang mit dem entsprechendem Regelset für das TYPO3 Projekt \footnote{Link}.
+Da das Regelwerk mit 28 Seiten recht umfangreich aussfällt, wird zur Überprüfung des Quellcodes das Programm PHP\_CodeSniffer\footnote{\url{https://github.com/squizlabs/PHP_CodeSniffer}} in Zusammenhang mit dem entsprechendem Regelset für das TYPO3 Projekt \footnote{\url{https://github.com/typo3-ci/TYPO3CMS}} verwendet.
 
 \subsection{Unit Testing}
 Eine Anforderung an den Prototyp war, dass er die alte Datenbank API weiterhin unterstützt. Dadurch ist gewährleistet, dass noch nicht angepasste Extensions weiterhin funktionieren. Um dies zu überprüfen muß die Funktionaliät von TYPO3 in Verbindung alter API / neue API fortlaufend getestet werden.
@@ -27,29 +27,26 @@ Ein möglicher Ansatz wäre es, mit zwei identischen TYPO3 Installationen zu sta
 
 Ein andere Ansatz würde auf der Code Ebene ansetzen und pro Methode der alten API verschiedene Testfälle definieren, welche nachvollziehbar wären und immer wieder ausgeführt werden könnten.
 
-Das dafür in Frage kommende Framework heißt PHPUnit\footnote{LINK}. Es stellt das PHP Pedant von dem aus der Javawelt bekannten JUnit dar und wird von TYPO3 unterstützt. TYPO3 bringt selbst schon über 6000 UnitTests mit\footnote{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}.
+Das dafür in Frage kommende Framework heißt PHPUnit\footnote{\url{http://phpunit.de/}}. Es stellt das PHP Pedant von dem aus der Javawelt bekannten JUnit dar und wird von TYPO3 unterstützt. TYPO3 bringt selbst schon über 6000 UnitTests mit\footnote{\url{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}}.
 
-Das eingangs umrissene Szenario stellt lediglich ein greifbares Beispiel für den Nutzen von Unit Tests dar und ist keineswegs auf Spezialfälle wie Refactorings oder dem Austausch einer API beschränkt. In der vorliegenden Arbeit wurden alle implementierten Methoden der neuen API mit Unit Tests - in Verbindung mit PHPUnit -abgedeckt.
+Das eingangs umrissene Szenario stellt lediglich ein greifbares Beispiel für den Nutzen von Unit Tests dar und ist keineswegs auf Spezialfälle wie Refactorings oder dem Austausch einer API beschränkt. In der vorliegenden Arbeit wurden alle implementierten Methoden der neuen API mit Unit Tests – in Verbindung mit PHPUnit – abgedeckt.
 
 \subsection{Versionsverwaltung}
-Als Versionsverwaltung wurde GIT\footnote{http://git-scm.com/} in Verbindung mit dem Code Hostingdienst GiHub\footnote{http://github.com} genutzt. Github dient zum einen als Backup im Falle eines Festplattenausfalls und zum anderen als späterer Anlaufpunkt der Extension für Interessierte.
-
-GitHub bietet zudem auch eine Aufgabenverwaltung\footnote{Issuetracking} an, dass bei dem Projekt mehr oder minder intensiv genutzt wurde, dem jedoch nach der Veröffentlich als OpenSource Software mehr Bedeutung zukommen wird.
+Als Versionsverwaltung wurde GIT\footnote{\url{http://git-scm.com/}} in Verbindung mit dem Code Hostingdienst GiHub\footnote{\url{http://github.com}} genutzt. Github dient zum einen als Backup im Falle eines Festplattenausfalls und zum anderen als späterer Anlaufpunkt der Extension für Interessierte.
 
 Ferner hat sich um GitHub eine Vielzahl von Services entwickelt, welche unter anderen dabei hilft, die CodeQualität zu analysieren. Die zwei zu erwähnenden Projekte sind Travis\footnote{LINK} und Scrutinizer\footnote{LINK}, welche für das Projekt genutzt wurden.
 
 \subsection{Travis-CI}
-[Bild einfügen]
-Travis-CI ist ein Continuous Integration\footnote{Kontinuierliche Integration} (CI) Service, welcher auf Github gehostete baut.
+Travis-CI ist ein \textit{Continuous Integration} (CI) Service, welcher auf Github gehostete baut.
 
 Der Begriff "bauen" kommt von Sprachen wie C oder Java, die erst kompiliert werden müssen (engl. to compile oder to build), bevor sie ein ausführbares Programm darstellen. Im Gegesatz zu interpretierten Sprachen, die zur Laufzeit von einem Interpreter übersetzt werden. Hier definiert der Begriff "bauen" im Zusammmenhang mit CI das auschecken des Codes aus einem Repository und die Ausführung von:
+
 	\begin{itemize}
 		\item Tests (Unit-, Smoke-, Akteptanz- und Behaviortests),
-		\item statischer Codeanalysen wie den oben genannten PHP\_CodeSniffer, PHPDepend\footnote{LINK}, PHP Mess Detection\footnote{LINK} oder PHP Copy and Paste\footnote{LINK}
-		\item oder das Verpacken der Software in ein Realease fähiges Format wie PHAR\footnote{LINK} oder einen Tarball\footnote{LINK}.
+		\item statischer Codeanalysen wie den oben genannten PHP\_CodeSniffer, PHPDepend\footnote{\url{http://pdepend.org/}}, PHP Mess Detection\footnote{\url{http://phpmd.org/}} oder PHP Copy and Paste\footnote{\url{https://github.com/sebastianbergmann/phpcpd}}
 	\end{itemize}
 
-Die Konfiguration von Travis-CI erfolgt über eine Textdatei im YAML-Format\footnote{LINK} und liegt im Wurzelverzeichnis des Projekts.
+Die Konfiguration von Travis-CI erfolgt über eine Textdatei im YAML-Format\footnote{\url{http://www.yaml.org/start.html}} und liegt im Wurzelverzeichnis des Projekts.
 
 [Beispiel einer YAML Datei für Travis einfügen]
 
@@ -78,7 +75,7 @@ Anhand dieses Ergebnis können dann weitere Entscheidungen getroffen werden. Zum
 
 Braucht man jedoch eine graphische Auswertung, der durch die statische Codeanalysen gewonnen Daten, kommt ein Service wie Scrutinizer zum Einsatz. Wie schon bei Travis-CI erfolgt die Konfiguration über eine YAML Datei.
 
-Wie Tests gezeigt haben\footnote{https://scrutinizer-ci.com/g/Konafets/TYPO3v4-Core/inspections} ist es gegenwärtig nicht möglich den TYPO3 Kern mit Scrutinizer auszuwerten, da das Tool verschiedene Limits implementiert hat. Dies Limits werden von TYPO3 teilweise um ein Vielfaches überschritten. Es ist lediglich gelungen die Auswertung der Analyse zum Umfang des Codes und zur Copy and Paste Detection darzustellen. Da dies jedoch keine ausreichende Aussage über die Code Qualität treffen kann und die Qualität des Codes des TYPO3 Kerns nicht im Fokus dieser Arbeit liegt, wurde auf die Auswertung verzichtet.
+Wie Tests gezeigt haben\footnote{\url{https://scrutinizer-ci.com/g/Konafets/TYPO3v4-Core/inspections}} ist es gegenwärtig nicht möglich den TYPO3 Kern mit Scrutinizer auszuwerten, da das Tool verschiedene Limits implementiert hat. Dies Limits werden von TYPO3 teilweise um ein Vielfaches überschritten. Es ist lediglich gelungen die Auswertung der Analyse zum Umfang des Codes und zur Copy and Paste Detection darzustellen. Da dies jedoch keine ausreichende Aussage über die Code Qualität treffen kann und die Qualität des Codes des TYPO3 Kerns nicht im Fokus dieser Arbeit liegt, wurde auf die Auswertung verzichtet.
 
 Es wurde lediglich ein Srcutinizer Projekt für die Extension erstellt.
 
@@ -91,6 +88,8 @@ Der Grund für die Verbindung mit Scrutinizer war auch hier der Gedanke an die s
 \subsection{IDE}
 Als Editor wurde die \gls{ide} PHPStorm verwendet, die über Autovervollständig von Variablen, Methoden und Klassen, unterstützt den Programmierer bei der Erstellung von Klassen durch Templates und bietet vielseitige Integration von externen Programmen.
 
-So ist es zum Beispiel möglich die PHPUnit Tests von PHPStorm aus zu starten und mit ein wenig Konfiguraton\cite{web:kowalke14} kann man sich die CodeCoverage im Editor anzeigen lassen.
+So ist es zum Beispiel möglich die PHPUnit Tests von PHPStorm aus zu starten und mit ein wenig Konfiguraton \cite{web:kowalke14} kann man sich die CodeCoverage im Editor anzeigen lassen.
 
-Die überaus leistungsfähige Integraton von XDebug runden die Funktionaliät, die der Editor bildet, ab.
+Die PHPStorm verfügt über einen Debug Listener, der auf ein vom Browser gesendetes Token wartet und bei Empfang den Debug Prozess startet. Für den verwendeten Browser \textit{Chrome} ist ein Addon verfügbar, mittels diesem das Senden des Debug-Tokens per Knopfdruck ein- und ausgeschaltet werden kann.
+
+Wird der Browser und die \gls{ide} in den Debug-Modus gesetzt und TYPO3 CMS neugeladen, bleibt das Programm an dem gesetzten Breakpoint stehen.

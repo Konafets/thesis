@@ -68,20 +68,25 @@ MariaDB [(none)]> quit;
 Durch das Aufrufen von \url{http://thesis.dev/} im Browser wird der Installationsprozess gestartet, der in fünf Schritten das System installiert.
 
 \subsection{Schritt 1 - Systemcheck}
+\label{prototype:subsec:OneSystemcheck}
 	Im ersten Schritt (Abb.:~\ref{fig:installTYPO3LegacyStepOne}) prüft das \textit{Install Tool} ob alle Verzeichnisse und Symlinks angelegt wurden und die entsprechenden Benutzerrechte besitzen. Intern werden hier Verzeichnisse wie \pdf{typo3temp} und Dateien wie \pdf{LocalConfiguration.php} angelegt.
 
 \subsection{Schritt 2 - Eingabe der Datenbankdaten}
+\label{prototype:subsec:TwoInsertDatabaseData}
 	Im zweiten Schritt (Abb.:~\ref{fig:installTYPO3LegacyStepTwo}) werden die Benutzerdaten für die Datenbank eingegeben. Es kann zwischen einer Port- oder Socket-basierten Verbindung ausgewählt werden.
 
 	Wenn anstelle von MySQL ein alternatives \gls{dbms} genutzt werden soll, kann über die Schaltfläche am Ende des Formulars die Systemextension DBAL installiert werden.
 
 \subsection{Schritt 3 - Auswahl der Datenbank}
+\label{prototype:subsec:ThreeSelectDatabase}
 	Nachdem die Verbindungsdaten eingegeben wurden, versucht TYPO3 CMS eine Verbinung zum \gls{dbms} zu etablieren. Gelingt dies, werden alle verfügbaren Datenbanken abgefragt und aufgelistet (Abb.:~\ref{fig:installTYPO3LegacyStepThree}). Über die Auswahl kann eine leere Datenbank festgelegt werden. Alternativ kann über das Inputfeld eine zu erstellende Datenbank angegeben werden. Mit dem Absenden des Formulars werden die Basistabellen in der Datenbank angelegt.
 
 \subsection{Schritt 4 - Einrichten eines TYPO3 Administrators}
+\label{prototype:subsec:FourCreateAdmin}
 	In 4. Schritt (Abb.:~\ref{fig:installTYPO3LegacyStepFour}) der Installation wird ein Administrator eingerichtet und es kann ein Name für die Seite vergeben werden.
 
 \subsection{Schritt 5 - Abschluß der Installation}
+\label{prototype:subsec:FiveDone}
 	Danach ist die Installation abgeschlossen und über die Schaltfläche kann das Backend aufgerufen werden (Abb.:~\ref{fig:installTYPO3LegacyStepFive})
 
 	\begin{figure}[H]

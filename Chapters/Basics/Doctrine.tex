@@ -225,7 +225,7 @@ Die Integration der beiden \gls{pdo}-Klassen in Doctrine DBAL erfolgt über das 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.77]{uml/AdapterPattern.eps}
+	\includegraphics[scale=0.5]{uml/AdapterPattern.eps}
 	\caption{Das Adapter Entwurfsmuster in UML-Notation}
 	\label{fig:adapterPattern}
 \end{figure}
@@ -248,7 +248,7 @@ Das UML Diagramm in Abbildung~\ref{fig:adapterPatternConnection} zeigt die Imple
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.77]{uml/AdapterPatternConnection.eps}
+	\includegraphics[scale=0.5]{uml/AdapterPatternConnection.eps}
 	\caption{Aufbau des Connection-Objekts von Doctrine DBAL}
 	\label{fig:adapterPatternConnection}
 \end{figure}
@@ -259,7 +259,7 @@ Die Klasse \phpinline{PDOStatement} von \gls{pdo} wird ebenfalls auf diese Art i
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.77]{uml/AdapterPatternStatement.eps}
+	\includegraphics[scale=0.5]{uml/AdapterPatternStatement.eps}
 	\caption{Aufbau des Statement-Objekts von Doctrine DBAL}
 	\label{fig:adpaterPatternStatement}
 \end{figure}
@@ -399,7 +399,7 @@ foreach($statement as $row) {
 In \gls{pdo} existiert für jede Fetch-Methoden aus der traditionellen Datenbankprogrammierung ein Äquivalent in Form einer Konstante:
 
 \begin{itemize}
-	\item \phpinline{PDO::FETCH_ASSOC} = \phpinline{*_fetch_assoc()}\footnote{Der Stern (*) dient als Platzhalter und kann wahlweise durch mysql, mysqli oder pg eingesetzt werden.}
+	\item \phpinline{PDO::FETCH_ASSOC} = \phpinline{*_fetch_assoc()}\footnote{Der Stern (*) dient als Platzhalter und kann wahlweise durch mysql, mysqli oder pg ersetzt werden.}
 	\item \phpinline{PDO::FETCH_NUM} = \phpinline{*_fetch_array()}
 	\item \phpinline{PDO::FETCH_ROW} = \phpinline{*_fetch_row()}
 \end{itemize}
@@ -436,7 +436,7 @@ Prepared Statements wurden bereits von der Datenbankerweiterung MySQLi eingefüh
 
 Prepared Statements stellen normalen \gls{sql}-Code dar, bei dem die variablen Teile durch Platzhalter ersetzt wurden. Sie können als eine Vorlage für \gls{sql}-Abfragen verstanden werden, die mit verschiedenen Werten immer wieder ausgeführt werden sollen.
 
-Ein Prepared Statements wird zunächst an die Datenbank gesendet, wo der \gls{sql}-Parser die Struktur des Templates einmalig analysieren und vorkompiliert im Cache speichern kann. In einer zweiten Anfrage werden der Datenbank die Werte übermittelt, die bei jedem erneuten Aufruf vom Parser anstelle der Platzhalter eingesetzt werden. Dies macht zum einen die Ausfühung der Anfrage schneller (vgl. \cite[S. 75]{book:popel2007pdo}) und erhöht zudem die Sicherheit, da es \gls{sql}-Injections nahezu unmöglich macht. Mehr zu \gls{sql}-Injections in Kapitel~\ref{basics:doctrine:subsec:sqlInjections}.
+Ein Prepared Statements wird zunächst an die Datenbank gesendet, wo der \gls{sql}-Parser die Struktur des Templates einmalig analysieren und vorkompiliert im Cache speichern kann. In einer zweiten Anfrage werden der Datenbank die Werte übermittelt, die bei jedem erneuten Aufruf vom Parser anstelle der Platzhalter eingesetzt werden. Dies macht zum einen die Ausfühung der Anfrage schneller (vgl. \cite[S. 75]{book:popel2007pdo}) und erhöht zudem die Sicherheit, da es \gls{sql}-Injections nahezu unmöglich macht. Mehr zu \gls{sql}-Injections in Kapitel~\ref{basics:doctrine:subsubsec:sqlInjections}.
 
 Zur Demonstration soll je ein Codebeispiel dienen. Dabei werden neue Studierende in die oben gezeigte Datenbanktabelle eingefügt. Der sprechende Hut\footnote{\url{http://de.harry-potter.wikia.com/wiki/Sprechender_Hut}} hat bereits über die Häuser der Neuzugänge entschieden.
 
@@ -590,8 +590,6 @@ Bei \gls{sql}-Injections kann über das Frontend einer Anwendung eine Zeichenket
 \end{itemize}
 
 Für ein kurzes Beispiel einer \gls{sql}-Injection soll ein Formular dienen, indem nach den Nachnamen der Studierenden aus Hogwarts gesucht werden kann. Der gesuchte  Datensatz wird ausgegeben wenn er gefungen wird, ansonsten erscheint eine entsprechende Meldung das nichts gefunden wurde. Der in das Inputfeld eingegebene Wert wird von \gls{php} automatisch in der Variablen \phpinline{$_REQUEST} gespeichert und kann in der Anwendung ausgelesen werden. \phpinline{'SELECT * FROM students WHERE last_name = Diggory'} stellt eine mögliche, zu erwartende \gls{sql}-Anfrage dar.
-
-[Balsamico Formular einfügen]
 
 \begin{listing}[H]
 \begin{phpcode}
