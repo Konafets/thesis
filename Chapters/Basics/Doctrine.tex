@@ -525,8 +525,7 @@ Trotz der veränderten Reihenfolge der Werte in dem Array werden sie in die rich
 \label{basics:doctrine:subsubsec:binding}
 Die Zuordnung einer Variablen zu einem Platzhalter wird \textit{Binding} genannt - gebundene Variablen werden demzufolge als \textit{Bounded Variables} bezeichnet.
 
-Neben der gezeigten Bindung über\\
-\phpinline{PDOStatement::execute()} bietet \gls{pdo} spezialisiserte Methoden an, was folgende Ursachen hat:
+Neben der gezeigten Bindung über \phpinline{PDOStatement::execute()} bietet \gls{pdo} spezialisiserte Methoden an, was folgende Ursachen hat:
 
 \begin{enumerate}
 	\item Bei der gezeigten Bindung werden die Variablen stets als String behandelt. Es ist nicht möglich dem \gls{dbms} mitzuteilen, das der übergebene Wert einem anderen Datentyp entspricht.
@@ -637,7 +636,7 @@ Bei einer Abstraktion wird stets etwas Spezifisches, durch das Weglassen von Det
 
 Aus diesem Grund vermag es \gls{pdo} nicht eine \gls{sql}-Abfrage, die in dem Dialekt eines Herstellers formuliert wurde, in den eines anderen zu übersetzen.
 
-Das folgende Beispiel zeigt die von MySQL unstützte vereinfachte Form eines \sqlinline{INSERT}-Statements. Dies stellt eine Abweichung vom \gls{sql}-Standard dar(vgl. \cite[S. 388]{website:SQLStandard1992}) und ist somit nicht portabel.
+Das folgende Beispiel zeigt die von MySQL unstützte vereinfachte Form eines \sqlinline{INSERT}-Statements. Dies stellt eine Abweichung vom \gls{sql}-Standard dar (vgl. \cite[S. 388]{website:SQLStandard1992}) und ist somit nicht portabel.
 
 \begin{listing}[H]
 \begin{mysqlcode}
