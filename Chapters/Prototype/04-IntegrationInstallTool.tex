@@ -7,7 +7,7 @@
 \label{prototype:sec:integrateIntoInstallTool}
 Um bereits bei der Installation ein alternatives \gls{dbms} nutzen zu können, mußte der Prototyp breits über das \textit{Install Tool} installierbar sein, was Anpassungen an dem \textit{Install Tool} und TYPO3 CMS zur Folge hatte.
 
-Wie in Kapitel~\ref{prototype:subsec:installTYPO3} zu sehen war, besteht das \textit{Install Tool} aus fünf Schritten, die durch die Klassen im Ordner \pdf{typo3/sysext/install/Classes/Controller/Action/Step} bereitgestellt werden. Der StepController \pdf{typo3/sysext/install/Classes/Controller/Action/StepController} iteriert bei jedem Reload des Installtools über alle Schritte und prüft ob der jeweils aktuelle Schritt bereits ausgeführt wurde oder noch ausgeführt werden muß. Er erkennt dies an Bedingungen, die von jedem Schritt definiert werden. Sind alle Bedingungen erfüllt, findet ein Redirekt auf den nächsten Schritt statt.
+Wie in Kapitel~\ref{prototype:subsec:installTYPO3} zu sehen war, besteht das \textit{Install Tool} aus fünf Schritten, die durch die Klassen im Ordner \pdf{typo3/sysext/install/Classes/Controller/Action/Step} bereitgestellt werden. Der \phpinline{\TYPO3\CMS\Install\Controller\StepController} iteriert bei jedem Reload des Installtools über alle Schritte und prüft ob der jeweils aktuelle Schritt bereits ausgeführt wurde oder noch ausgeführt werden muß. Er erkennt dies an Bedingungen, die von jedem Schritt definiert werden. Sind alle Bedingungen erfüllt, findet ein Redirekt auf den nächsten Schritt statt.
 
 Die Ausgabe der Schritte erfolgt über verschiedene HTML-Template Dateien, die in der TYPO3 eigenen Template-Sprache \textit{Fluid} verfasst sind. Das \textit{Install Tool} setzt hier das \gls{mvc}-Pattern ein, um die Geschäftslogik von der Präsentation zu trennen.
 
@@ -23,19 +23,20 @@ Die HTML-Templates unterteilen sich in \textit{Layouts}, \textit{Templates} und 
 Im folgenden werden die vorgenommenen Änderungen im Detail beschrieben.
 
 \begin{itemize}
-\item Eine von Composer erstellte \textit{Autoload}-Datei, wurde in die Datei \phpinline{\TYPO3\CMS\Core\Core\Bootstrap} eingebunden. Somit können die von Doctrine DBAL zur Verfügung gestellten Klassen geladen werden. Siehe~\ref{lst:composerAutoload}
-\item In \pdf{typo3/sysext/install/Resources/Private/Partials/Action/Step/DatabaseConnect/} wurden die Partials \pdf{LoadDoctrineDbal.html} und \pdf{UnloadDoctrineDbal.html} zur De- und Installation des Prototypen und das Partial \pdf{DoctrineDbalDriverSelection.html} für die Auswahl des Datenbanktreibers erstellt
-\item diese wurden dem zweiten Schritt \pdf{typo3/sysext/install/Resources/Private/Partials/Action/Step/DatabaseConnect.html} hinzugefügt. Die Variable \texttt{isDoctrineEnabled} enthält den Installationsstatus des Prototypen. Abhängig von ihr wird entweder die Schaltfläche zur Installation des Prototypen oder das Auswahlfeld für die Datenbanktreiber und die Schaltfläche zur Deinstallation des Prototypen anzeigt.
-\item damit die Variable einen Wert enthält, wurde diese von der \textit{Action} aus \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect.php} definiert und an die View übergeben.
-\item in \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect.php} wurden Methoden erstellt, die die installierten PDO-Extensions des Systems abfragen und an die View übergeben
+\item In \phpinline{\TYPO3\CMS\Core\Core\Bootstrap} wurde die von Composer erstellte\\ \textit{Autoload}-Datei eingebunden. Somit können die von Doctrine DBAL zur Verfügung gestellten Klassen geladen werden. Siehe Listing~\ref{lst:composerAutoload}
+\item Es wurden die Partials \pdf{LoadDoctrineDbal.html} und \pdf{UnloadDoctrineDbal.html} zur De- und Installation des Prototypen sowie das Partial\\ \pdf{DoctrineDbalDriverSelection.html} für die Auswahl des Datenbanktreibers erstellt
+\item diese wurden dem Template des zweiten Schritts \pdf{DatabaseConnect.html} hinzugefügt. Die Variable \texttt{isDoctrineEnabled} enthält den Installationsstatus des Prototypen. Abhängig von ihr wird entweder die Schaltfläche zur Installation des Prototypen oder das Auswahlfeld für die Datenbanktreiber und die Schaltfläche zur Deinstallation des Prototypen anzeigt.
+\item damit die Variable einen Wert enthält, wurde diese von der \textit{Action} aus\\ \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect} definiert und an die View übergeben.
+\item in \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect} wurden Methoden erstellt, die die installierten PDO-Extensions des Systems abfragen und an die View übergeben
 \item Zur Vermeidung leere Werte in der Konfigurationsdatei, wurden die Prüfungen der Benutzereingaben von \phpinline{isset()} auf \phpinline{!empty()} geändert.
 \item Das Eingabeformular für die Datenbankverbindungsinformationen wurde angepasst. Es wurde ein Feld für das \textit{Charset} der Datenbank hinzugefügt und das Feld für die Datenbank entfernt, da sie im einem anderen Schritt über ein Auswahlfeld festgelegt wird.
-\item Damit die eingebenen Daten weiterverarbeitet werden konnten, wurden diese in den entsprechenden PHP-Klassen ergänzt. Listing~\ref{lst:saveDoctrineDriverToLocalConf} zeigt das die Abfrage und Speicherung des ausgewählten Datenbanktreibers durch \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseConnect.php} in der Konfigurationsdatei. Siehe~\ref{lst:saveDoctrineDriverToLocalConf}
-\item Externe Abhängigkeiten werden vom Package Manager in \pdf{thesis.dev/http/Packages/Library} erwartet. Aus diesem Grund mußte der Ordner \pdf{thesis.dev/http/typo3conf/ext/doctrine\_dbal/vendor/doctrine} nach \pdf{thesis.dev/http/Packages/Library/} kopiert werden.\footnote{Composer Konfigurationsdateien werden seit TYPO3 CMS 6.2 analysiert. Aus den definierten Abhängigkeiten und den (System)-Extensions wird vom Package Mananger ein Graph von Abhängigkeiten aufgebaut welcher in \pdf{thesis.dev/http/typo3conf/PackagesStates.php} gespeichert wird. Diese Datei wird bei der Installation erstellt und stetig aktualisiert. Da diese Funktionalität relativ neu ist, mußte diese Datei bei der Installation des Prototypen manuell angepasst werden.}
+\item Damit die eingebenen Daten weiterverarbeitet werden konnten, wurden diese in den entsprechenden PHP-Klassen ergänzt.
+\item Externe Abhängigkeiten werden vom Package Manager in\\ \pdf{thesis.dev/http/Packages/Library} erwartet. Aus diesem Grund mußte der Ordner \pdf{doctrine\_dbal/vendor/doctrine} nach \pdf{thesis.dev/http/Packages/Library/} kopiert werden.\footnote{Composer Konfigurationsdateien werden seit TYPO3 CMS 6.2 analysiert. Aus den definierten Abhängigkeiten und den (System)-Extensions wird vom Package Mananger ein Graph von Abhängigkeiten aufgebaut welcher in \pdf{thesis.dev/http/typo3conf/PackagesStates.php} gespeichert wird. Diese Datei wird bei der Installation erstellt und stetig aktualisiert. Da diese Funktionalität relativ neu ist, mußte diese Datei bei der Installation des Prototypen manuell angepasst werden.}
 \end{itemize}
 
 \begin{listing}[H]
 \begin{phpcode}
+// Bootloader.php
 public function initializeClassLoader() {
 	/** Composer loader */
 	require_once PATH_typo3conf . 'ext/doctrine_dbal/vendor/autoload.php';
@@ -46,17 +47,6 @@ public function initializeClassLoader() {
 \end{phpcode}
 \caption{Einbinden des vom Composer erstellten Autoloaders}
 \label{lst:composerAutoload}
-\end{listing}
-
-\begin{listing}
-\begin{phpcode}
-elseif (isset($postValues['setDoctrineDriver'])) {
-  $localConfigurationPathValuePairs['DB/driver'] = $postValues['setDoctrineDriver'];
-  $configurationManager->setLocalConfigurationValuesByPathValuePairs($localConfigurationPathValuePairs);
-}
-\end{phpcode}
-\caption{Speicherung des Datenbanktreibers in der LocalConfiguration.php [DatabaseConnect.php]}
-\label{lst:saveDoctrineDriverToLocalConf}
 \end{listing}
 
 %\begin{htmlcode}
@@ -94,21 +84,91 @@ elseif (isset($postValues['setDoctrineDriver'])) {
 %\caption{Zuweisung von in PHP definierten Variablen an die View}
 %\end{listing}
 
-Im Folgenden wird die Installation von TYPO3 CMS zusammen mit dem Prototypen erläutert.
+\subsection{Doctrines Schemarepr\"asentation}
+\label{subsec:doctrineSchema}
 
-\subsection{Schritt 1 - Systemcheck}
+Während der Installation werden die initialen Datenbanktabellen angelegt. Die dafür notwendigen \gls{sql}-Anweisungen halten die Extensions in \pdf{*.sql}-Dateien vor. Dabei handelt es sich um einfache Textdateien, die aus ein oder mehreren \mysqlinline{CREATE TABLE} Anweisungen bestehen.
+Diese werden von \phpinline{TYPO3\CMS\Core\Database\SqlParser} geparst, auseinandergenommen und neu zusammengesetzt, wobei kleinere Syntaxfehler behoben werden. Eine Hauptaufgabe des Parsers liegt darin, diejenigen \pdf{*.sql}-Dateien zu erkennen und zu vereinen, die die gleiche Tabelle mit unterschiedlichen Feldern anlegen wollen. Als Beispiel seien die Systemextensions \texttt{ext:frontend} und \texttt{ext:felogin} erwähnt, die beide die Tabelle \texttt{fe\_users} anlegen.
+
+\begin{listing}
+\begin{mysqlcode}
+# ext:felogin
+CREATE TABLE fe_users (
+	felogin_redirectPid  tinytext,
+	felogin_forgotHash  varchar(80) default ''
+);
+
+# ext:frontend
+CREATE TABLE fe_users (
+	uid int(11) unsigned NOT NULL auto_increment,
+	pid int(11) unsigned DEFAULT '0' NOT NULL,
+	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
+	username varchar(50) DEFAULT '' NOT NULL,
+	password varchar(100) DEFAULT '' NOT NULL,
+	usergroup tinytext,
+	…
+);
+\end{mysqlcode}
+\caption{}
+\label{lst:sameSQLDefinitionOfFeUsers}
+\end{listing}
+
+Der Importvorgang erfolgt durch \phpinline{\TYPO3\CMS\Install\Controller\Action\Step\DatabaseData::importDatabaseData()}, die den Ist-Zustand der Datenbank mit dem Soll-Zustand vergleicht. Der Soll-Zustand wird durch den Service \phpinline{\TYPO3\CMS\Install\Service\SqlExpectedSchemaService::getTablesDefinitionString()} anhand der  \pdf{*.sql}-Dateien ermittelt. Der Ist-Zustand wird durch \phpinline{\TYPO3\CMS\Install\Service\SqlSchemaMigrationService::getFieldDefinitions_database()} ermittelt und anschließend durch die Methoden \phpinline{getDatabaseExtra()} und \phpinline{getUpdateSuggestions()} derselben Klasse verglichen. Die genauere Analyse der Methoden würde für die Arbeit zu weit führen. Anschließend wird die Differenz in Form von \gls{sql}-Anweisungen an die Datenbank gesendet.
+
+Statische Daten werden über Dateien mit der Bezeichnung \pdf{ext\_tables\_static+adt.sql} in die Datenbank eingefügt. Im Moment besitzt lediglich der Extension Manager solch eine Datei, die die URL zum \gls{ter} einfügt.
+
+Um die Abhängigkeit des \textit{Install Tool} zu MySQL bei der Erstellung der Basistabellen aufzulösen wurden die \pdf{*.sql}-Dateien in die Schema Syntax von Doctrine überführt. Dies wurde bereits in Kapitel~\ref{basics:doctrine:subsec:dbal} durch die Erstelltung eines Schemas skizziert. Die Zielstellung war die vollständige Umstellung auf die Nutzung von \phpinline{\Doctrine\DBAL\Schema\Schema}-Objekten, da diese die notwendige Abstraktion von dem \gls{dbms} bieten und von Doctrine DBAL jederzeit anhand der aktuell verwendenten Plattform in die entsprechenden \gls{sql}-Anweisungen konvertiert werden können.
+
+Dazu mußten die \pdf{*.sql}-Dateien der Systemextensions umgewandelt werden, sowie die Erstellung der dynamischen Cachetabellen implementiert werden. Im ersten Schritt wurden die \pdf{*.sql}-Dateien der folgenden Sytemextension in die Schemarepräsentation von Doctrine migriert:
+
+\begin{itemize}
+\item typo3/sysext/core
+\item typo3/sysext/extbase
+\item typo3/sysext/extensionmanager
+\item typo3/sysext/felogin
+\item typo3/sysext/filemetadata
+\item typo3/sysext/frontend
+\item typo3/sysext/impexp
+\item typo3/sysext/indexed\_search
+\item typo3/sysext/indexed\_search\_mysql
+\item typo3/sysext/linkvalidator
+\item typo3/sysext/openid
+\item typo3/sysext/rsauth
+\item typo3/sysext/rtehtmlarea
+\item typo3/sysext/scheduler
+\item typo3/sysext/sys\_action
+\item typo3/sysext/sys\_note
+\item typo3/sysext/version
+\item typo3/sysext/workspaces
+\end{itemize}
+
+Die Datei \pdf{ext\_tables\_static+adt.sql} wurde in die Klasse \phpinline{DefaultData} migriert.
+
+Zur Ermittlung des Soll-Zustand der Datenbank wurde der Klasse\\ \phpinline{\TYPO3\CMS\Install\Service\SqlExpectedSchemaService} die Methode \phpinline{getTablesDefinitionAsDoctrineSchemaObjects()} hinzugefügt, die die vorhandenen \pdf{Schema.php}-Dateien sucht und per \phpinline{require} dem PHP-Skript zur Verfügung stellt. [Zeile 136] Die so eingebundenen Dateien werden zur weiteren Verarbeitung in einem Array gespeichert und als Parameter einer Funktion übergeben, die über die \textit{Signal/Slot}-Implementation von TYPO3 CMS ein Signal emittiert. Die empfangende Methode erstellt daraufhin die Tabellen für das \textit{Caching Framework}. Diese werden von TYPO3 CMS dynamisch nach dem Muster \texttt{cf\_cache\_<tabellenname>} beziehungsweise \texttt{cf\_cache\_<tabellenname>\_tags} erstellt. Die dazu implementierten Klassen \phpinline{\TYPO3\CMS\Core\Cache\Schema\Typo3DatabaseBackendCacheSchema} und\\ \phpinline{\TYPO3\CMS\Core\Cache\Schema\Typo3DatabaseBackendTagsSchema}  dienen dabei als Templates, denen bei der Instantiierung der \textit{<tabellenname>} mitgegeben wird. Sie erstellen intern ein Objekt vom Typ \phpinline{\Doctrine\DBAL\Schema\Schema}, welches schließlich die ensprechende Cachetabelle repräsentiert.
+
+Einen Sonderfall stellen die Cache- und Tagstabellen für Extbase dar, da sie von TYPO3 CMS aus internen Gründen zunächst mit einem temporären Namen erstellt werden und erst im weiteren Verlauf in die Tabellen \texttt{cf\_extbase\_object} und \texttt{cf\_extbase\_object\_tags} umbenannt werden können. Bereits hier zeigten sich die Vorteile durch die  interne Verwendung von \phpinline{\Doctrine\DBAL\Schema\Schema}-Objekten. Die Umbenennung konnte durch \phpinline{renameTable()} des Objekts realisiert werden, anstelle der Nutzung von \phpinline{str\_replace()}, wie dies im originalen Code implementiert wurde.
+
+Das von dem Signal zurückgegeben Schema-Array enthält nun alle zu erstellenden Tabellen - auch jene, die – wie oben beschrieben – von den Extensions mehrfach mit unterschiedlichen Feldern definiert wurden. Um diese Tabellen zu vereinen, wurde die Methode \phpinline{flattenSchemas()} in der gleichen Klasse implementiert, der das Schema-Array übergeben wird. Das daraus resultierende Array stellt den Soll-Zustand der Datenbank dar.
+
+Zur Ermittlung des Ist-Zustandes wurde die Klasse\\ \phpinline{\TYPO3\CMS\Install\Service\SqlSchemaMigrationService} in die Extension kopiert und per XCLASS registriert. Sie wird von der Klasse \phpinline{\Konafets\DoctrineDbal\Install\Service\SqlSchemaMigrationService} um die Methode \phpinline{getCurrentSchemaFromDatabase()} erweitert, die den \textit{Schema Manager} von Doctrine nutzt um den Zustand der Datenbank unabhängig vom \gls{dbms} abzufragen. Der gleichen Klasse wurde die Methode)  \phpinline{getDifferenceBetweenDatabaseAndExpectedSchemaAsSql()} hinzugefügt um die Differenz zwischen dem Ist- und Sollzustand zu ermitteln. Sie gibt die Differenz in Form der zu erstellenden Tabellen in der jeweiligen \gls{sql}-Syntax des benutzten \gls{dbms} zurück.
+
+Die kompletten Änderungen können unter\\ \url{http://bit.ly/typo3cms-integrate-schema-into-install-tool} für TYPO3 CMS und unter \url{http://bit.ly/prototype-integrate-schema-into-install-tool} nachvollzogen werden.
+
+\subsection{Installation des Prototypen}
+\label{prototype:subsec:installPrototype}
+
+\subsubsection{Schritt 1 - Systemcheck}
 	Der erste Schritt entspricht dem aus Kapitel~\ref{prototype:subsec:OneSystemcheck}
 
-\subsection{Schritt 2 - Eingabe der Datenbankdaten}
+\subsubsection{Schritt 2 - Eingabe der Datenbankdaten}
 	Im zweiten Schritt (Abb.:~\ref{fig:installTYPO3DoctrineStepTwoA}) wird nun durch Betätigung der Schaltfläche \textit{I want use Doctrine DBAL} Doctrine DBAL installiert, worauf eine entsprechende Meldung darüber zusammen mit dem Auswahlfeld für den Datenbanktreiber erscheint. Nach der Auswahl des Treibers werden die Inputfelder eingeblendet. Da die verschiedenen \gls{dbms} unterschiedliche Daten für den Aufbau einer Verbindung zur Datenbank benötigen, ist die Anzahl und Art der Felder von dem ausgewählten Treiber abhängig. Der Codeteil ist in der Datei \pdf{typo3/sysext/install/Classes/Controller/Action/Step/DatabaseConnect.php} ab Zeile 556 zu finden. Abbildung~\ref{fig:installTYPO3DoctrineStepTwoB} zeigt die  Felder für MySQL.
 
-\subsection{Schritt 3 - Auswahl der Datenbank}
+\subsubsection{Schritt 3 - Auswahl der Datenbank}
 	Nachdem die Verbindungsdaten eingegeben wurden, versucht TYPO3 CMS eine Verbinung zum \gls{dbms} zu etablieren. Gelingt dies, werden alle verfügbaren Datenbanken abgefragt und aufgelistet (Abb.:~\ref{fig:installTYPO3LegacyStepThree}). Über die Auswahl kann eine leere Datenbank festgelegt werden. Alternativ kann über das Inputfeld eine zu erstellende Datenbank angegeben werden. Mit dem Absenden des Formulars werden die Basistabellen in der Datenbank angelegt.
-[SCHEMA BESCHREIBEN]
 
-\subsection{Schritt 4 - Einrichten eines TYPO3 Administrators}
+\subsubsection{Schritt 4 - Einrichten eines TYPO3 Administrators}
 	Der Schritt entspricht dem aus Kapitel~\ref{prototype:subsec:FourCreateAdmin}
-\subsection{Schritt 5 - Abschluß der Installation}
+\subsubsection{Schritt 5 - Abschluß der Installation}
 	Der Schritt entspricht dem aus Kapitel~\ref{prototype:subsec:FiveDone}
 
 
@@ -133,10 +193,6 @@ Im Folgenden wird die Installation von TYPO3 CMS zusammen mit dem Prototypen erl
 
 
 
-Zur Überprüfung ob TYPO3 CMS tatsächlich den Prototypen nutzt, wurde in der \gls{ide} ein Debug-Breakpoint in die Klasse \phpinline{Konafets\DoctrineDbal\Persistence\Legacy\DatabaseConnection} innerhalb der \phpinline{connectDB} gesetzt, an dem die \gls{ide} die Ausfühung von TYPO3 CMS anhielt als er erreicht wurde.
+Zur Überprüfung ob TYPO3 CMS tatsächlich den Prototypen nutzt, wurde in der \gls{ide} ein Debug-Breakpoint in\\ \phpinline{Konafets\DoctrineDbal\Persistence\Legacy\DatabaseConnection} innerhalb der \phpinline{connectDB} gesetzt, an dem die \gls{ide} die Ausfühung von TYPO3 CMS anhielt als er erreicht wurde.
 
-
-\subsection{Doctrines Schemarepräsentation}
-
-\subsection{Implementation einer fluenten Query-Language}
 
