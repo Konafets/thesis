@@ -1,23 +1,34 @@
 Konventionen
 ============
 
-* In der vorliegenden Arbeit wird mit dem aktuellen Master(Erklärung) von Doctrine 2 DBAL gearbeitet.
-* Der gezeigte Code folgt den Coding Guidelines des TYPO3 Projekts
-* TYPO3 wurde in der Version 6.2 beta6 benutzt (UPdate auf 6.2 stable)
+Verzeichnisse und Dateinamen werden in Monotype gesetzt:
 
-Verzeichnisse und Dateinamen werden kursiv dargestellt:
+\begin{itemize}
+\item \pdf{/typo3/systext/cms/}
+\item \pdf{index.php}
+\end{itemize}
 
-* */typo3/systext/cms/*
-* *index.php*
-
-Ein wörtlichen Zitat wird in dieser Form gekennzeichnet:
+Englisch Fachbegriffe werden kursiv gesetzt: \textit{Prepared Statement}
 
 
 Beispielcode wird so dargestellt:
 
+\begin{phpcode}
+<?php phpinfo(); ?>
+\end{phpcode}
 
+Im Fließtext auftretender Code wird analog zu Codeblöcken formatiert:
 
-Soll der Leser im Code auf eine bestimmte Stelle hingewiesen werden, wird diese fett gedruckt:
+\begin{itemize}
+\item Objekte: \phpinline{\Doctrine\DBAL\Connection}
+\item Methoden: \pdf{\Doctrine\DBAL\Connection::query()}
+\item Terminalkommandos: 
+\end{itemize}
+
+Um den Zusammenhang herzustellen wurden Objekte und Methoden mit ihren \textit{Namespaces} angegeben.
+
+ 
+Ist der zu zeigende Codeteil zu lang, wurden Links zur \url{https://github.com/Konafets/doctrine-dbal/} beziehungsweise zu \url{https://github.com/Konafets/TYPO3CMSDoctrineDBAL} angeben. Aufgrund ihrer Länge wurden diese Links durch den Linkverkürzer \url{bit.ly} verkürzt.
 
 
 
