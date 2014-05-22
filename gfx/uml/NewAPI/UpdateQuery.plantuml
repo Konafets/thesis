@@ -34,17 +34,19 @@ class Konafets.DoctrineDbal.Persistence.Doctrine.TuncateQuery implements Konafet
 	+getSql()
 }
 
-interface Konafets.DoctrineDbal.Persistence.Database.InsertQueryInterface extends Konafets.DoctrineDbal.Persistence.Database.QueryInterface {
-	+insertInto()
-	+values()
+interface Konafets.DoctrineDbal.Persistence.Database.UpdateQueryInterface extends Konafets.DoctrineDbal.Persistence.Database.QueryInterface {
+	+update()
+	+set()
+	+where()
 }
 
-class Konafets.DoctrineDbal.Persistence.Doctrine.InsertQuery extends Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery 
+class Konafets.DoctrineDbal.Persistence.Doctrine.UpdateQuery extends Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery 
 
-class Konafets.DoctrineDbal.Persistence.Doctrine.InsertQuery implements Konafets.DoctrineDbal.Persistence.Database.InsertQueryInterface {
+class Konafets.DoctrineDbal.Persistence.Doctrine.UpdateQuery implements Konafets.DoctrineDbal.Persistence.Database.UpdateQueryInterface {
 	+getType()
-	+insertInto()
-	+values()
+	+update()
+	+set()
+	+where()
 	+getSql()
 }
 

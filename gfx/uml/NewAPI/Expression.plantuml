@@ -1,0 +1,22 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Expression {
+	+logicalAnd()
+	+logicalOr()
+	+logicalNot()
+	+not()
+	+equals()
+	+notEquals()
+	+lessThan()
+	+lessThanOrEquals()
+	+greaterThan()
+	+greaterThanOrEquals()
+	+like()
+	+in()
+	+notIn()
+	+findInSet()
+}
+@enduml
