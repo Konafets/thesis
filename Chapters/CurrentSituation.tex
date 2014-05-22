@@ -5,7 +5,7 @@
 %-----------------------------------------------
 \section{Aktuelle Situation}
 \label{sec:currentSituation}
-In Kapitel~\ref{basics:typo3:subsubsec:coreAndApi} wurde bereits darauf hingewiesen, dass TYPO3 CMS eine einheitliche Datenbank API anbietet. Diese wird durch die Klasse \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} bereitgestellt und ist über die globale Variable \phpinline{$GLOBALS['TYPO3_DB']} verfügbar. Sie bietet Methoden zum Lesenden und Schreibenden Zugriff auf die Datenbank an.
+In Kapitel~\ref{basics:typo3:subsubsec:coreAndApi} wurde bereits darauf hingewiesen, dass TYPO3 CMS eine einheitliche Datenbank API anbietet. Diese wird durch die Klasse \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} bereitgestellt und ist über die globale Variable \phpinline{$GLOBALS['TYPO3_DB']} verfügbar. Sie bietet Methoden zum lesenden und schreibenden Zugriff auf die Datenbank an.
 
 \begin{listing}
 	\begin{phpcode}
@@ -21,7 +21,7 @@ $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
 	\label{lst:databaseOldExample}
 \end{listing}
 
-Durch die Nutzung der Datenbank API wird zum einen die Integrität der Daten sichergestellt und zum anderen eine Abstraktionsebene zwischen TYPO3 CMS und der Datenbank eingeführt. Durch die Vermeidung der direkten Nutzung der von MySQL beziehungsweise von MySQLi zur Verfügung gestellten Datenbankfunktionen wird eine Abhängigkeit zu MySQL vermieden. Allerdings stellt die Datenbank API keine Datenbankabstraktionsschicht dar. Diese wird durch die Systemextension DBAL implementiert. Mehr dazu im Kapitel~\ref{extdbal}.
+Durch die Nutzung der Datenbank API wird zum einen die Integrität der Daten sichergestellt und zum anderen die Nutzung der \gls{php}-Datenbankfunktionen abstrahiert. Somit kann die Implementation der Datenbank API-Methoden angepasst werden ohne die API selbst zu verändern. Die Umstellung von den MySQL- auf die MySQLi-Methoden ist ein Beispiel wurde auf diese Weise durchgeführt.\footnote{\url{http://bit.ly/typo3cms-switch-from-mysql-to-mysqli}}
 
 Die Datenbank API bietet eine Vielzahl an Methoden die sich in die folgenden fünf Gruppen einteilen lassen.
 
