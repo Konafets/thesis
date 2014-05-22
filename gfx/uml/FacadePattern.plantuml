@@ -1,0 +1,34 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+package SubSystem <<Rect>> {
+  class Class01
+  class Class02
+  class Class03
+}
+
+class Facade {
+  +operation()
+}
+
+note bottom of Facade {
+  +operation() 
+    $c1 = new SubSystem.Class01();
+    $c2 = new SubSystem.Class02();
+    $c3 = new SubSystem.Class03();
+
+    return $c1->add($c2->getNextPrime(4), $c3->getPi());
+}
+
+Facade --> Class01
+Facade --> Class02
+Facade --> Class03
+
+class Client {
+}
+
+Client --> Facade : operation()
+@enduml
+
