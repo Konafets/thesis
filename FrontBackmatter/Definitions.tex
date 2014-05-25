@@ -20,11 +20,12 @@
 \newacronym{fe}{FE}{Frontend}
 \newacronym{be}{BE}{Backend}
 \newacronym{tca}{TCA}{Table Content Array\protect\glsadd{glos:tca}}
-\newacronym{dbal}{DBAL}{Database Abstraction Layer\protect\glsadd{glos:dbal}}
+%\newacronym{dbal}{DBAL}{Database Abstraction Layer\protect\glsadd{glos:dbal}}
+\newacronym{dbal}{DBAL}{Database Abstraction Layer}
 \newacronym{cms}{CMS}{Content Management-System}
 \newacronym{cmf}{CMF}{Content Management-Framework}
-\newacronym{ecms}{ECMS}{Enterprise Content Management-Sytem}
-\newacronym{wcms}{WCMS}{Web Content Management-Sytem}
+\newacronym{ecms}{ECMS}{Enterprise Content Management-System}
+\newacronym{wcms}{WCMS}{Web Content Management-System}
 \newacronym{orm}{ORM}{Object-relational mapping}
 \newacronym{jcr}{JCR}{Content Repository for Java Technology API}
 \newacronym{mvc}{MVC}{Model-View-Controller}
@@ -58,4 +59,22 @@
 {
 	name={Composer},
 	description={Composer ist ein Dependency Manager\footnote{https://getcomposer.org/} für PHP, welcher von der Kommandozeile aufgerufen wird. Es dient zum Auflösen von Abhängigkeiten eines Projektes. Diese Abhängigkeiten werden in einer \pdf{composer.json}-Datei definiert und durch Ausführung des Programms in Verbindung mit der Konfigurationsdatei in dem Ordner \pdf{vendor} installiert.}
+}
+
+\newglossaryentry{glos:sqlDialect}
+{
+	name={SQL-Dialekt},
+	description={Als SQL Dialekt wird ein vom SQL-Standard abweichender Hersteller-spezifischer Sprachumfang bezeichnet. Ein Dialekt ist in der Regel kompatibel mit dem Standard und erweitert ihn um eigene Sprachkonstrukte.}
+}
+
+\newglossaryentry{glos:adaptee}
+{
+	name={Adaptee},
+	description={Eine Klasse die vone eine Adapterklasse in eine andere Klasse konvertiert wird.}
+}
+
+\newglossaryentry{glos:extkey}
+{
+	name={Extension-Key},
+	description={Ein einmaliger Bezeichner für den internen Namen einer TYPO3 CMS Extension.}
 }
