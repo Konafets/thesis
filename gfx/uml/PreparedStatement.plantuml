@@ -1,0 +1,16 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Database.PreparedStatement {
+	+bindValue(): TYPO3.CMS.Core.Database.PreparedStatement
+	+bindValues(): TYPO3.CMS.Core.Database.PreparedStatement
+	+execute(): boolean
+	+fetch(): array
+	+fetchAll(): array
+	+errorCode(): integer
+	+errorInfor(): array
+	.. weitere Methoden ..
+}
+@enduml

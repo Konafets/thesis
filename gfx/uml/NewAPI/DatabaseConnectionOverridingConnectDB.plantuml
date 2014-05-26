@@ -1,0 +1,13 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+class Konafets.DoctrineDbal.Persistence.Legacy.DatabaseConnection {
+  +connectDB(): void
+}
+
+class Konafets.DoctrineDbal.Persistence.Doctrine.DatabaseConnection extends Konafets.DoctrineDbal.Persistence.Legacy.DatabaseConnection {
+  +connectDatabase(): void
+  +connectDB(): void
+}
+@enduml

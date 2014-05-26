@@ -1,0 +1,7 @@
+Abstract
+
+Web-basierte Content-Management-Systeme bieten für den Redaktuer eine einheitliche und - vom System abhängige - mehr oder weniger einfache Möglichkeit der Konfiguration und Pflege einer Webpräsenz. 
+
+Damit die Inhalte nicht an eine Struktur oder an ein Design gebunden sind, werden sie davon getrennt und meistens in einer Datenbank\footnote{Ausnahmen bestätigen die Regel: Das CMS Kirby speichert die Inhalte in Textdateien http://getkirby.com} gespeichert. Im Grunde ist es jedoch unerheblich wo die Inhalte gespeichert werden - oder sollte es zumindest sein.
+
+In der Realiät ist es jedoch so, dass eine Webanwendung - und nichts anderes ist ein WCMS - mit eine bestimmen Persistenzschicht\footnote{Plaintext, SQLite, PostgreSQL, …} im Hinterkopf entwurfen wurde und dem Entwickler so zu einem Dialekt und Anbieter zwingt. Zum anderen engt diese Limitierung das Einsatzgebiet einer Anwendung stark ein. Dies fällt bei Desktopanwendungen nicht weiter ins Gewicht, das die Datenbank im Programm mitgeliefert wird. Bei Webanwendungen, die in der Theorie durch einen Webstack\footnote{eine Art virtueller Maschine analog zur JavaVirtualMaschine} plattformunabhängig laufen sollen und bei denen die Datenbank nicht mitgeliefert wird, sondern ein Teil des Stacks ist 

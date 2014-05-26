@@ -1,0 +1,57 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Konafets.DoctrineDbal.Persistence.Database.QueryInterface {
+	+getType()
+	+bindValue()
+	+bindParam()
+	+prepare()
+	+execute()
+	+getSql()
+	+getAffectedRows()
+	+__toString()
+}
+
+interface Konafets.DoctrineDbal.Persistence.Database.TruncateQueryInterface extends Konafets.DoctrineDbal.Persistence.Database.QueryInterface {
+	+truncate()
+}
+
+abstract class Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery {
+	+prepare()
+	+bindValue()
+	+bindParam()
+	+execute()
+	+getAffectedRows()
+	+__toString()
+}
+
+class Konafets.DoctrineDbal.Persistence.Doctrine.TuncateQuery extends Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery 
+class Konafets.DoctrineDbal.Persistence.Doctrine.TuncateQuery implements Konafets.DoctrineDbal.Persistence.Database.TruncateQueryInterface {
+	+getType()
+	+truncate()
+	+getSql()
+}
+
+interface Konafets.DoctrineDbal.Persistence.Database.UpdateQueryInterface extends Konafets.DoctrineDbal.Persistence.Database.QueryInterface {
+	+update()
+	+set()
+	+where()
+}
+
+class Konafets.DoctrineDbal.Persistence.Doctrine.UpdateQuery extends Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery 
+
+class Konafets.DoctrineDbal.Persistence.Doctrine.UpdateQuery implements Konafets.DoctrineDbal.Persistence.Database.UpdateQueryInterface {
+	+getType()
+	+update()
+	+set()
+	+where()
+	+getSql()
+}
+
+note bottom of Konafets.DoctrineDbal.Persistence.Doctrine.AbstractQuery {
+	__toString 
+		return $this->getSql()
+}
+@enduml

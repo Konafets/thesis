@@ -1,0 +1,27 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+note top of Doctrine.DBAL.Connection : Klient 
+class Doctrine.DBAL.Connection
+Doctrine.DBAL.Connection --> Doctrine.DBAL.Driver.Connection
+
+note top of Doctrine.DBAL.Driver.Connection : Ziel
+interface Doctrine.DBAL.Driver.Connection {
+  +query()
+}
+
+note top of PDO : Adaptee
+class PDO {
+  +query()
+}
+
+note right of Doctrine.DBAL.Driver.PDOConnection : Adapter
+class Doctrine.DBAL.Driver.PDOConnection extends PDO
+class Doctrine.DBAL.Driver.PDOConnection implements Doctrine.DBAL.Driver.Connection {
+  +query()
+}
+note bottom of Doctrine.DBAL.Driver.PDOConnection : parent::query();
+
+@enduml

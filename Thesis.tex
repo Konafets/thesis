@@ -18,22 +18,62 @@
 % Hier fängt der eigentliche Inhalt an
 %--------------------------------------
 \begin{document}
-	%\layout
 	\frontmatter
 		\include{FrontBackmatter/Titlepage}
 		\include{FrontBackmatter/Colophon}
 		\include{FrontBackmatter/Abstract}
+		\newpage
+		\thispagestyle{empty}
+		\hspace{1cm}
+		\newpage
+		\thispagestyle{empty}
+		\vspace*{\fill}
+		\begin{verse}
+			\centering
+			``'The Babel fish,' said The Hitchhiker's Guide to the Galaxy quietly, 'is small, yellow and leech-like, and probably the oddest thing in the Universe.\\
+			...\\
+			The practical upshot of all this is that if you stick a Babel fish in your ear you can instantly understand anything in any form of language.'''
+
+			– Douglas Adams, The Hitchhiker's Guide to the Galaxy
+			%``War is peace.\\
+			%Freedom is slavery.\\
+			%Ignorance is strength.''
+
+			%– George Orwell, 1984
+		\end{verse}
+		%\begin{quote}
+			%\hfill ``@WilliamShatner Yes, Standard Orbit, Captain. And we're detecting signs of life on the surface.''\\
+			%\\
+			%\hfill – William Shatner und ISS Commander Chris Hadfield am 03.01.2013 auf Twitter (\url{https://twitter.com/Cmdr_Hadfield/status/286948264236945408})
+		%\end{quote}
+		%\begin{quote}
+			%\hfill ``'The Answer to the Great Question\ldots~Of Life, the Universe and Everything\ldots~Is\ldots~Forty-two,' said Deep Thought, with infinite majesty and calm.''\\
+			%\\
+			%\hfill – Douglas Adams, The Hitchhiker's Guide to the Galaxy
+
+		%\end{quote}
+		\vspace*{\fill}
+		\newpage
 		\tableofcontents
-		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
-		\printglossary[type=main, title=Glossar,toctitle=Glossar]
-
 	\mainmatter
-
+		\include{FrontBackmatter/Introduction}
+		\include{Chapters/Basics}
+		\include{Chapters/CurrentSituation}
+		\include{Chapters/Prototype}
+		%\include{Chapters/Outlook}
+	\backmatter
+		\include{Chapters/Conclusion}
 	\appendix
-		\include{FrontBackmatter/Statement}
 		\printbibliography[title={Quellenverzeichnis}]
+		\includepdfset{pagecommand={\thispagestyle{headings}}}
+		% Print glossar
+		\printglossary[type=main,title=Glossar,toctitle=Glossar,style=altlist]
+		% Print Akronyms
+		\printglossary[type=\acronymtype, title=Abkürzungsverzeichnis,toctitle=Abk\"urzungsverzeichnis,style=long]% Der Umlaut muß hier so angegeben werden, da es sonst Anzeigeprobleme im PDF-Viewer gibt.
 		\listoftables
 		\listoffigures
 		\listoflistings
+		\includepdf[pages={1,2}, addtotoc={1,chapter,0,Tabelle alte API Methoden - neue Methoden,chap:int},  scale=0.9]{Bib/Functions.pdf}
+		\include{FrontBackmatter/Statement}
 		% Glossaries und Akronyme kommen hier hin oder ins Frontmatter
 \end{document}

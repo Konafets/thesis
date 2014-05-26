@@ -3,6 +3,7 @@ LATEXMK=latexmk
 MAINDOCUMENT = Thesis
 SOURCES=$(MAINDOCUMENT).tex Makefile
 
+UMLFILES=$(wildcard gfx/uml/*.plantuml)
 
 all: latexmake
 
@@ -22,6 +23,7 @@ clean:
 	rm -f Chapters/*.bak
 	rm -f Chapters/*.aux
 	rm -f FrontBackmatter/*.bak
+	rm -f gfx/uml/*.png
 
 lua:
 	lualatex  -shell-escape $(MAINDOCUMENT).tex
@@ -29,4 +31,6 @@ lua:
 glossaries:
 	makeglossaries $(MAINDOCUMENT)
 
-.PHONY: clean latexmake lua glossaries
+uml:
+	java -jar /opt/local/bin/plantuml.jar -v $(UMLFILES) 
+.PHONY: clean latexmake lua glossaries uml

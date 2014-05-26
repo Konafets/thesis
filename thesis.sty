@@ -42,6 +42,7 @@
 \RequirePackage{calc}             % Abhängigkeit von tikz-uml
 \RequirePackage[draft]{microtype} % mikrotypographische Optimierungen. Moved
 \RequirePackage{pgfopts}          % This package is an add-on of the pgfkeys package for the management of packages and classes options.
+\RequirePackage{framed}           % This package provides framed environments
 
 \newboolean{@drafting}            % Activate/Deactivate drafting informations
 \newboolean{@eulerchapternumbers} % use AMS Euler for chapter font (otherwise Palatino)
@@ -157,7 +158,7 @@
     % in order have Euler math fonts work with Minion, special option is needed
     \ifthenelse{\boolean{@eulermath}}%
     {%
-        \PassOptionsToPackage{opticals,mathlf,onlytext}{MinionPro}%
+        %\PassOptionsToPackage{opticals,mathlf,onlytext}{MinionPro}%
         \RequirePackage{MinionPro} %  opticals, fullfamily, osf
     }{%
         \PassOptionsToPackage{opticals,mathlf}{MinionPro}%
@@ -166,9 +167,11 @@
 }{%
     % default: Palatino
     \PassOptionsToPackage{osf,sc}{mathpazo}%
-    \RequirePackage{mathpazo} % Palatino with real small caps and old style figures
-    \linespread{1.05} % a bit more for Palatino
+    %\RequirePackage{mathpazo} % Palatino with real small caps and old style figures
+    \RequirePackage{eulervm} % Palatino with real small caps and old style figures
+    \setmainfont[Ligatures=TeX]{Palatino}
     %\setmainfont{ITC Goudy Sans LT Medium}
+    \linespread{1.05} % a bit more for Palatino
 }
 
 \ifthenelse{\boolean{@beramono}}%
@@ -177,7 +180,7 @@
     \RequirePackage{beramono}%
 }{%
 
-    \setmonofont[Scale=0.75]{Source Code Pro Light}
+    \setmonofont[Scale=0.80]{Source Code Pro Regular}
     % put your own suitable typewriter font here
     %\renewcommand{\ttdefault}{\rmdefault}
 }
@@ -259,8 +262,8 @@
 
 \clearscrheadfoot
 \setheadsepline{0pt}
-\renewcommand{\chaptermark}[1]{\markboth{\spacedlowsmallcaps{#1}}{\spacedlowsmallcaps{#1}}}
-\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace\spacedlowsmallcaps{#1}}}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\enspace#1}}
 \lehead{\mbox{\llap{\small\thepage\kern2em}\headmark\hfil}}
 \rohead{\mbox{\hfil{\headmark}\rlap{\small\kern2em\thepage}}}
 \renewcommand{\headfont}{\small}
@@ -310,10 +313,10 @@
 }
 
 % sections \FloatBarrier
-\titleformat{\section}{\relax}{\textsc{\MakeTextLowercase{\thesection}}}{1em}{\spacedlowsmallcaps}
+\titleformat{\section}{\relax}{\textsc{\thesection}}{1em}{\normalsize\itshape}
 
 % subsections
-\titleformat{\subsection}{\relax}{\textsc{\MakeTextLowercase{\thesubsection}}}{1em}{\normalsize\itshape}
+\titleformat{\subsection}{\relax}{\textsc{\thesubsection}}{1em}{\normalsize\itshape}
 
 % subsubsections
 \titleformat{\subsubsection}{\relax}{\textsc{\MakeTextLowercase{\thesubsubsection}}}{1em}{\normalsize\itshape}
@@ -363,10 +366,12 @@
     }
     {% Palatino or other
 	    \PackageInfo{classicthesis}{A4 paper, Palatino or other}
-	    \areaset[current]{336pt}{750pt} % ~ 336 * factor 2 + 33 head + 42 \the\footskip
+	    \areaset[current]{380pt}{750pt} % ~ 336 * factor 2 + 33 head + 42 \the\footskip
 %   	\areaset{336pt}{761pt} % 686 (factor 2.2) + 33 head + 42 head \the\footskip 10pt
 		\setlength{\marginparwidth}{7em}%
         \setlength{\marginparsep}{2em}%
+		\setlength{\footskip}{1em}
+		\setlength{\skip\footins}{2em} % Add more space between textblock and footnote
     }%
 }
 % Here are some suggestions for the text widths and heights:

@@ -1,0 +1,68 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Doctrine.DBAL.DriverManager {
+  +getConnection(): Doctrine.DBAL.Connection
+}
+
+class Docrine.DBAL.Connection {
+  #Doctrine.DBAL.Driver.PDOMySql.Driver $_conn
+}
+
+interface Doctrine.DBAL.Driver.Connection {
+  +prepare(): \Doctrine\DBAL\Driver\Statement 
+  +query(): \Doctrine\DBAL\Driver\Statement 
+  +quote(): string
+  +exec(): integer
+  +lastInsertId(): string
+  +beginTransaction(): boolean
+  +commit(): boolean
+  +rollBack(): boolean
+  +errorCode(): string|null
+  +errorInfo(): array
+}
+
+class PDO {
+  +prepare(): PDOStatement 
+  +query(): PDOStatement 
+  +quote(): string
+  +exec(): integer
+  +lastInsertId(): string
+  +beginTransaction(): boolean
+  +commit(): boolean
+  +rollBack(): boolean
+  +errorCode(): string|null
+  +errorInfo(): array
+  +getAttribute(): mixed
+  +{static} getAvailableDrivers(): array
+  +setAttribute(): boolean
+}
+class Doctrine.DBAL.Driver.PDOConnection extends PDO
+class Doctrine.DBAL.Driver.PDOConnection implements Doctrine.DBAL.Driver.Connection
+class Doctrine.DBAL.Driver.DB2Connection implements Doctrine.DBAL.Driver.Connection
+
+interface Doctrine.DBAL.Driver {
+  +connect(): \Doctrine\DBAL\Driver\Connection
+  +getDatabasePlatform(): \Doctrine\DBAL\Platforms\AbstractPlatform
+  +getSchemaManager(): \Doctrine\DBAL\Schema\AbstractSchemaManager
+  +getName(): string
+  +getDatabase(): string
+}
+class Doctrine.DBAL.Driver.PDOMySql.Driver {
+  +connect(): Doctrine.DBAL.Driver.PDOConnection
+}
+
+class Doctrine.DBAL.Driver.PDOMySql.Driver extends Doctrine.DBAL.Driver.AbstractMySQLDriver
+class Doctrine.DBAL.Driver.AbstractMySQLDriver implements Doctrine.DBAL.Driver
+
+class Doctrine.DBAL.Driver.PDOPgSql.Driver {
+  +connect(): Doctrine.DBAL.Driver.PDOConnection
+}
+
+class Doctrine.DBAL.Driver.PDOPgSql.Driver extends Doctrine.DBAL.Driver.AbstractPostgreSQLDriver
+class Doctrine.DBAL.Driver.AbstractPostgreSQLDriver implements Doctrine.DBAL.Driver
+
+class Docrine.DBAL.Connection implements Doctrine.DBAL.Driver.Connection
+@enduml

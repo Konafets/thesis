@@ -1,0 +1,13 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Database.DatabaseConnection {
+  +INSERTquery($table, $fields_values, $no_quote_fields = FALSE): string
+  +UPDATEquery($table, $where, $fields_values, $no_quote_fields = FALSE): string
+  +DELETEquery($table, $where): string
+  +SELECTquery($select_fields, $from_table, $where_clause, $groupBy = '', $orderBy = '', $limit = ''): string
+  +TRUNCATEquery($table): string
+}
+@enduml

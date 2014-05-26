@@ -1,0 +1,7 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class Konafets.DoctrineDbal.Persistence.Legacy.DatabaseConnection extends Konafets.DoctrineDbal.Persistence.Doctrine.DatabaseConnection 
+@enduml

@@ -1,0 +1,12 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Doctrine.DBAL.Driver.ResultStatement
+interface Doctrine.DBAL.Driver.Statement extends Doctrine.DBAL.Driver.ResultStatement
+
+class Doctrine.DBAL.Statement implements IteratorAggregate
+class Doctrine.DBAL.Statement implements Traversable
+class Doctrine.DBAL.Statement implements Doctrine.DBAL.Driver.Statement
+@enduml

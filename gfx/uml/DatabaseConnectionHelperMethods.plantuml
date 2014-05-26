@@ -1,0 +1,20 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Database.DatabaseConnection {
+	+fullQuoteStr($str, $table, $allowNull = FALSE): string
+	+fullQuoteArray($arr, $table, $noQuote = FALSE, $allowNull = FALSE): array
+	+quoteStr($str, $table): string
+	+escapeStrForLike($str, $table): string
+	+cleanIntArray($arr): array
+	+cleanIntList($list): string
+	+stripOrderBy($str): string
+	+stripGroupBy($str): string
+	+splitGroupOrderLimit($str): array
+	+getDateTimeFormats($table): array
+	+listQuery($field, $value, $table): string
+	+searchQuery($searchWords, $fields, $table, $constraint = self::AND_Constraint): string
+}
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+class TYPO3.CMS.Core.Database.DatabaseConnection {
+	+sql_query($query): mysqli_result object|boolean
+	+sql_error(): string
+	+sql_errno(): integer
+	+sql_num_rows($res): integer
+	+sql_fetch_assoc($res): array|boolean
+	+sql_fetch_row($res): array|boolean
+	+sql_free_result($res): boolean
+	+sql_insert_id(): integer
+	+sql_affected_rows(): integer
+	+sql_data_seek($res): boolean
+	+sql_field_types($res, $pointer): string
+}
+@enduml

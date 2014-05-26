@@ -1,0 +1,73 @@
+%-----------------------------------------------
+% Dateiname: Workstyle.tex
+% Autor    : Stefano Kowalke <blueduck@gmx.net>
+% Lizenz   : BSD
+%-----------------------------------------------
+\section{Arbeitsweise}
+\label{sec:workstyle}
+Aufgrund seiner Aufgabe stellt der Prototyp einen tiefen Eingriff in die Architektur von TYPO3 dar. Vor diesem Hintergrund ist es unumgänglich, dass er alle Anforderungen erfüllt, die an eine Systemextension gestellt werden, auch wenn er keine Systemextension ist.
+
+Dies fängt mit der Einhaltung der TYPO3 Coding Guidelines an, geht über die Versionierung des Codes hin zum Einbinden in das TYPO3 Testframework
+
+\subsection{Formatierung des Quellcodes}
+Programmierer neigen zu unterschiedlichen Programmierstilen, was solange kein Problem darstellt, solange sie allein an einem Projekt arbeiten. Kommen mehr Entwickler hinzu und es vermischen sich verschiedene Stile, kann es schnell unübersichtlich werden. Um den Sinn eines Programms zu verstehen, hilft es allgemein, wenn die Codebasis in einer konsistenten Form formatiert wurde. Dies erhöht die Wartbarkeit und verbessert die Code Qualität.
+
+Coding Guidelines stellen dabei das Regelwerk dar, auf das sich die Entwickler eines Projekts geeinigt haben.
+
+In den TYPO3 Coding Guidelines (CGL)\footnote{\url{http://docs.typo3.org/typo3cms/CodingGuidelinesReference/6.2/_pdf/manual.t3cgl-6.2.pdf}} wird die Verzeichnisstruktur von TYPO3 selbst, sowie die von Extensions erläutert. Sie erklären die Namenskonventionen für Dateien, Klassen, Methoden und Variablen und beschreiben den Aufbau einer Klassendatei mit notwendigem Inhalt, der unabhängig von dem Zweck der Klasse vorhanden sein muss.
+
+Der größte Teil der CGL behandelt die Formatierung verschiedener Sprachkonstrukte wie Schleifen, Arrays und Bedingungen.
+
+Da das Regelwerk mit 28 Seiten recht umfangreich ausfällt, wird zur Überprüfung des Quellcodes das Programm PHP\_CodeSniffer\footnote{\url{https://github.com/squizlabs/PHP_CodeSniffer}} in Zusammenhang mit dem entsprechenden Regelset für das TYPO3 Projekt \footnote{\url{https://github.com/typo3-ci/TYPO3CMS}} verwendet.
+
+\subsection{Unit Testing}
+Eine Anforderung an den Prototyp war, dass er die alte Datenbank API weiterhin unterstützt. Dadurch ist gewährleistet, dass noch nicht angepasste Extensions weiterhin funktionieren. Um dies zu überprüfen muß die Funktionalität von TYPO3 in Verbindung mit der alten und der neuen \gls{api} fortlaufend getestet werden.
+
+Ein möglicher Ansatz wäre es, mit zwei identischen TYPO3 Installationen zu starten, die mit der Zeit auseinander divergieren, indem eine der beiden APIs immer mehr auf die neue API umgebaut würde. Das Testen dabei kann jedoch nur auf eine stichprobenartige Überprüfung der Funktionalität des manipulierten Systems beruhen, da es nahezu unmöglich ist, durch dieses manuelle Vorgehen alle Testfälle abzudecken.
+
+Ein anderer Ansatz würde auf der Code Ebene ansetzen und pro Methode der alten API verschiedene Testfälle definieren, welche nachvollziehbar wären und immer wieder ausgeführt werden könnten.
+
+Das dafür in Frage kommende Framework heißt PHPUnit\footnote{\url{http://phpunit.de/}}. Es stellt das PHP Pendant von dem aus der Javawelt bekannten JUnit dar und wird von TYPO3 unterstützt. TYPO3 bringt selbst schon über 6000 UnitTests mit\footnote{\url{https://travis-ci.org/TYPO3/TYPO3.CMS/builds/23070563}}.
+
+Das eingangs umrissene Szenario stellt lediglich ein greifbares Beispiel für den Nutzen von Unit Tests dar und ist keineswegs auf Spezialfälle wie Refactorings oder den Austausch einer API beschränkt. In der vorliegenden Arbeit wurden alle implementierten Methoden der neuen API mit Unit Tests – in Verbindung mit PHPUnit – abgedeckt.
+
+\subsection{Versionsverwaltung}
+Als Versionsverwaltung wurde GIT\footnote{\url{http://git-scm.com/}} in Verbindung mit dem Code Hostingdienst GitHub\footnote{\url{http://github.com}} genutzt. Github dient zum einen als Backup im Falle eines Festplattenausfalls und zum anderem als späterer Anlaufpunkt der Extension für Interessierte.
+
+%Ferner hat sich um GitHub eine Vielzahl von Services entwickelt, welche unter anderen dabei hilft, die Code-Qualität zu analysieren. Die zwei zu erwähnenden Projekte sind Travis\footnote{LINK} und Scrutinizer\footnote{LINK}, welche für das Projekt genutzt wurden.
+
+\subsection{Composer}
+Composer\footnote{\url{getcomposer.org}} ist ein \textit{Dependency Manager} für \gls{php}. Er installiert externe Bibliotheken, die über eine Konfigurationsdatei als Abhängigkeit festgelegt wurden.
+
+%\subsection{Travis-CI}
+%Travis-CI ist ein \textit{Continuous Integration} (CI) Service, welcher auf Github gehostete baut.
+
+%Der Begriff "bauen" kommt von Sprachen wie C oder Java, die erst kompiliert werden müssen (engl. to compile oder to build), bevor sie ein ausführbares Programm darstellen. Im Gegensatz zu interpretierten Sprachen, die zur Laufzeit von einem Interpreter übersetzt werden. Hier definiert der Begriff "bauen" im Zusammenhang mit CI das auschecken des Codes aus einem Repository und die Ausführung von:
+
+	%\begin{itemize}
+		%\item Tests (Unit-, Smoke-, Akzeptanz- und Behaviortests),
+		%\item statischer Codeanalysen wie den oben genannten PHP\_CodeSniffer, PHPDepend\footnote{\url{http://pdepend.org/}}, PHP Mess Detection\footnote{\url{http://phpmd.org/}} oder PHP Copy and Paste\footnote{\url{https://github.com/sebastianbergmann/phpcpd}}
+	%\end{itemize}
+
+%Die Konfiguration von Travis-CI erfolgt über eine Textdatei im YAML-Format\footnote{\url{http://www.yaml.org/start.html}} und liegt im Wurzelverzeichnis des Projekts.
+
+%[Beispiel einer YAML Datei für Travis einfügen]
+
+%Da der Prototyp aus zwei Teilen besteht, wurden zwei Travisprojekte erstellt. Eins für die Extension und eins für den modifizierten TYPO3 Kern.
+
+%\subsubsection{Konfiguration für die Extension}
+%PHPUnit
+%CodeSniffer
+%PHPCPD
+%PHPMessDetection
+%PHPLOC
+
+%Ziel war eine möglichst 100\% Testabdeckung zu erreichen.
+
+%\subsubsection{Konfiguration für den TYPO3 Kern}
+%Während bei den Tests der Extension auf eine innere Konsistenz des Programmcodes geschaut wurde, wurde bei den Tests des Kerns Augenmerk auf die Integration der Extension in das modifizierte TYPO3 gelegt. Ziel war es, dass alle mitgelieferten Tests des Cores erfüllt werden.
+
+\subsection{\gls{ide}}
+Als Editor wurde die \gls{ide} PHPStorm verwendet, die über Autovervollständigung von Variablen, Methoden und Klassenverfügt und den Programmierer bei der Erstellung von Klassen durch Templates unterstützt.
+
+PHPStorm verfügt über einen Debug Listener, der auf ein vom Browser gesendetes Token wartet und bei Empfang den Debug Prozess startet. Für den verwendeten Browser \textit{Chrome} ist ein Addon verfügbar, mittels dessen das Senden des Debug-Tokens per Knopfdruck ein- und ausgeschaltet werden kann. Wird der Browser und die \gls{ide} in den Debug-Modus gesetzt und TYPO3 CMS neu geladen, bleibt das Programm an dem gesetzten Breakpoint stehen.

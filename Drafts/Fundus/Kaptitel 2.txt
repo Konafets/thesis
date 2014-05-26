@@ -1,0 +1,52 @@
+
+
+
+Einleitung
+ - den Leser an das Thema heranführen
+ - Problembewußtsein schaffen
+ - Das Ziel der Thesis erläutern
+ - Was wird in der Thesis nicht gemacht -> Abgrenzung
+ - Das Vorgehen erklären
+ - Aufbau der Thesis
+
+Vorstellung von
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2 Grundlagen
+Dieses Kapitel legt die Aus  2.1 Ausgangssituation  2.2 LAMPStack    2.2.1 Apache2    2.2.2 MySQL    2.2.3 PostgreSQL     2.2.4 PHP  2.3 TYPO3  2.4 Doctrine2DBAL 
+    2.4.1 Beschreibung 
+    2.4.2 Abgrenzung zum ORM 
+    2.4.3 Verbreitung  2.5 PDO  2.6 Versionskontroll- und Issuetrackingsystem   2.7 UnitTesting  2.8 Sicherheit
+
+Ausgangssituation
+
+In der Defaulteinstellung speichert das CMS TYPO3 die Inhalte der Website in einer MySQL-Datenbank. Soll sich das CMS mit der Datenbank eines anderen Herstellers verbinden, muss die mitgelieferte Systemextension DBAL installiert werden, welche die SQL-Queries parst und in einen anderen Dialekt konvertiert.
+
+Damit dies einwandfrei funktioniert, müssen sich die Entwickler - sei es TYPO3 Kern- oder externer Extensionprogrammier - an gewisse Richtlinien, wie zum Beispiel die ausschließliche Nutzung der TYPO3 Datenbank API, halten. Trotz der Nutzung der API können zu DBAL inkompatible Anfragen formuliert werden. Ferner ist es möglich komplett an der API vorbei mit der Datenbank zu kommunizieren, wodurch man wieder beim Anfangsproblem angelangt ist, welches man mit der Nutzung der DBAL Extension lösen wollte: Die Fixierung auf einen SQL-Dialekt. Deswei- teren verwendert die DBAL Extension die extene Bibliothek AdoDB welche nicht mehr aktiv weiterentwickelt wird und weder Verbessungen noch Sicherheitsupdates bereitstellt.

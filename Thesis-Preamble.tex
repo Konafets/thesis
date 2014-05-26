@@ -8,23 +8,26 @@
 % Dokumentenklasse DINA4 einseitig
 %----------------------------------
 \documentclass[
-	fontsize    = 11pt,           % Die Schriftgröße
+	fontsize    = 10pt,           % Die Schriftgröße
 	twoside     = false,          % scrbook hat per Default ein Zwei-Seitenlayout
 	parskip     = full,           % Steuert die Absätze. http://www.rrzn.uni-hannover.de/fileadmin/kurse/material/latex/scrguide.pdf Tabelle 3.7
 	headsepline,                  % Fügt eine Trennungslinie in den Seitenkopf
 	footnotes   = multiple,       % Fügt ein Komma zwischen den Indexzahlen bei aufeinanderfolgende Fußnoten ein
-	numbers     = noendperiod     % Keinen Punkt der letzten Gliederungsebene in der Überschrift  -> 1.2.1 statt 1.2.1.
+	numbers     = noendperiod,    % Keinen Punkt der letzten Gliederungsebene in der Überschrift  -> 1.2.1 statt 1.2.1
+	BCOR = 20mm
 ]{scrbook}
 
+%\includeonly{Chapters/Doctrine}
+%\includeonly{Chapters/Basics,FrontBackmatter/Definitions}
 \PassOptionsToPackage{
-	%layout,
-	drafting,
+    %layout,
+    %drafting,
     eulerchapternumbers,
-	eulermath,
-	colophon,
-	bettertable,
+    eulermath,
+    colophon,
+    bettertable,
     %minionpro,
-%	dottedtoc,
+    %dottedtoc,
 }{thesis}
 
 
@@ -34,12 +37,13 @@
 \usepackage{fontspec}                      % Wird von LuLaTeX benöigt und löst "fontenc" ab.
 \usepackage{polyglossia}                   % Wird von LuLaTeX benöigt und löst "babel" ab.
 \usepackage[german=quotes]{csquotes}       % Anführungszeichen global im Dokument steuern. Paket wird von "polyglossia" empfohlen.
+
 \usepackage[
 	backend=biber,                         % Benutzer biber zur Erstellung
 	bibwarn=true,                          % Warne, wenn das BiTex Format falsch ist
 	autolang=other,
-	style=authoryear,
-	bibstyle=iso-authoryear,
+	style=alphabetic-verb,
+	bibstyle=alphabetic-verb,
 ]
 {biblatex}                                 % Nutze Biblatex zur Erstellung des Literaturverzeichnis
 \addbibresource{Bib/Bibliography.bib}      % Die Literatureinträge
@@ -56,27 +60,32 @@
     ]{glossaries}                          % Erstellt Glossar und Abkürzungsverzeichnis. Laut der Dokumentation ist es ausdrücklich notwendig, dass es nach dem Package hyperref eingebunden werden muß
 \makeglossaries                            % Anweisung das Glossar zu erstellen
 
+\newfontfamily\quotefont[Ligatures=TeX]{Palatino} % The font for the quotation marks at a quote
+\usepackage{pdfpages}
+\usepackage{chronosys} % Creates timelines
+\usepackage{fancyvrb}  % Improved Verbatim environments
+\usepackage{longtable} % Spread tables over multiple pages
+
 %=================================================
 % Angaben zur Arbeit wie Titel und Name des Autor
 %=================================================
 \newcommand{\myTitle}{Integration der Datenbank-Abstraktionsschicht Doctrine2\xspace}
-\newcommand{\myTitleSecondLine}{ in das Content-Management-System TYPO3\xspace}
+\newcommand{\myTitleSecondLine}{in das Content-Management-System TYPO3\xspace}
 %\newcommand{\mySubtitle}{Put your subtitle here\xspace}
 %\newcommand{\myDegree}{Put your degree here\xspace}
 \newcommand{\myName}{Stefan Kowalke\xspace}
-\newcommand{\myEMail}{<stefan.kowalke@stud.fh-flensburg.de>\xspace}
+\newcommand{\myEMail}{<blueduck@gmx.net>\xspace}
 \newcommand{\myMatricleNumber}{485366\xspace}
 \newcommand{\myProf}{Prof. Dr. Hans-Werner Lang\xspace}
 \newcommand{\myOtherProf}{Dipl. VK Tobias Hiep\xspace}
 %\newcommand{\mySupervisor}{Put name here\xspace}
 \newcommand{\myUni}{\uppercase{\large Fachhochschule Flensburg}\xspace}
-\newcommand{\myDepartment}{Angewandte Informatik - \xspace}
+\newcommand{\myDepartment}{Angewandte Informatik\xspace}
 %\newcommand{\myFaculty}{Put data here\xspace}
 \newcommand{\myMajor}{Medieninformatik\xspace}
 \newcommand{\myLocation}{Flensburg\xspace}
 \newcommand{\myTime}{März 2014\xspace}
 %\newcommand{\myVersion}{version 4.1\xspace}
-
 
 %----------------
 % Renew commands
@@ -104,10 +113,53 @@
   \let\bibcloseparen=\bibclosebracket}
 \makeatother
 
+%----------------------
+% Neue Quoting Umgebung
+%----------------------
+\newcommand*\quotesize{60} % if quote size changes, need a way to make shifts relative
+% Make commands for the quotes
+\newcommand*{\openquote}
+   {\tikz[remember picture,overlay,xshift=-4ex,yshift=-2.5ex]
+   \node (OQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont``};\kern0pt}
+
+\newcommand*{\closequote}[1]
+  {\tikz[remember picture,overlay,xshift=4ex,yshift={#1}]
+   \node (CQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont''};}
+
+% select a colour for the shading
+\definecolor{shadecolor}{gray}{0.95}
+
+\newcommand*\shadedauthorformat{\emph} % define format for the author argument
+
+% Now a command to allow left, right and centre alignment of the author
+\newcommand*\authoralign[1]{%
+  \if#1l
+    \def\authorfill{}\def\quotefill{\hfill}
+  \else
+    \if#1r
+      \def\authorfill{\hfill}\def\quotefill{}
+    \else
+      \if#1c
+        \gdef\authorfill{\hfill}\def\quotefill{\hfill}
+      \else\typeout{Invalid option}
+      \fi
+    \fi
+  \fi}
+
+% wrap everything in its own environment which takes one argument (autor) and one
+% optional argument [l, c or r]
+\newenvironment{shadequote}[2][l]%
+{\authoralign{#1}
+\ifblank{#2}
+   {\def\shadequoteauthor{}\def\yshift{-2ex}\def\quotefill{\hfill}}
+   {\def\shadequoteauthor{\par\authorfill\shadedauthorformat{#2}}\def\yshift{2ex}}
+\begin{snugshade}\begin{quote}\openquote}
+{\shadequoteauthor\quotefill\interlinepenalty=10000\end{quote}\end{snugshade}}
+
 %------------------
 % Eigene Kommandos
 %------------------
-
+\newcommand{\pdf}[1]{\texttt{\mbox{#1}}}
 
 %---------------------
 % Spracheinstellungen
@@ -144,21 +196,44 @@
 %--------------
 %**************************************
 % Schrifteinstellungen für Codelistings
-%
-\setmonofont[Scale=0.75]{Source Code Pro Light}
+\setmonofont[Scale=0.75]{Source Code Pro}
 \definecolor{bg}{rgb}{0.95,0.95,0.95}
+%\usemintedstyle[php]{monokai}
+\newmintinline{php}{startinline} % http://www.joelclermont.com/2013/03/28/better-php-highlighting-in-octopress/
 \newminted{php}{
 	linenos              = true,
-	xleftmargin          = 2em,
+	startinline          = true, % http://www.joelclermont.com/2013/03/28/better-php-highlighting-in-octopress/
+	xleftmargin          = 1em,
 	tabsize              = 4,
-	bgcolor              = bg,
 	funcnamehighlighting = true
 }
-
+\newmintinline{json}{}
+\newminted{json}{
+	tabsize              = 2,
+	xleftmargin          = 1em,
+	funcnamehighlighting = true
+}\newmintinline{html}{}
+\newminted{html}{
+	tabsize              = 2,
+	xleftmargin          = 1em,
+	funcnamehighlighting = true
+}
+\newmintinline{sh}{}
+\newminted{sh}{
+	xleftmargin          = 1em,
+	funcnamehighlighting = true
+}
+\newmintinline{sql}{}
+\newmintinline{mysql}{}
 \newminted{mysql}{
 	linenos     = true,
 	bgcolor     = bg,
-	xleftmargin = 2em
+	xleftmargin = 1em
 }
 
+\newminted{psql}{
+	linenos     = true,
+	bgcolor     = bg,
+	xleftmargin = 1em
+}
 \usepackage{thesis}
