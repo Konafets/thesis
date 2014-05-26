@@ -6,21 +6,31 @@
 \section{Umstellen der Query-Methoden auf Doctrine DBAL und Prepared Statements}
 \label{prototype:sec:usingDoctrinePreparedStatements}
 
-In Kapitel~\ref{sec:currentSituation} zur Datenbank API wurde bereits die Unterteilung in Generierende und Ausführende SQL-Methoden erläutert. Die Generierung der Anfrage erfolgt anhand der Parameter, die – zusammen mit den entsprechenden SQL-Anweisungen – in eine Zeichenkette umgewandelt und zurückgegeben werden.
+In Kapitel~\ref{sec:currentSituation} zur Datenbank API wurde bereits die Unterteilung in Generierende und Ausführende SQL-Methoden erläutert. Die Generierung der Abfrage erfolgt anhand der Parameter, die – zusammen mit den entsprechenden SQL-Abfragen – in eine Zeichenkette umgewandelt und zurückgegeben werden.
 
 \begin{listing}[H]
 \begin{phpcode}
-public function UPDATEquery($table, $where, array $fields_values, $no_quote_fields = FALSE) {
-  ... 
+public function UPDATEquery(
+  $table,
+  $where,
+  array $fields_values,
+  $no_quote_fields = FALSE
+  ) {
+  ...
     $fields = array();
 	if (is_array($fields_values) && count($fields_values)) {
 	  // Quote and escape values
-	  $nArr = $this->fullQuoteArray($fields_values, $table, $no_quote_fields, TRUE);
+	  $nArr = $this->fullQuoteArray(
+	            $fields_values,
+	            $table,
+	            $no_quote_fields,
+	            TRUE
+	          );
 	  foreach ($nArr as $k => $v) {
 	    $fields[] = $k . '=' . $v;
 	  }
 	}
-	
+
 	$query = 'UPDATE ' . $table . ' SET ' . implode(',', $fields) .
 		((string)$where !== '' ? ' WHERE ' . $where : '');
 	...
@@ -32,7 +42,7 @@ public function UPDATEquery($table, $where, array $fields_values, $no_quote_fiel
 \label{lst:UPDATEoldAPI}
 \end{listing}
 
-Doctrine DBAL bietet mit dem \phpinline{QueryBuilder} eine Klasse an, mit der die Formulierung von SQL-Anweisungen abstrahiert werden kann. Die Generierung der SQL-Anweisung aus Listing~\ref{lst:UPDATEoldAPI} konnte durch die Nutzung des \phpinline{QueryBuilders} wie folgt verändert werden:
+Doctrine DBAL bietet mit dem \phpinline{QueryBuilder} eine Klasse an, mit der die Formulierung von SQL-Abfragen abstrahiert werden kann. Die Generierung der SQL-Abfrage aus Listing~\ref{lst:UPDATEoldAPI} konnte durch die Nutzung des \phpinline{QueryBuilders} wie folgt verändert werden:
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -46,20 +56,21 @@ public function UPDATEquery(...) {
 ...
 }
 \end{phpcode}
-\caption{Generierung der SQL-Anfrage wird an den QueryBuilder delegiert}
+\caption{Generierung der SQL-Abfrage wird an den QueryBuilder delegiert}
 \label{lst:createSqlByDirectCallToQueryBuilder}
 \end{listing}
 
-Dies wurde für alle generierenden Methoden der alten API realisiert. Dabei wurde der Code der Methoden in die neue API kopiert, während die alten Klassen den Aufruf an ihre Elternmethode delegieren \phpinline{return parent::insertQuery(...)}. Dies wurde notwendig, da der Methodenname der alten API nicht der \gls{cgl} entsprach; der Aufruf über \phpinline{parent::} und nicht über \phpinline{$this->} wurde notwendig, da \gls{php} nicht zwischen Groß- und Kleinschreibung unterscheidet - die Methoden \phpinline{INSERTquery()} und \phpinline{insertQuery()} werden als identisch angesehen. 
+Dies wurde für alle generierenden Methoden der alten API realisiert. Dabei wurde der Code der Methoden in die neue API kopiert, während die alten Klassen den Aufruf an ihre Elternmethode delegieren \phpinline{return parent::insertQuery(...)}. Dies wurde notwendig, da der Methodenname der alten API nicht der \gls{cgl} entsprach; der Aufruf über \phpinline{parent::} und nicht über \phpinline{$this->} wurde notwendig, da \gls{php} nicht zwischen Groß- und Kleinschreibung unterscheidet - die Methoden \phpinline{INSERTquery()} und \phpinline{insertQuery()} werden als identisch angesehen.
 
-Durch diesen Schritt wurde die letzte Abhängikeit zu einem bestimmten \gls{dbms} aufgelöst.
+Durch diesen Schritt wurde die letzte Abhängigkeit zu einem bestimmten \gls{dbms} aufgelöst.
 
-Während die alte Datenbank API wie gewohnt benutzt werden kann (siehe Listing~\ref{lst:resetStageOfElementsOldAPI}), wird für die neue Datenbank API eine Abstraktion zur Formulierung von SQL-Anweisungen nach dem Vorbild des \phpinline{QueryBuilders} angestrebt (siehe Listing~\ref{lst:resetStageOfElementsNewAPI}). Wie zu sehen ist, werden dort auch die logischen Ausdrücke abstrahiert.
+Während die alte Datenbank API wie gewohnt benutzt werden kann (siehe Listing~\ref{lst:resetStageOfElementsOldAPI}), wird für die neue Datenbank API eine Abstraktion zur Formulierung von SQL-Abfragen nach dem Vorbild des \phpinline{QueryBuilders} angestrebt (siehe Listing~\ref{lst:resetStageOfElementsNewAPI}). Wie zu sehen ist, werden dort auch die logischen Ausdrücke abstrahiert.
 
 \begin{listing}[H]
 \begin{phpcode}
 protected function resetStageOfElements($stageId) {
-  $fields = array('t3ver_stage' => \TYPO3\CMS\Workspaces\Service\StagesService::STAGE_EDIT_ID);
+  $fields = array('t3ver_stage' =>
+    \TYPO3\CMS\Workspaces\Service\StagesService::STAGE_EDIT_ID);
   foreach ($this->getTcaTables() as $tcaTable) {
     if (BackendUtility::isTableWorkspaceEnabled($tcaTable)) {
       $where = 't3ver_stage = ' . (int)$stageId;
@@ -80,16 +91,18 @@ protected function resetStageOfElements($stageId) {
       $dbh = $GLOBALS['TYPO3_DB'];
       $expr = $dbh->expr();
       $query = $dbh->createUpdateQuery();
-      
+
       $query->update($tcaTable)
-        ->set('t3ver_stage', \TYPO3\CMS\Workspaces\Service\StagesService::STAGE_EDIT_ID)
+        ->set(
+          't3ver_stage',
+          \TYPO3\CMS\Workspaces\Service\StagesService::STAGE_EDIT_ID)
         ->where(
           $expr->equals(t3ver_stage, $stageId),
           $expr->greaterThan(t3ver_wsid, 0),
           $expr->equals(pid, -1)
-        )     
+        )
       );
-      
+
       $query->execute();
  ...
 }
@@ -98,10 +111,10 @@ protected function resetStageOfElements($stageId) {
 \label{lst:resetStageOfElementsNewAPI}
 \end{listing}
 
-Es wurde darauf verzichtet die API des \phpinline{QueryBuilder} direkt anzubieten. Die Gründe dafür sind 
+Es wurde darauf verzichtet die API des \phpinline{QueryBuilder} direkt anzubieten. Die Gründe dafür sind
 
 \begin{itemize}
-\item vereinfachte API: ein \phpinline{Query}-Objekt bietet ledigich die für seine Domain notwendigen Methoden an. Dadurch kann es auch nicht zur Formulierung von syntaktisch falschen Anfragen kommen.
+\item vereinfachte API: ein \phpinline{Query}-Objekt bietet lediglich die für seine Domain notwendigen Methoden an. Dadurch kann es auch nicht zur Formulierung von syntaktisch falschen Abfragen kommen.
 \item keine Abhängigkeit zu Doctrine DBAL: die Implementation der Methoden kann – wie am Anfang des Kapitels gezeigt - jederzeit gegen etwas anderes ausgetauscht werden.
 \end{itemize}
 
@@ -109,36 +122,36 @@ Zur Umsetzung wurde das \textit{Facade}-Entwurfsmuster angewendet. Hier stellt e
 
 \begin{figure}[H]
     \includegraphics[scale=0.5]{gfx/uml/FacadePattern.eps}
-    \caption{Schematischer Aufbau des Fassade-Entwurfsmuster}
+    \caption{Schematischer Aufbau des Fassade-Entwurfsmusters}
     \label{fig:facadePattern}
 \end{figure}
 
-Das folgende UML-Diagramm zeigt anhand der \phpinline{TruncateQuery}- und \phpinline{UpdateQuery}-Objekte die fertige Hierachie. Die Wurzel stellt das \phpinline{QueryInterface} dar, in dem alle Methoden festgelegt worden sind, die von allen \phpinline{Query}-Objekten implementiert werden müssen. Dadurch wird sichergestellt, dass jedes \phpinline{Query}-Objekt in Verbindung mit PreparedStatements verwendet werden kann und die Kenntnis darüber besitzt wie es in eine \gls{sql}-Anweisung konvertiert und ausgeführt werden kann. 
+Das folgende UML-Diagramm zeigt anhand der \phpinline{TruncateQuery}- und \phpinline{UpdateQuery}-Objekte die fertige Hierachie. Die Wurzel stellt das \phpinline{QueryInterface} dar, in dem alle Methoden festgelegt worden sind, die von allen \phpinline{Query}-Objekten implementiert werden müssen. Dadurch wird sichergestellt, dass jedes \phpinline{Query}-Objekt in Verbindung mit PreparedStatements verwendet werden kann und die Kenntnis darüber besitzt wie es in eine \gls{sql}-Abfrage konvertiert und ausgeführt werden kann.
 
-Das Interface wird von einem spezialisierten Interface erweitert, welche die Domain-spezifischen Methoden festlegt. So muß ein \phpinline{TruncateQuery} die Methoden \phpinline{truncate()}, \phpinline{getType()} und \phpinline{getSql()} implementieren. Die anderen vorgeschriebenen Methoden werden von der Klasse phpinline{AbstractQuery} implementiert, die von jeder \phpinline{Query}-Klasse erweitert wird.
+Das Interface wird um ein Interface erweitert, welches die Domain-spezifischen Methoden festlegt. So muß ein \phpinline{TruncateQuery} die Methoden \phpinline{truncate()}, \phpinline{getType()} und \phpinline{getSql()} implementieren. Die anderen vorgeschriebenen Methoden werden von der Klasse phpinline{AbstractQuery} implementiert, die von jeder \phpinline{Query}-Klasse erweitert wird.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.35]{gfx/uml/NewAPI/UpdateQuery.eps}
+    \includegraphics[scale=0.5, angle=90]{gfx/uml/NewAPI/UpdateQuery.eps}
     \caption{Aufbau der Query-API}
     \label{fig:newQueryAPI}
 \end{figure}
 
-Der Aufbau ist an die Implementation der Datenbank API von EzPublish angelehnt, die von Benjamin Eberlei eingeführt wurde.\footnote{\url{http://bit.ly/ezpublish-database-api}} Während die Erzeugung der \gls{sql}-Anweisungen innerhalb der EzPublish Datenbank API manuell erfolgt, delegieren die Methoden der \phpinline{Query}-Klassen des Prototypen den Aufruf an den \phpinline{QueryBuilder}.
+Der Aufbau ist an die Implementation der Datenbank API von EzPublish angelehnt, die von Benjamin Eberlei eingeführt wurde.\footnote{\url{http://bit.ly/ezpublish-database-api}} Während die Erzeugung der \gls{sql}-Abfragen innerhalb der EzPublish Datenbank API manuell erfolgt, delegieren die Methoden der \phpinline{Query}-Klassen des Prototypen den Aufruf an den \phpinline{QueryBuilder}.
 
 \begin{listing}[H]
 \begin{phpcode}
 public function update($table) {
   $this->queryBuilder->update($table);
-	
+
   return $this;
 }
 
 public function set($columns, $values) {
   $this->queryBuilder->set($columns, $values);
-  
+
   return $this;
-} 
+}
 
 public function where() {
   $constraints = func_get_args();
@@ -168,14 +181,14 @@ public function getSql() {
 Der Klasse \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatabaseConnection} wurden \phpinline{create*Query()}-Methoden hinzugefügt, die die Instantiierung eines \phpinline{Query}-Objekts vereinfachen.
 
 \begin{listing}[H]
-\begin{phpcode} 
+\begin{phpcode}
 public function createUpdateQuery() {
   if (!$this->isConnected) {
     $this->connectDatabase();
   }
 
   return GeneralUtility::makeInstance(
-  		  '\\Konafets\\DoctrineDbal\\Persistence\\Doctrine\\UpdateQuery', 
+  		  '\\Konafets\\DoctrineDbal\\Persistence\\Doctrine\\UpdateQuery',
   		  $this->link
   		);
 }
@@ -187,7 +200,7 @@ public function createUpdateQuery() {
 Nun konnte die Abhängigkeit zu Doctrine DBAL durch den direkten Aufruf des \phpinline{QueryBuilders} aus Listing~\ref{lst:createSqlByDirectCallToQueryBuilder} entfernt werden:
 
 \begin{listing}[H]
-\begin{phpcode} 
+\begin{phpcode}
 public function UpdateQuery(...) {
 ...
   $query = $this->createUpdateQuery()
@@ -202,7 +215,7 @@ public function UpdateQuery(...) {
 \label{}
 \end{listing}
 
-Zur Abstraktion der logischen Ausdrücke aus dem Codebeispiel~\ref{lst:resetStageOfElementsNewAPI} wurde die Klasse \phpinline{Expression} implementiert, die auch als Fassade vom der von Doctrine DBAL zur Verfügung gestellten \phpinline{ExpressionBuilder}. Das Namensschema folgt der Extbase-\gls{api}.
+Zur Abstraktion der logischen Ausdrücke aus dem Codebeispiel~\ref{lst:resetStageOfElementsNewAPI} wurde die Klasse \phpinline{Expression} implementiert, die ebenfalls eine Fassade darstellt - dieses Mal vor der Klasse \phpinline{\doctrine\DBAL\Query\ExpressionBuilder}. Das Namensschema folgt der Extbase-\gls{api}.
 
 \begin{figure}[H]
     \centering
@@ -213,19 +226,38 @@ Zur Abstraktion der logischen Ausdrücke aus dem Codebeispiel~\ref{lst:resetStag
 
 Die Query-API kann nun, wie es in Listing~\ref{lst:resetStageOfElementsNewAPI} gezeigt, verwendet werden.
 
-Anhand eines weiteren Beispiels aus dem Code von TYPO3 CMS soll die Migration der alten API auf die neue API unter Verwendung des \phpinline{UpdateQuery} gezeigt werden. Dazu wurde Code ausgewählt, welcher bei jedem Aufruf des Backends ausgeführt wird und somit gut testbar ist. Er befindet sich in der Datei\\ \pdf{typo3/sysext/core/Classes/Authentication/AbstractUserAuthentication.php} in der Methode \phpinline{fetchUserSession()}. Der Code aktualsiert die Session für den angemeldeten Backendbenutzer. Die erzeugte SQL-Anweisung sieht so aus:\\ \mysqlinline{UPDATE be_sessions SET ses_tstamp = '1400788819' WHERE ses_id='c2c75…' AND ses_name='be_typo_user'}. Die Werte in der \mysqlinline{WHERE}-Bedingung werden durch \phpinline{fullQuoteStr()} maskiert um SQL-Injections zu verhindern.
+Aus der Datei \pdf{typo3/sysext/core/Classes/Authentication/AbstractUserAuthentication.php} wurde die Methode \phpinline{fetchUserSession()} ausgewählt. An ihr soll die Migration der alten API auf die neue API unter Verwendung des \phpinline{UpdateQuery} gezeigt werden. Die Methode aktualisiert die Session für den angemeldeten Backendbenutzer und wird bei jedem Aufruf des Backends aufgerufen. Dadurch ist ist sehr gut überprüfbar, ob die Migration wie erwartet funktioniert. Die Methode erzeugt folgende SQL-Abfrage: \\
 
 \begin{listing}[H]
-\begin{phpcode} 
-public function fetchUserSession($skipSessionUpdate = FALSE) { 
-... 
+\begin{mysqlcode}
+UPDATE be_sessions
+SET ses_tstamp = '1400788819'
+WHERE ses_id='c2c75…'
+AND ses_name='be_typo_user'
+\end{mysqlcode}
+\caption{Die von fetchUserSession erzeugte SQL-Abfrage}
+\label{lst:fetchUserSqlQuery}
+\end{listing}
+
+Die Werte in der \mysqlinline{WHERE}-Bedingung werden durch \phpinline{fullQuoteStr()} maskiert, um SQL-Injections zu verhindern.
+
+\begin{listing}[H]
+\begin{phpcode}
+public function fetchUserSession($skipSessionUpdate = FALSE) {
+...
   if ($timeout > 0 && $GLOBALS['EXEC_TIME'] < $user['ses_tstamp'] + $timeout) {
     if (!$skipSessionUpdate) {
-    
+
 	  $this->db->exec_UPDATEquery(
-	    $this->session_table, 
-	    'ses_id=' . $this->db->fullQuoteStr($this->id, $this->session_table) . 
-	      ' AND ses_name=' . $this->db->fullQuoteStr($this->name, $this->session_table), 
+	    $this->session_table,
+	    'ses_id=' . $this->db->fullQuoteStr(
+	      $this->id,
+	      $this->session_table
+	    ) .
+	      ' AND ses_name=' . $this->db->fullQuoteStr(
+	        $this->name,
+	        $this->session_table
+	      ),
 	    array('ses_tstamp' => $GLOBALS['EXEC_TIME']));
 
 	  // Make sure that the timestamp is also updated in the array
@@ -243,10 +275,10 @@ public function fetchUserSession($skipSessionUpdate = FALSE) {
 \end{listing}
 
 
-Das folgende Listing zeigt dengleichen Code nach der Migration. Obwohl die Methoden bereits weiter oben vorgestellt wurden, soll hier auf die Verwendung eines \phpinline{FluentInterfaces} hingewiesen werden. Dies ermöglicht zum einen die Verkettung der Methoden und zum anderen eine lesbare API, bei der auf den ersten Blick der Kontext eines jeden Parameters anhand des Methodennamens deutlich wird. Realisiert werden \phpinline{Fluent Interface} durch die Zurückgabe des eigenen Objekts in der Methode mittels \phpinline{return $this}.
+Das folgende Listing zeigt den gleichen Code nach der Migration. Obwohl die Methoden bereits weiter oben vorgestellt wurden, soll hier auf die Verwendung eines \phpinline{FluentInterfaces} hingewiesen werden. Dies ermöglicht zum einen die Verkettung der Methoden und zum anderen eine lesbare API, bei der auf den ersten Blick der Kontext eines jeden Parameters anhand des Methodennamens deutlich wird. Realisiert werden \phpinline{Fluent Interface} durch die Zurückgabe des eigenen Objekts in der Methode mittels \phpinline{return $this}.
 
 \begin{listing}[H]
-\begin{phpcode} 
+\begin{phpcode}
  ...
   if ($timeout > 0 && $GLOBALS['EXEC_TIME'] < $user['ses_tstamp'] + $timeout) {
     if (!$skipSessionUpdate) {
@@ -270,10 +302,10 @@ Das folgende Listing zeigt dengleichen Code nach der Migration. Obwohl die Metho
 \label{lst:fetchUserSessionAfterMigration}
 \end{listing}
 
-Wie zu sehen ist, wurde die Maskierung auch hier manuell durch \phpinline{DatabaseConnection::quote()} vorgenommen. In Kapitel~\ref{basics:doctrine:subsubsec:preparedStatements} wurde auf die Gefahren von SQL-Injections hingewiesen und wie diese durch \textit{Prepared Statements} (siehe Kaptiel~\ref{basics:doctrine:subsubsec:preparedStatements}) verhindert werden können. Das nächste Listing zeigt wie diese mit der API genutzt werden können. 
+Auch hier wurde die Maskierung manuell durch \phpinline{DatabaseConnection::quote()} vorgenommen. In Kapitel~\ref{basics:doctrine:subsubsec:preparedStatements} wurde auf die Gefahren von SQL-Injections hingewiesen und wie diese durch Prepared Statements (siehe Kaptiel~\ref{basics:doctrine:subsubsec:preparedStatements}) verhindert werden können. Das nächste Listing zeigt wie diese mit der API genutzt werden können.
 
 \begin{listing}[H]
-\begin{phpcode} 
+\begin{phpcode}
 $query = $this->db->createUpdateQuery();
 $query->update($this->session_table)
   ->set('ses_tstamp', $GLOBALS['EXEC_TIME'])
@@ -288,8 +320,8 @@ $query->update($this->session_table)
 \end{listing}
 
 
-Die Methode \phpinline{quote()} wurde gegen \phpinline{bindValue(...)} ausgetauscht. Diese erzeugt einen \textit{Named Parameter} und bindet den Wert der Variablen an das \textit{PreparedStatement}-Objekt, dass sich in \phpinline{$query} befindet. Analog dazu existiert die Methode \phpinline{bindParam()}, die nach dem Vorbild der gleichnamigen Methode von Doctrine DBAL funktioniert. Die erzeugte SQL-Anfrage lautet:\\ \mysqlinline{UPDATE be_sessions SET ses_tstamp = 1400788396}\\ \mysqlinline{WHERE (ses_id = :placeholder1) AND (ses_name = :placeholder2)}.
+Die Methode \phpinline{quote()} wurde gegen \phpinline{bindValue(...)} ausgetauscht. Diese erzeugt einen \textit{Named Parameter} und bindet den Wert der Variablen an das \phpinline{PreparedStatement}-Objekt, das sich in \phpinline{$query} befindet. Analog dazu existiert die Methode \phpinline{bindParam()}, die nach dem Vorbild der gleichnamigen Methode von Doctrine DBAL funktioniert. Die erzeugte SQL-Abfrage lautet:\\ \mysqlinline{UPDATE be_sessions SET ses_tstamp = 1400788396}\\ \mysqlinline{WHERE (ses_id = :placeholder1) AND (ses_name = :placeholder2)}.
 
-Somit konnte auch die Benutzung von \textit{Prepared Statements} abstrahiert und vereinfacht werden. Es ist nun nicht mehr notwendig die Werte explizit an die SQL-Anweisung zu binden. Ein weiterer Schritt könnte eine grundsätzliche Erzeugung von \textit{Prepared Statements} sein, von der ein Nutzer der Datenbank API nichts mitbekommt. 
+Somit konnte auch die Benutzung von Prepared Statements abstrahiert und vereinfacht werden. Es ist nun nicht mehr notwendig, die Werte explizit an die SQL-Abfrage zu binden. Ein weiterer Schritt könnte eine grundsätzliche Erzeugung von Prepared Statements sein, von der ein Nutzer der Datenbank API nichts mitbekommt.
 
-Für einfache SQL-Abfragen empfielt das Doctrine Projekt die Benutzung der Methoden \phpinline{\Doctrine\DBAL\Connection\delete()}, \phpinline{\Doctrine\DBAL\Connection\update()} und \phpinline{\Doctrine\DBAL\Connection\insert()}, die intern \textit{Prepared Statements} mit \textit{Positional Parametern} erzeugen. Zur Nutzung dieser Methoden wurden in der Klasse \phpinline{\Konafets\DoctrineDbal\Persistence\Doctrine\DatabaseConnection} die Methoden gleichen Namens implementiert, die die Anfrage direkt an die Doctrine Methoden weiterreichen. Die neuimplementierten Methoden \phpinline{executeDeleteQuery()}, \phpinline{executeInsertQuery()}, \phpinline{executeUpdateQuery()} verfolgen ebenfalls diesen Ansatz, wurden jedoch als Ersatz zu den \phpinline{exec_*}-Methoden der alten API konzipiert. Diese konnten jedoch ohne tiefergreifende Eingriffe in den Code von TYPO3 CMS nicht verwendet werden, da der aufrufende Code von \phpinline{exec_*}-Methoden ein \phpinline{PDOStatement}-Objekt erwartet, welches für weitere Funktionen wie \phpinline{$GLOBALS['TYPO3_DB']->sql_num_rows($res)} genutzt wird. Die Doctrine Methoden geben jedoch lediglich die Anzahl der veränderten Zeilen zurück - was im Grunde genau der Wert ist, der durch den Aufruf von \phpinline{sql_num_rows()} erwartet wird.
+Für einfache SQL-Abfragen empfielt das Doctrine Projekt die Benutzung der Methoden \phpinline{\Doctrine\DBAL\Connection\delete()}, \phpinline{\Doctrine\DBAL\Connection\update()} und\\ \phpinline{\Doctrine\DBAL\Connection\insert()}, die intern Prepared Statements mit \textit{Positional Parametern} erzeugen. In der neuen Datenbank API wurden Methoden gleichen Namens implementiert, die die Abfrage direkt an die Doctrine Methoden weiterreichen. Die neuimplementierten Methoden \phpinline{executeDeleteQuery()}, \phpinline{executeInsertQuery()} und\\ \phpinline{executeUpdateQuery()} verfolgen ebenfalls diesen Ansatz, wurden jedoch als Ersatz zu den \phpinline{exec_*}-Methoden der alten API konzipiert. Diese konnten jedoch ohne tiefergreifende Eingriffe in den Code von TYPO3 CMS nicht verwendet werden, da der aufrufende Code von \phpinline{exec_*}-Methoden ein \phpinline{PDOStatement}-Objekt erwartet, welches für weitere Funktionen wie \phpinline{$GLOBALS['TYPO3_DB']->sql_num_rows($res)} genutzt wird. Die Doctrine Methoden geben jedoch lediglich die Anzahl der veränderten Zeilen zurück - was im Grunde genau der Wert ist, der durch den Aufruf von \phpinline{sql_num_rows()} erwartet wird.

@@ -1,0 +1,13 @@
+@startuml
+set namespaceSeparator none
+hide empty members
+hide empty methods
+
+interface Doctrine.DBAL.Driver.Statement
+class Doctrine.DBAL.Driver.PDOStatement 
+
+class Doctrine.DBAL.Driver.PDOStatement extends PDOStatement
+class Doctrine.DBAL.Driver.PDOStatement implements Doctrine.DBAL.Driver.Statement
+
+class PDOStatement implements Traversable
+@enduml

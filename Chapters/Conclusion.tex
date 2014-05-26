@@ -3,11 +3,23 @@
 % Autor    : Stefano Kowalke <blueduck@gmx.net>
 % Lizenz   : BSD
 %-----------------------------------------------
-\chapter{Fazit und Ausblick}
+\pdfbookmark[1]{Fazit}{Fazit}
+\begingroup
+\let\clearpage\relax
+\let\cleardoublepage\relax
+\let\cleardoublepage\relax
+
+\chapter*{Fazit}
 \label{ch:conclusion}
-In dieser Arbeit wurde die Frage aufgeworfen, ob Doctrine DBAL in TYPO3 CMS integrierbar ist. Dies kann durch den implementierten Prototyp durchweg positiv beantwortet werden. Es wurde gezeigt, dass Änderungen am Code von TYPO3 CMS lediglich das \textit{Install Tool} betrafen, jedoch die Kompatibilität zu der nativen Datenbank API gewahrt bleiben. Dagegen konnte die Abhängigkeit zu MySQL aufgehoben werden.
+In der Thesis wurden die Fragen nach der Intergrierbarkeit von Doctrine DBAL in TYPO3 CMS bei gleichzeitiger Beibehaltung der Kompatibilität zu der existierenden Datenbank API aufgeworfen. Der zu diesem Zweck erstellte Prototyp hat die Machbarkeit bewiesen. Es konnte gezeigt werden, dass Doctrine DBAL auf unterschiedlichen Ebenen integrierbar ist. Angefangen bei der Erstellung der Verbindung zur Datenbank über die Nutzung des Query Builders zur Generierung der SQL-Abfragen bis hin zur Implementation einer abstrakten Abfragesprache. Die Möglichkeit der tranparenten Nutzung von Prepared Statements runden dies ab.
 
-Dadurch ist die schrittweise Migration von der nativen API zu der neuen API möglich.
+Zur Integration des Prototypen musste lediglich das \textit{Install Tool} angepasst werden, während die Codebasis von TYPO3 CMS von den Umbaumaßnahmen nicht betroffen war. Aufgrund der gewählten Architektur des Prototypen kann TYPO3 CMS jedoch Schritt für Schritt auf die neue Datenbank API migriert werden.
 
-Der Autor bekam die Gelegenheit den implementierten Prototypen im Rahmen des halbjährlichen Treffen, der TYPO3 CMS Kernentwickler zu präsentieren. Dabei wurde die Umsetzung durchweg positiv aufgenommen und eine mögliche Integration in TYPO3 CMS in Aussicht gestellt. Mindestens zwei Kernentwickler haben dem Autor ihr Interesse an einer weiteren Zusammenarbeit ausgedrückt, bei der die Weiterentwicklung des Prototypen zu dem Nachfolger der Systemextension \textit{DBAL} und der aktuellen Datenbank API im Fokus steht.
+\vfill
 
+\chapter{Ausblick}
+\label{ch:outlook}
+Der implementierte Prototyp konnte im Rahmen des halbjährlichen Treffen, der TYPO3 CMS Kernentwickler präsentieren werden. Dabei wurde die Umsetzung durchweg positiv aufgenommen und eine mögliche Integration in TYPO3 CMS in Aussicht gestellt.\footnote{\url{http://typo3.org/news/article/typo3-cms-active-contributors-meeting-2014/}} Mindestens zwei Kernentwickler haben dem Autor ihr Interesse an einer weiteren Zusammenarbeit ausgedrückt, bei der die Weiterentwicklung des Prototypen zu dem Nachfolger der Systemextension \textit{DBAL} und der aktuellen Datenbank API im Fokus steht.
+
+\endgroup
+\vfill

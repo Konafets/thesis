@@ -155,3 +155,4 @@ Session.vim
 
 *.project.vim
 Bib/Zotero/Exportierte Einträge
+.latexmkrc

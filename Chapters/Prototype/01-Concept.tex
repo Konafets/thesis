@@ -8,22 +8,23 @@
 Bevor mit der Implementierung des Prototyps begonnen werden konnte, wurden die zu erreichenden Ziele definiert.
 
 \begin{itemize}
-\item Der Prototyp erhält den Extensionkey \textit{doctrine\_dbal}.
-\item  Der Prototyp ist eine normale Extension, die über das \textit{Install Tool} installierbar ist. Dies ist notwendig, da bereits bei der Installation das zu nutzende \gls{dbms} auswählbar sein muß. Er ist gegenfalls ohne größeren Aufwand in eine Systemextension umwandelbar.
+\item  Der Prototyp ist eine normale Extension, die über das \textit{Install Tool} installierbar ist. Dies ist notwendig, da bereits bei der Installation das zu nutzende \gls{dbms} auswählbar sein muß. Er ist gegebenenfalls ohne größeren Aufwand in eine Systemextension umwandelbar.
 \item Der Prototyp unterstützt die alte Datenbank \gls{api}, damit TYPO3 CMS und externe Extensions weiterhin funktionieren.
 \item Der Prototyp unterstützt MySQL als \gls{dbms}.
-\item Die Methodennamen der neuen \gls{api} folgen den TYPO3 \gls{cgl}.
-\item Die Erstellung der Basisdatenbank erfolgt durch Doctrine DBAL und nutzt dessen abstaktes Datenbankschema.
-\item Der Prototyp nutzt intern \textit{Prepared Statements}.
-\item Der Prototyp führt eine \textit{Fluent Query Language} ein, damit auf die manuelle Formulierung von SQL Anfragen verzichtet werden kann.
+\item Die Methodennamen der neuen \gls{api} folgen den TYPO3 \gls{cgl}. Dazu muss eine Übersicht angefertigt werden, die die neuen Namen den alten Namen gegenüberstellt. Diese befindet sich im Anhang.
+\item Die Erstellung der Basisdatenbank erfolgt durch Doctrine DBAL und nutzt dessen abstraktes Datenbankschema.
+\item Der Prototyp nutzt intern Prepared Statements.
+\item Der Prototyp führt eine \textit{Fluent Query Language} ein, damit auf die manuelle Formulierung von SQL Abfragen verzichtet werden kann.
 \end{itemize}
+
+\newpage
 
 Diese Anforderungen konnten anschließend in einzelne Teilaufgaben zusammengefasst werden:
 
 \begin{enumerate}
 \item Erhöhung der Testabdeckung der vorhandenen Datenbank \gls{api}
-\item Erstellen der Grundstrukutur des Prototypen
-\item Integration in das \phpinline{Install Tool}
+\item Erstellen der Grundstruktur des Prototypen
+\item Integration in das \textit{Install Tool}
 \item Implementation einer Fluent \gls{api}
 \item Umbau von TYPO3 CMS auf die \gls{api} des Prototypen
 \end{enumerate}

@@ -30,7 +30,7 @@ Wie aus Abbildung~\ref{fig:doctrineArchitecture} ersichtlich wird, ist Doctrine 
 	Ein ORM ist eine Abstraktionsschicht zwischen relationaler Datenbank und der eigentlichen Anwendung. Statt per SQL kann man durch das ORM objektorientiert auf die Daten zugreifen.
 \end{shadequote}
 
-Das folgende Anwendungsbeispiel zeigt eine typische Situation. Es soll ein neuer Student in die Datenbank der Hochschule eingefügt werden. Im ersten Codelisting wird die Aufgabe auf dem herkömmlichen Weg gelöst. Dabei wird die Anfrage an eine MySQL und PostgreSQL Datenbank gesendet. Die Variable \phpinline{$connection} enthält je eine initialisierte Verbindung zur entsprechenden Datenbank.
+Das folgende Anwendungsbeispiel zeigt eine typische Situation. Es soll ein neuer Student in die Datenbank der Hochschule eingefügt werden. Im ersten Codelisting wird die Aufgabe auf dem herkömmlichen Weg gelöst. Dabei wird die Abfrage an eine MySQL und PostgreSQL Datenbank gesendet. Die Variable \phpinline{$connection} enthält je eine initialisierte Verbindung zur entsprechenden Datenbank.
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -70,7 +70,7 @@ $entityManager->flush();
 
 Der Code in Listing~\ref{lst:orm} gibt keinen Rückschluss auf die darunter liegende Datenbank. Die Daten des Studenten könnten in eine CSV-Datei, einer MySQL oder Postgres Datenbank gespeichert worden sein. Hingegen wurden in Listing~\ref{lst:withoutOrm} zwei verschiedene Methoden genutzt, um die Daten in eine MySQL und Postgres Datenbank zu schreiben. Die Speicherung in eine Textdatei wurde dabei nicht berücksichtigt.
 
-Doctrine ORM ist für die Umwandlung des \phpinline{$student}-Objekt, in eine \gls{sql}-Abfrage zuständig. Die erzeugte Abfrage ist mit der aus Listing~\ref{lst:withoutOrm} vergleichbar. Die Konvertierung der Anfrage in die verschiedenen \gls{glos:sqlDialect} erfolgt durch Doctrine DBAL.
+Doctrine ORM ist für die Umwandlung des \phpinline{$student}-Objekt, in eine \gls{sql}-Abfrage zuständig. Die erzeugte Abfrage ist mit der aus Listing~\ref{lst:withoutOrm} vergleichbar. Die Konvertierung der Abfrage in die verschiedenen \gls{glos:sqlDialect} erfolgt durch Doctrine DBAL.
 
 \subsection{DBAL}
 \label{basics:doctrine:subsec:dbal}
@@ -135,7 +135,7 @@ CREATE TABLE `be_users` (
 	KEY `be_users_username` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 \end{mysqlcode}
-\caption{Das erstellte Schema als MySQL Anfrage}
+\caption{Das erstellte Schema als MySQL Abfrage}
 \label{lst:mysqlFromSchema}
 \end{listing}
 
@@ -294,7 +294,7 @@ Anhand des angegebenen Wertes in \phpinline{'driver'} wählt Doctrine den entspr
 
 Über den zweiten Parameter \phpinline{$config} kann eine Konfiguration an Doctrine DBAL übergeben werden. Außerdem ist es möglich ein \phpinline{Logger}-Objekt zu definieren, welches über dieses Objekt in Doctrine DBAL injiziert wird.
 
-\subsubsection{Einfache Datenbankanfragen}
+\subsubsection{Einfache Datenbankabfragen}
 \label{basics:doctrine:subsubsec:simpleDatabaseQueries}
 
 Im Folgenden wird die Verwendung von Doctrine DBAL an einfachen Beispielen erläutert. Als Grundlage der Abfragen und Ergebnisse dient eine Datenbank mit der folgenden Tabelle. Um die Beispiele einfach zu halten wurde auf eine korrekte Normalisierung der Tabelle, bei der die letzte Spalte in eine eigene Tabelle überführt und per Fremdschlüssel referenziert wird, verzichtet.
@@ -339,7 +339,7 @@ while($row = pg_fetch_assoc($result)) {
 \label{lst:externalFetchAssocMethods}
 \end{listing}
 
-In Doctrine DBAL enthält \phpinline{Doctrine\DBAL\Connection} die Verbindung zur Datenbank. Um eine Anfrage an die Datenbank zu senden, bietet die Klasse die Methode \phpinline{query()} an. Die Methode gibt ein Objekt vom Typ \phpinline{Doctrine\DBAL\Statement} zurück, dass das \phpinline{IteratorAggregate} Interface implementiert. Dadurch kann über das Objekt mittels einer \phpinline{foreach}-Schleife iteriert werden.
+In Doctrine DBAL enthält \phpinline{Doctrine\DBAL\Connection} die Verbindung zur Datenbank. Um eine Abfrage an die Datenbank zu senden, bietet die Klasse die Methode \phpinline{query()} an. Die Methode gibt ein Objekt vom Typ \phpinline{Doctrine\DBAL\Statement} zurück, dass das \phpinline{IteratorAggregate} Interface implementiert. Dadurch kann über das Objekt mittels einer \phpinline{foreach}-Schleife iteriert werden.
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -417,7 +417,7 @@ In \gls{pdo} existiert für jede Fetch-Methode aus der traditionellen Datenbankp
 	\item \phpinline{PDO::FETCH_ROW} = \phpinline{*_fetch_row()}
 \end{itemize}
 
-Über das \phpinline{Doctrine\DBAL\Statement}\footnote{Leider ist der Begriff dieser Klasse etwas unglücklich gewählt oder es ist ein Designfehler von \gls{pdo}, denn ein Objekt dieser Klasse repräsentiert zum einen ein (Prepared) Statement und, nachdem die Anfrage ausgeführt wurde, die Ergebnisrelation. Die Methoden der Klasse agieren somit einmal auf dem Statement und einmal auf dem Ergebnis. Dies widerspricht dem Konzept in der Objekt-orientierten Programmierung, dass eine Klasse nur eine Verantwortlichkeit (engl. Single Responsibility Principle) haben darf. (vgl. \cite[S. 181]{book:martinCleanCode2008})} werden weitere Möglichkeiten wie die Methoden \phpinline{Doctrine\DBAL\Statement::fetch()} und \phpinline{Doctrine\DBAL\Statement::fetchAll()} angeboten, um das Ergebnis zu erhalten.
+Über das \phpinline{Doctrine\DBAL\Statement}\footnote{Leider ist der Begriff dieser Klasse etwas unglücklich gewählt oder es ist ein Designfehler von \gls{pdo}, denn ein Objekt dieser Klasse repräsentiert zum einen ein (Prepared) Statement und, nachdem die Abfrage ausgeführt wurde, die Ergebnisrelation. Die Methoden der Klasse agieren somit einmal auf dem Statement und einmal auf dem Ergebnis. Dies widerspricht dem Konzept in der Objekt-orientierten Programmierung, dass eine Klasse nur eine Verantwortlichkeit (engl. Single Responsibility Principle) haben darf. (vgl. \cite[S. 181]{book:martinCleanCode2008})} werden weitere Möglichkeiten wie die Methoden \phpinline{Doctrine\DBAL\Statement::fetch()} und \phpinline{Doctrine\DBAL\Statement::fetchAll()} angeboten, um das Ergebnis zu erhalten.
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -437,14 +437,14 @@ Prepared Statements wurden bereits von der Datenbankerweiterung MySQLi eingefüh
 
 Prepared Statements stellen normalen \gls{sql}-Code dar, bei dem die variablen Teile durch Platzhalter ersetzt wurden. Sie können als eine Vorlage für \gls{sql}-Abfragen verstanden werden, die mit verschiedenen Werten immer wieder ausgeführt werden sollen.
 
-Ein Prepared Statement wird zunächst an die Datenbank gesendet, wo der \gls{sql}-Parser die Struktur des Templates einmalig analysieren und vorkompiliert im Cache speichern kann. In einer zweiten Anfrage werden der Datenbank die Werte übermittelt, die bei jedem erneuten Aufruf vom Parser anstelle der Platzhalter eingesetzt werden. Dies macht zum einen die Ausführung der Anfrage schneller (vgl. \cite[S. 75]{book:popel2007pdo}) und erhöht zudem die Sicherheit, da es \gls{sql}-Injections nahezu unmöglich macht. Mehr zu \gls{sql}-Injections in Kapitel~\ref{basics:doctrine:subsubsec:sqlInjections}.
+Ein Prepared Statement wird zunächst an die Datenbank gesendet, wo der \gls{sql}-Parser die Struktur des Templates einmalig analysieren und vorkompiliert im Cache speichern kann. In einer zweiten Abfrage werden der Datenbank die Werte übermittelt, die bei jedem erneuten Aufruf vom Parser anstelle der Platzhalter eingesetzt werden. Dies macht zum einen die Ausführung der Abfrage schneller (vgl. \cite[S. 75]{book:popel2007pdo}) und erhöht zudem die Sicherheit, da es \gls{sql}-Injections nahezu unmöglich macht. Mehr zu \gls{sql}-Injections in Kapitel~\ref{basics:doctrine:subsubsec:sqlInjections}.
 
 Zur Demonstration soll je ein Codebeispiel dienen. Dabei werden neue Studierende in die oben gezeigte Datenbanktabelle eingefügt. Der sprechende Hut\footnote{\url{http://de.harry-potter.wikia.com/wiki/Sprechender_Hut}} hat bereits über die Häuser der Neuzugänge entschieden.
 
 Die Daten der Studierenden liegen in einem assoziativen Array vor und können somit über eine \phpinline{foreach}-Schleife durchmustert werden. Pro Schleifendurchlauf wird ein Studierender der Datenbank hinzugefügt. Die Werte werden durch\\
 \phpinline{Doctrine\DBAL\Connection::quote()} maskiert, um \gls{sql}-Injections zu unterbinden.
 
-In Listing~\ref{lst:lst:insertWithoutPreparedStatement} wird bei jedem Durchlauf eine neue Abfrage mit den aktuellen Daten erzeugt und an die Datenbank geschickt. Für diese wiederkehrende Aufgabe bietet sich die Benutzung von Prepared Statements an, da pro Iteration lediglich die Werte angepasst werden müssen.
+In Listing~\ref{lst:insertWithoutPreparedStatement} wird bei jedem Durchlauf eine neue Abfrage mit den aktuellen Daten erzeugt und an die Datenbank geschickt. Für diese wiederkehrende Aufgabe bietet sich die Benutzung von Prepared Statements an, da pro Iteration lediglich die Werte angepasst werden müssen.
 
 \begin{listing}[H]
 \begin{phpcode}
@@ -619,17 +619,17 @@ Dieser Code beinhaltet zwei Fehler:
 
 Im Falle einer leeren Variable, sähe die Abfrage so aus:\\ \phpinline{'SELECT * FROM students WHERE last_name = '}.
 
-Im besten Fall gibt sie eine leere Ergebnismenge zurück, im schlechtesten einen Fehler. Dieses Problem ist leicht zu lösen, indem zum einen auf die Existenz der Variablen geprüft wird und zum anderen, ob sie einen Wert enthält. Zusätzlich sollte noch auf den Datentyp des enthaltenen Wertes geprüft werden. Erst dann wird die Anfrage abgesetzt.
+Im besten Fall gibt sie eine leere Ergebnismenge zurück, im schlechtesten einen Fehler. Dieses Problem ist leicht zu lösen, indem zum einen auf die Existenz der Variablen geprüft wird und zum anderen, ob sie einen Wert enthält. Zusätzlich sollte noch auf den Datentyp des enthaltenen Wertes geprüft werden. Erst dann wird die Abfrage abgesetzt.
 
 Da die Eingabe nicht maskiert wird, interpretiert der \gls{sql}-Parser einige Zeichen als Steuerzeichen der \gls{sql}-Syntax. Beispiele solcher Zeichen sind das Semikolon (\pdf{;}), der Apostroph (\pdf{'}), der Backslash (\pdf{\textbackslash}) oder zwei Minuszeichen (\pdf{--}).
 
-Selbst ein Websitebesucher ohne kriminelle Absichten könnte mit der Suche nach einem Studenten mit dem Namen \textit{O'Hara} die \gls{sql}-Injection auslösen. Die in diesem Fall an die Datenbank gesendete \gls{sql}-Abfrage \phpinline{'SELECT * FROM students WHERE last_name = 'O'Hara';} würde wohl einen Fehler auslösen, da der Parser die Anfrage nach dem \textit{O} anhand des Apostroph als beendet interpretiert und \phpinline{Hara} kein gültiges Sprachkonstrukt von \gls{sql} darstellt.
+Selbst ein Websitebesucher ohne kriminelle Absichten könnte mit der Suche nach einem Studenten mit dem Namen \textit{O'Hara} die \gls{sql}-Injection auslösen. Die in diesem Fall an die Datenbank gesendete \gls{sql}-Abfrage \phpinline{'SELECT * FROM students WHERE last_name = 'O'Hara';} würde wohl einen Fehler auslösen, da der Parser die Abfrage nach dem \textit{O} anhand des Apostroph als beendet interpretiert und \phpinline{Hara} kein gültiges Sprachkonstrukt von \gls{sql} darstellt.
 
 Ein Angreifer könnte hingegen die Eingabe in das Formular nach \mysqlinline{' or '1'='1} verändern. Damit würde sich diese Abfrage\\ \mysqlinline{'SELECT * FROM students WHERE last_name = '' or '1'='1';} ergeben.
 
 Wird die Maskierung mit einer entsprechenden Prüfung von Benutzereingaben kombiniert, verhindert das die Gefahr von \gls{sql}-Injections – eine richtige Anwendung vorausgesetzt.
 
-Die an \phpinline{Doctrine\DBAL\Connection::query()} übergebenen \gls{sql}-Abfragen müssen durch \phpinline{Doctrine\DBAL\Connection::quote()} maskiert werden. Traditionell wird dafür die \gls{php}-Funktion \phpinline{addslashes()} oder die jeweiligen Maskierungsmethoden der \gls{dbms} verwendet. Werden Prepared Statements genutzt, müssen die Benutzereingaben trotzdem überprüft, jedoch nicht mehr maskiert werden. Dies übernimmt der \gls{sql}-Parser, der lediglich die Werte in das vorkompilierte Prepared Statement einsetzt. Wird dem Prepared Statement noch der Typ des Wertes mitgeteilt, kann das \gls{dbms} eine Typprüfung vornehmen und ggf. einen Fehler zurückgeben.
+Die an \phpinline{Doctrine\DBAL\Connection::query()} übergebenen \gls{sql}-Abfragen müssen durch \phpinline{Doctrine\DBAL\Connection::quote()} maskiert werden. Traditionell wird dafür die\\ PHP-Funktion \phpinline{addslashes()} oder die jeweiligen Maskierungsmethoden der \gls{dbms} verwendet. Werden Prepared Statements genutzt, müssen die Benutzereingaben trotzdem überprüft, jedoch nicht mehr maskiert werden. Dies übernimmt der \gls{sql}-Parser, der lediglich die Werte in das vorkompilierte Prepared Statement einsetzt. Wird dem Prepared Statement noch der Typ des Wertes mitgeteilt, kann das \gls{dbms} eine Typprüfung vornehmen und ggf. einen Fehler zurückgeben.
 
 \subsubsection{Limitierungen}
 \label{basics:doctrine:subsubsec:limitsOfAbstraction}
@@ -647,7 +647,7 @@ INSERT INTO students SET last_name='Kowalke', first_name='Stefano';
 \label{lst:notPortableSQL}
 \end{listing}
 
-Stattdessen muss die Anfrage so nah wie möglich am Standard gestellt werden, um als portabel zu gelten.
+Stattdessen muss die Abfrage so nah wie möglich am Standard gestellt werden, um als portabel zu gelten.
 
 \begin{listing}[H]
 \begin{mysqlcode}

@@ -18,7 +18,6 @@
 % Hier fängt der eigentliche Inhalt an
 %--------------------------------------
 \begin{document}
-	%\layout
 	\frontmatter
 		\include{FrontBackmatter/Titlepage}
 		\include{FrontBackmatter/Colophon}
@@ -31,11 +30,16 @@
 		\vspace*{\fill}
 		\begin{verse}
 			\centering
-			``War is peace.\\
-			Freedom is slavery.\\
-			Ignorance is strength.''
+			``'The Babel fish,' said The Hitchhiker's Guide to the Galaxy quietly, 'is small, yellow and leech-like, and probably the oddest thing in the Universe.\\
+			...\\
+			The practical upshot of all this is that if you stick a Babel fish in your ear you can instantly understand anything in any form of language.'''
 
-			– George Orwell, 1984
+			– Douglas Adams, The Hitchhiker's Guide to the Galaxy
+			%``War is peace.\\
+			%Freedom is slavery.\\
+			%Ignorance is strength.''
+
+			%– George Orwell, 1984
 		\end{verse}
 		%\begin{quote}
 			%\hfill ``@WilliamShatner Yes, Standard Orbit, Captain. And we're detecting signs of life on the surface.''\\
@@ -56,11 +60,12 @@
 		\include{Chapters/Basics}
 		\include{Chapters/CurrentSituation}
 		\include{Chapters/Prototype}
-		\include{Chapters/Outlook}
+		%\include{Chapters/Outlook}
 	\backmatter
 		\include{Chapters/Conclusion}
 	\appendix
 		\printbibliography[title={Quellenverzeichnis}]
+		\includepdfset{pagecommand={\thispagestyle{headings}}}
 		% Print glossar
 		\printglossary[type=main,title=Glossar,toctitle=Glossar,style=altlist]
 		% Print Akronyms
@@ -68,6 +73,7 @@
 		\listoftables
 		\listoffigures
 		\listoflistings
+		\includepdf[pages={1,2}, addtotoc={1,chapter,0,Tabelle alte API Methoden - neue Methoden,chap:int},  scale=0.9]{Bib/Functions.pdf}
 		\include{FrontBackmatter/Statement}
 		% Glossaries und Akronyme kommen hier hin oder ins Frontmatter
 \end{document}

@@ -13,14 +13,15 @@
 	parskip     = full,           % Steuert die Absätze. http://www.rrzn.uni-hannover.de/fileadmin/kurse/material/latex/scrguide.pdf Tabelle 3.7
 	headsepline,                  % Fügt eine Trennungslinie in den Seitenkopf
 	footnotes   = multiple,       % Fügt ein Komma zwischen den Indexzahlen bei aufeinanderfolgende Fußnoten ein
-	numbers     = noendperiod     % Keinen Punkt der letzten Gliederungsebene in der Überschrift  -> 1.2.1 statt 1.2.1.
+	numbers     = noendperiod,    % Keinen Punkt der letzten Gliederungsebene in der Überschrift  -> 1.2.1 statt 1.2.1
+	BCOR = 20mm
 ]{scrbook}
 
 %\includeonly{Chapters/Doctrine}
 %\includeonly{Chapters/Basics,FrontBackmatter/Definitions}
 \PassOptionsToPackage{
     %layout,
-    drafting,
+    %drafting,
     eulerchapternumbers,
     eulermath,
     colophon,
@@ -60,7 +61,7 @@
 \makeglossaries                            % Anweisung das Glossar zu erstellen
 
 \newfontfamily\quotefont[Ligatures=TeX]{Palatino} % The font for the quotation marks at a quote
-
+\usepackage{pdfpages}
 \usepackage{chronosys} % Creates timelines
 \usepackage{fancyvrb}  % Improved Verbatim environments
 \usepackage{longtable} % Spread tables over multiple pages
@@ -73,7 +74,7 @@
 %\newcommand{\mySubtitle}{Put your subtitle here\xspace}
 %\newcommand{\myDegree}{Put your degree here\xspace}
 \newcommand{\myName}{Stefan Kowalke\xspace}
-\newcommand{\myEMail}{<stefan.kowalke@stud.fh-flensburg.de>\xspace}
+\newcommand{\myEMail}{<blueduck@gmx.net>\xspace}
 \newcommand{\myMatricleNumber}{485366\xspace}
 \newcommand{\myProf}{Prof. Dr. Hans-Werner Lang\xspace}
 \newcommand{\myOtherProf}{Dipl. VK Tobias Hiep\xspace}
@@ -85,7 +86,6 @@
 \newcommand{\myLocation}{Flensburg\xspace}
 \newcommand{\myTime}{März 2014\xspace}
 %\newcommand{\myVersion}{version 4.1\xspace}
-
 
 %----------------
 % Renew commands

@@ -3,79 +3,114 @@
 % Autor    : Stefano Kowalke <blueduck@gmx.net>
 % Lizenz   : BSD
 %-----------------------------------------------
-\section{Aktuelle Situation}
+\chapter{Aktuelle Situation}
 \label{sec:currentSituation}
-In Kapitel~\ref{basics:typo3:subsubsec:coreAndApi} wurde bereits darauf hingewiesen, dass TYPO3 CMS eine einheitliche Datenbank API anbietet. Diese wird durch die Klasse \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} bereitgestellt und ist über die globale Variable \phpinline{$GLOBALS['TYPO3_DB']} verfügbar. Sie bietet Methoden zum lesenden und schreibenden Zugriff auf die Datenbank an.
+\section{Die native Datenbank API}
+n Kapitel~\ref{basics:typo3:subsubsec:coreAndApi} wurde bereits darauf hingewiesen, dass die einheitliche Datenbank API von der Klasse \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} bereitgestellt wird. Über die globale Variable \phpinline{$GLOBALS['TYPO3_DB']} kann darauf zugegriffen werden.
 
-\begin{listing}
+\begin{listing}[H]
 	\begin{phpcode}
 $GLOBALS['TYPO3_DB']->exec_UPDATEquery(
   $this->user_table,
   $this->userid_column . '=' .
-    $this->db->fullQuoteStr($tempuser[$this->userid_column], $this->user_table),
+    $this->db->fullQuoteStr(
+      $tempuser[$this->userid_column],
+      $this->user_table
+    ),
   array($this->lastLogin_column => $GLOBALS['EXEC_TIME'])
 );
 
 	\end{phpcode}
-	\caption{Aktualisierung des Zeitpunkt des letzten Logins}
+	\caption{Aktualisierung des Zeitpunkts des letzten Logins}
 	\label{lst:databaseOldExample}
 \end{listing}
 
-Durch die Nutzung der Datenbank API wird zum einen die Integrität der Daten sichergestellt und zum anderen die Nutzung der \gls{php}-Datenbankfunktionen abstrahiert. Somit kann die Implementation der Datenbank API-Methoden angepasst werden ohne die API selbst zu verändern. Die Umstellung von den MySQL- auf die MySQLi-Methoden ist ein Beispiel wurde auf diese Weise durchgeführt.\footnote{\url{http://bit.ly/typo3cms-switch-from-mysql-to-mysqli}}
+Durch die Nutzung der Datenbank API wird zum einen die Integrität der Daten sichergestellt und es werden die \gls{php}-Datenbankfunktionen abstrahiert. Somit kann die Implementation der API-Methoden angepasst werden, ohne die API selbst zu verändern. Auf diese Weise wurde die Umstellung von MySQL auf die MySQLi durchgeführt.\footnote{\url{http://bit.ly/typo3cms-switch-from-mysql-to-mysqli}}
 
-Die Datenbank API bietet eine Vielzahl an Methoden die sich in die folgenden fünf Gruppen einteilen lassen.
+Die Datenbank API bietet eine Vielzahl an Methoden, die sich in die folgenden fünf Gruppen einteilen lassen:
 
-Die erste Gruppe besteht aus Methoden, die anhand der übergebenen Parametern einen SQL-Query generieren. Damit werden die typischen CRUD-Operationen~\ref{ft:crud}) abgebildet.
+\begin{enumerate}
+	\item Methoden die SQL-Abfragen generieren
+	\item Methoden die SQL-Abfragen gegen die Datenbank ausführen
+	\item Methoden die auf der Ergebnismenge agieren
+	\item Administrative Methoden
+	\item Hilfsmethoden
+\end{enumerate}
+
+\newpage
+
+\subsection{Generierende Methoden}
+
+Die erste Gruppe besteht aus Methoden, die anhand der übergebenen Parameter einen SQL-Abfrage generieren. Damit werden die typischen CRUD-Operationen~\ref{ft:crud} abgebildet.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.65]{gfx/uml/DatabaseConnectionCreationMethods.eps}
-	\caption{DatenbankConnection mit den generierenden Methoden}
+	\caption{Methoden zum Erzeugen von SQL-Abfragen}
 	\label{fig:databaseConnectionWithSQLGenerationMethods}
 \end{figure}
 
-Folgendes Codebeispiel aus \phpinline{\TYPO3\CMS\Core\Authentication\AbstractUserAuthentication} zeigt die Funktionsweise von \phpinline{SELECTquery()}. Der Kommentar zeigt die generierte SQL-Query.
+Folgendes Codebeispiel aus \phpinline{\TYPO3\CMS\Core\Authentication\AbstractUserAuthentication} zeigt die Funktionsweise von \phpinline{SELECTquery()}. Der Kommentar zeigt die generierte SQL-Abfrage.
 
-\begin{listing}
+\begin{listing}[H]
 	\begin{phpcode}
 // DELETE FROM sys_file_reference WHERE tablenames='pages';
 $deleteQuery = $GLOBALS['TYPO3_DB']->DELETEquery(
     'sys_file_reference',
-    'tablenames=' . $GLOBALS['TYPO3_DB']->fullQuoteStr('pages', 'sys_file_reference')
+    'tablenames=' . $GLOBALS['TYPO3_DB']->fullQuoteStr(
+      'pages',
+      'sys_file_reference'
+    )
 );
 	\end{phpcode}
 	\caption{Löschen eines Datensatzes aus einer Tabelle}
 	\label{lst:databaseOldDeleteExample}
 \end{listing}
 
-Eine Ebene höher setzt die nächste Gruppe an, die die eben gezeigen Methoden nutzt und den generierten SQL-Query ausführt und eine Ergebnismenge vom Typ \phpinline{mysqli_result} zurückliefert.
+\subsection{Ausführende Methoden}
+Eine Ebene höher setzt die nächste Gruppe an, die die eben gezeigten Methoden nutzt, den generierten SQL-Abfrage ausführt und eine Ergebnismenge vom Typ \phpinline{mysqli_result} zurückliefert.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{gfx/uml/DatabaseConnectionExecuteMethods.eps}
-\caption{DatenbankConnection mit den ausführenden Methoden}
+\caption{Methoden zum Ausführen von SQL-Abfragen}
 \label{fig:databaseConnectionWithSQLExecutionMethods}
 \end{figure}
 
-In der dritte Gruppe befinden sich die Methoden, die im weitesten Sinn zur Verarbeitung der Ergebnismenge genutzt werden. Darunter fallen
+\newpage
+\subsection{Methoden zur Manipulation der Ergebnismenge}
+In der dritten Gruppe befinden sich die Methoden, die im weitesten Sinn zur Verarbeitung der Ergebnismenge genutzt werden. Darunter fallen
 
 \begin{itemize}
-	\item jene die die Daten aus der Ergebnismenge extrahieren
-	\item mie für die Fehlerbehandlung genutzt werden können,
-	\item sowie Methoden die Informationen über die Ergebnismenge breitstellen
+	\item jene, die die Daten aus der Ergebnismenge extrahieren,
+	\item die für die Fehlerbehandlung genutzt werden können,
+	\item sowie Methoden, die Informationen über die Ergebnismenge bereitstellen
 \end{itemize}
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.65]{gfx/uml/DatabaseConnectionFetchMethods.eps}
-\caption{DatenbankConnection: Methoden zur Verarbeitung der Ergebnismenge}
+\caption{Methoden zur Verarbeitung der Ergebnismenge}
 \label{fig:databaseConnectionWithResultsetsMethods}
 \end{figure}
 
-Die nächste Gruppe besteht aus Hilfsmethoden, die genutzt werden um
+
+\subsection{Administrative Methoden}
+Die nächste Gruppe besteht aus einer Reihe von Methoden, die verschiedene Metadaten über die Datenbank zur Verfügung stellen. Der Name impliziert, dass sie für Administrative Tätigkeiten genutzt werden, was jedoch irreführend ist. Sie werden hauptsächlich während der Installation vom \textit{Installation Tool} verwendet, um Informationen über die zugrundeliegende Datenbank zu erhalten
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{gfx/uml/DatabaseConnectionAdminMethods.eps}
+\caption{Administrativen Methoden}
+\label{fig:databaseConnectionWithSQLAdminMethods}
+\end{figure}
+
+\newpage
+\subsection{Hilfsmethoden}
+Die letzte Gruppe besteht  aus Hilfsmethoden, die genutzt werden um
 
 \begin{itemize}
-	\item einen SQL-Query an die Datenbank zu senden
+	\item einen SQL-Abfrage an die Datenbank zu senden
 	\item Benutzereingaben zu maskieren
 	\item Listen von Integern zu normalisieren
 	\item eine \phpinline{WHERE}-Bedingung aus Komma-separierten Datensätzen zu erzeugen
@@ -84,28 +119,13 @@ Die nächste Gruppe besteht aus Hilfsmethoden, die genutzt werden um
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.65]{gfx/uml/DatabaseConnectionHelperMethods.eps}
-\caption{DatenbankConnection: Hilfsmethoden}
+\caption{Hilfsmethoden}
 \label{fig:databaseConnectionWithHelperMethods}
 \end{figure}
 
-Die letzte Gruppe besteht aus einer Reihe von Methoden, die verschiedene Metadaten über die Datenbank zur Verfügung stellen. Der Name impliziert, dass sie für Administrative Tätigkeiten genutzt werden, was jedoch irreführend ist. Sie werden hauptsächlich während der Installation vom \textit{Installation Tool} verwendet, um Informationen über die zugrundeliegende Datenbank zu erhalten
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.7]{gfx/uml/DatabaseConnectionAdminMethods.eps}
-\caption{DatenbankConnection mit administrativen Methoden}
-\label{fig:databaseConnectionWithSQLAdminMethods}
-\end{figure}
-
-Aus historischen Gründen nutzt die Datenbank API die prozedualen MySQLi Funktionen anstelle der Objekt-orientierten API von MySQLi. Dadurch stellt\\ \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} kein Verbindungsobjekt dar - wie zum Beispiel \phpinline{PDO} - sondern eine Sammlung an Datenbankfunktionen. Dadurch gibt es auch kein Objekt, welches die Ergebnismenge repräsentiert, was \phpinline{\TYPO3\CMS\Core\Database\DatabaseConnection} zu einer recht große Klasse mit 1950 Zeilen Code und 76 Methoden.
-
-Im Gegensatz dazu steht die Anzahl von 40 UnitTests mit 49 Assertions für diese Klasse, die lediglich ein paar Hilfsmethoden testen. Es ist somit nicht sichergestellt, ob die Methoden das tun, was sie vorgeben zu tun. In den letzten Monaten wurde jedoch ein Framework für Funktionale Tests in TYPO3 CMS integriert, so dass die Methoden immerhin indirekt getest werden.
-
-[Und dass obwohl TYPO3 CMS mit aktuell 5527 Unit Tests und 8667 Assertions schon eine recht gute Testabdeckung hat 27\% der Dateien und 36\% der abgedeckten Zeilen]
-
-\subsection{Prepared Statements}
+\section{Prepared Statements}
 \label{currentsituationsubsec:preparedStatements}
-Seit TYPO3 CMS 4.5 können Prepared Statements für \mysqlinline{SELECT} Anweisungen verwendet werden. TYPO3 CMS unterstützt sowohl \textit{Posistional Parameters} wie auch \textit{Named Parameters}.
+Seit TYPO3 CMS 4.5 können Prepared Statements für \mysqlinline{SELECT} Abfragen verwendet werden. TYPO3 CMS unterstützt sowohl \textit{Posistional Parameters} wie auch \textit{Named Parameters}.
 
 \begin{listing}
 \begin{phpcode}
@@ -128,19 +148,19 @@ $statement->execute(array(':nickname' => 'goofy', ':status' => 'FIXED'));
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.75]{gfx/uml/PreparedStatement.eps}
-    \caption{Die Klasse PreparedStatement mit ausgewählen Methoden}
+    \caption{Die Klasse PreparedStatement mit ausgewählten Methoden}
     \label{fig:selectedMethodsOfPreparedStatements}
 \end{figure}
 
-\subsection{Datenbankschema}
+\section{Datenbankschema}
 \label{currentSituation:subsec:databaseSchema}
 Nach der Installation von TYPO3 CMS beinhaltet die Datenbank rund 60 einzelne Tabellen. Die Anzahl hängt von der Installation der optionalen Systemextensions ab.
 
 Wichtige Tabellen sind:
 \begin{itemize}
 	\item pages – Enthält die Seiten
-	\item tt\_content – Enthält die Inhaltselement, die auf den Seiten dargestellt werden
-	\item be\_groups / fe\_groups – Enhält die Backend- beziehungsweise die Frontendgruppen
+	\item tt\_content – Enthält die Inhaltselemente, die auf den Seiten dargestellt werden
+	\item be\_groups / fe\_groups – Enthält die Backend- beziehungsweise die Nutzergruppen
 	\item be\_users / fe\_users – enthält die Backend- beziehungsweise die Frontendbenutzer
 \end{itemize}
 
@@ -153,7 +173,7 @@ Dazu kommen Tabellen
 
 Die Inhalte werden in TYPO3 CMS in einer Dateisystem ähnlichen Baumstruktur verwaltet. Eine Webseite wird darin durch einen Datensatz vom Typ \textit{Seite} repräsentiert. Dieser Datensatz hat eine ID, die im gleichnamigen Feld in der Tabelle \texttt{pages} gespeichert wird. Diese ist der \textit{Unique Identifier} des Datensatzes.
 
-Die Inhalte einer Webseite wie Texte, Bilder oder Formulare werden innerhalb einer Seite abgelegt. TYPO3 CMS bietet hierzu eine breite Palette von verschiedenen Elementen an. Zudem können Plugins und wiederum Seiten innerhalb eines Seitendatensatzes abgelegt werden. Diese Liste kann unbegrenzt fortgeführt werden, da jede Extension neue Elemente eingeführen kann, welches in einer Seite ablegbar sind. Es ist lediglich wichtig zu wissen, dass Datensätze innnerhalb von Seiten abgelegt werden können. Die Inhaltselemente werden hauptsächlich in der Tabelle \texttt{tt\_content} gespeichert beziehungsweise in den Tabellen, die die Extension vorsieht.
+Die Inhalte einer Webseite wie Texte, Bilder oder Formulare werden innerhalb einer Seite abgelegt. TYPO3 CMS bietet hierzu eine breite Palette von verschiedenen Elementen an. Zudem können Plugins und wiederum Seiten innerhalb eines Seitendatensatzes abgelegt werden. Diese Liste kann unbegrenzt fortgeführt werden, da jede Extension neue Elemente einführen kann, die in einer Seite ablegbar sind. Es ist lediglich wichtig zu wissen, dass Datensätze innerhalb von Seiten abgelegt werden können. Die Inhaltselemente werden hauptsächlich in der Tabelle \texttt{tt\_content} gespeichert beziehungsweise in den Tabellen, die die Extension vorsieht.
 
 \begin{figure}[H]
 	\centering
@@ -162,7 +182,7 @@ Die Inhalte einer Webseite wie Texte, Bilder oder Formulare werden innerhalb ein
 	\label{fig:pagesAndTTContent}
 \end{figure}
 
-Die Verknüpfung von Inhaltselement zu übergeordneter Seite erfolgt in der Datenbank über die Spalte \phpinline{pid} (PageID), in der die ID der übergeordneten Seite als Fremdschlüssel gespeichert wird. Listing~\ref{lst:getSubpages} zeigt die SQL-Abfrage, die alle Unterseiten einer Seite zurückgibt. Dabei hat die Seite, dessen Unterseiten abgefragt werden, die \texttt{uid} 4, die in die Abfrage eingesetzt wird. Die Anfrage lautet: Wähle alle Datensätze aus der Tabelle \texttt{pages}, die in der Spalte \texttt{pid} eine 4 stehen haben.
+Die Verknüpfung von Inhaltselement zu übergeordneter Seite erfolgt in der Datenbank über die Spalte \phpinline{pid} (PageID), in der die ID der übergeordneten Seite als Fremdschlüssel gespeichert wird. Listing~\ref{lst:getSubpages} zeigt die SQL-Abfrage, die alle Unterseiten einer Seite zurückgibt. Dabei hat die Seite, dessen Unterseiten abgefragt werden, die \texttt{uid} 4, die in die Abfrage eingesetzt wird. Die Abfrage lautet: Wähle alle Datensätze aus der Tabelle \texttt{pages}, die in der Spalte \texttt{pid} eine 4 stehen haben.
 
 \begin{listing}
 	\begin{phpcode}
@@ -172,7 +192,7 @@ SELECT * FROM pages WHERE pid=4 ORDER BY sorting
 	\label{lst:getSubpages}
 \end{listing}
 
-Analog zum vorigen Listing, zeigt das Folgende die SQL-Anfrage, die alle Inhaltselemente von der Datenbank abfragt.
+Analog zum vorigen Listing, zeigt das Folgende die SQL-Abfrage, die alle Inhaltselemente von der Datenbank abfragt.
 
 \begin{listing}
 	\begin{phpcode}
@@ -182,12 +202,12 @@ SELECT * FROM tt_content WHERE pid=4 ORDER BY sorting
 	\label{lst:getContentElements}
 \end{listing}
 
-Die beiden Abfragen geben alle Datensätze zurück, was in der Realität jedoch meistens nicht gewünscht ist. Zum Beispiel sollen keine gelöschten Datensätze angezeigt oder nicht alle Inhaltselemente ausgegeben werden. Datensätze werden in der Datenbank nicht gelöscht, sondern in der Spalte \textit{deleted} durch das setzen des Wertes auf 1 als gelöscht markiert. Inhaltselemente werden über die Spalte \texttt{CType} nach ihrem Typ gefiltert. Um das gewünschte Ergebnis zu erhalten müssen \mysqlinline{WHERE}-Klauseln formuliert werden, was die doch recht trivialen SQL-Anfragen schnell komplex werden lässt.
+Die beiden Abfragen geben alle Datensätze zurück, was in der Realität jedoch meistens nicht gewünscht ist. Zum Beispiel sollen keine gelöschten Datensätze angezeigt oder nicht alle Inhaltselemente ausgegeben werden. Datensätze werden in der Datenbank nicht gelöscht, sondern in der Spalte \textit{deleted} durch das setzen des Wertes auf 1 als gelöscht markiert. Inhaltselemente werden über die Spalte \texttt{CType} nach ihrem Typ gefiltert. Um das gewünschte Ergebnis zu erhalten müssen \mysqlinline{WHERE}-Klauseln formuliert werden, was die doch recht trivialen SQL-Abfragen schnell komplex werden lässt.
 
 In TYPO3 CMS können die Benutzerrechte sehr granular eingestellt werden. Die Einstellungen können per Benutzer oder Benutzergruppe vorgenommen werden.
 Dabei kann ein Benutzer Mitglied keiner, einer oder mehrerer Benutzergruppen sein. Zudem kann eine Benutzergruppe keinen, einen oder mehrere Benutzer enthalten. Dies stellt eine Many-to-Many-Relation dar.
 
-In der Datenbank wird die Zugehörigkeit von Benutzer <-> Gruppe von den Tabellen \texttt{fe\_users} und \texttt{fe\_groups} beziehungweise \texttt{be\_users} und \texttt{be\_groups} abgebildet.
+In der Datenbank wird die Zugehörigkeit von Benutzer zu Gruppe von den Tabellen \texttt{fe\_users} und \texttt{fe\_groups} beziehungsweise \texttt{be\_users} und \texttt{be\_groups} abgebildet.
 
 \begin{figure}[H]
 	\centering
@@ -196,23 +216,27 @@ In der Datenbank wird die Zugehörigkeit von Benutzer <-> Gruppe von den Tabelle
 	\label{fig:beUsersAndBeGroups}
 \end{figure}
 
-Hier fällt der Datentyp der Spalte \texttt{usergroup} auf, die ID der Gruppe des Benutzers speichert. Hier ist ein \mysqlinline{VARCHAR} definiert, obwohl die Spalte \texttt{uid} den Typ \mysqlinline{INT} hat. Dies liegt darin, dass die Zuordnung der Benutzer zu Gruppe über eine kommaseparierte Liste erfolgt:
+In Abbildung~\ref{fig:beUsersAndBeGroups} fällt der Datentyp der Spalte \texttt{usergroup} auf, der die ID der Gruppe des Benutzers speichert. Er wurde als Typ \mysqlinline{VARCHAR} definiert, obwohl die Spalte \texttt{uid} den Typ \mysqlinline{INT} hat. Dies liegt darin, dass die Zuordnung der Benutzer zu Gruppe über eine kommaseparierte Liste erfolgt:
 
+\begin{table}[H]
 \begin{Verbatim}[samepage=true]
-+----+-----+------------+----------+----------+-------+-----------+---------+--------+---------+
-| id | pid |   tstamp   | username | password | admin | usergroup | disable | hidden | deleted |
-+----+-----+------------+----------+----------+-------+-----------+---------+--------+---------+
-|  1 |  0  | 1191353353 | admin    |  secret  |   1   |           |    0    |   0    |    0    |
-|  2 |  0  | 1281556682 | snape    |  secret  |   1   |    43     |    0    |   0    |    0    |
-|  3 |  0  | 1191353353 | hagrid   |  secret  |   0   |  5,32,43  |    0    |   1    |    0    |
-+----+-----+------------+----------+----------+-------+-----------+---------+--------+---------+
++----+-----+------------+----------+----------+-------+-----------+---------+
+| id | pid |   tstamp   | username | password | admin | usergroup | deleted |
++----+-----+------------+----------+----------+-------+-----------+---------+
+|  1 |  0  | 1191353353 | admin    |  secret  |   1   |           |    0    |
+|  2 |  0  | 1281556682 | snape    |  secret  |   1   |    43     |    0    |
+|  3 |  0  | 1191353353 | hagrid   |  secret  |   0   |  5,32,43  |    0    |
++----+-----+------------+----------+----------+-------+-----------+---------+
 \end{Verbatim}
+\caption{Auszug aus der be\_users Tabelle}
+\label{tab:tableBeUser}
+\end{table}
 
-Diese stellt lediglich ein Beispiel dar. Kommaseparierte Listen gibt es an vielen Stellen in der Datenbank. Die API von TYPO3 CMS stellt Methoden bereit, die die Liste für die weitere Verabreitung aufbereiten.
+Kommaseparierte Listen gibt es an vielen Stellen in der Datenbank. Die API von TYPO3 CMS stellt Methoden bereit, die die Liste für die weitere Verarbeitung aufbereiten.
 
-Dieses Konstrukt existiert wahrscheinlich seit Beginn des Systems und es ist zu vermuten, dass damit eine Many-to-Many-Tabelle vermieden werden sollte, was die Komplexität der SQL-Anfrage erhöht.
+Dieses Konstrukt existiert wahrscheinlich seit Beginn des Systems und es ist zu vermuten, dass damit eine Many-to-Many-Tabelle vermieden werden sollte, was die Komplexität der SQL-Abfrage erhöht.
 
-Um die kommaseparierten Listen aufzulösen, müßte eine weitere Tabelle eingeführt werden, dessen zwei Spalten jeweils auf die \texttt{id} der beiden zu verknüfenden Tabellen referenzieren.
+Um die kommaseparierten Listen aufzulösen, müsste eine weitere Tabelle eingeführt werden, deren zwei Spalten jeweils auf die \texttt{id} der beiden zu verknüpfenden Tabellen referenzieren.
 
 \begin{figure}[H]
 	\centering
@@ -221,6 +245,7 @@ Um die kommaseparierten Listen aufzulösen, müßte eine weitere Tabelle eingef�
 	\label{fig:beUsersHasBeGroups}
 \end{figure}
 
+\begin{table}[H]
 \begin{Verbatim}[samepage=true]
 +--------------+---------------+
 | be_users_uid | be_groups_uid |
@@ -231,5 +256,8 @@ Um die kommaseparierten Listen aufzulösen, müßte eine weitere Tabelle eingef�
 |      3       |      43       |
 +--------------+---------------+
 \end{Verbatim}
+\caption{Die MM-Tabelle für be\_users}
+\label{tab:mmTableBeUser}
+\end{table}
 
 TYPO3 CMS nutzt weder Datenbankseitige \textit{Constraints} noch Fremdschlüssel Definitionen. Alle Referenzierungen werden von TYPO3 CMS selbst verwaltet.
